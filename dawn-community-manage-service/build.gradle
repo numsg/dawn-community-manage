@@ -1,0 +1,21 @@
+group 'com.gsafety.dawn.community'
+version '1.0.0-SNAPSHOT'
+archivesBaseName = 'dawn-community-manage-service'
+
+apply plugin: "net.ltgt.apt"
+
+repositories {
+    mavenCentral()
+}
+dependencies{
+    // 依赖模块   
+    compile project(":dawn-community-manage-common")
+    compile project(":dawn-community-manage-contract")
+
+    compile 'org.mapstruct:mapstruct:1.1.0.Final'
+    // OR use this with Java 8 and beyond
+    compile 'org.mapstruct:mapstruct-jdk8:1.1.0.Final'
+
+    apt 'org.mapstruct:mapstruct-processor:1.1.0.Final'
+
+}

@@ -1,0 +1,48 @@
+# -----------------application:configs--------------------------
+# 1.spring configs (db...)
+# 2.app configs
+# 3.log configs
+# 4.common configs
+# ---------------------------------------------------------------
+
+server:
+  port: 8666      #以内嵌容器形式运行时，服务绑定的端口;当服务以war包形式部署在tomcat等容器中时，会忽略server.port配置节点
+
+spring:
+  datasource:
+    url: jdbc:postgresql://116.62.205.14:30015/dawn-db  #业务数据库访问url
+    username: postgres      #业务数据库访问用户名
+    password: postgres #业务数据库访问用户密码
+    driver-class-name: org.postgresql.Driver #数据库访问驱动名称
+    tomcat:   #默认使用tomcat连接池配置
+      max-idle:  10 #数据库连接池允许的最大空闲连接数
+      min-idle: 5 #数据库连接池允许最小的空闲连接数
+      initial-size: 5 #数据库连接池初始连接数
+      max-active:  100 #数据库连接池最大激活连接数
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss  #日期序列化格式
+  jpa:
+    show-sql: true                    #是否显示JPA查询的SQL。为true，日志中则会记录JPA查询数据库使用的SQL语句
+    database:   POSTGRESQL #ORACLE #              #spring JPA 使用的数据库类型
+    properties:
+      enabled: true
+    hibernate:
+      ddl-auto: none
+
+
+# log配置
+logging:
+  config: classpath:logback.xml
+
+# 种子工程扩展配置
+xseed:
+  url1: http://localhost:8666/test1
+  url2: http://localhost:8666/test2
+
+# app相关配置
+app:
+ language: en_US
+
+
+

@@ -1,0 +1,7 @@
+rootProject.name = 'dawn-community-manage'
+include 'dawn-community-manage-common'
+include 'dawn-community-manage-backend'
+include 'dawn-community-manage-contract'
+include 'dawn-community-manage-service'
+include 'dawn-community-manage-webapi'
+

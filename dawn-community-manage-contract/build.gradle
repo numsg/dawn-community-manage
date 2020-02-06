@@ -1,0 +1,8 @@
+group 'com.gsafety.dawn.community'
+version '1.0.0-SNAPSHOT'
+
+archivesBaseName = 'dawn-community-manage-contract'
+
+repositories {
+    mavenCentral()
+}

@@ -1,0 +1,47 @@
+/*spring boot 插件注释的原因是，开启后idea无法刷新下载其他最新的第三方snapshot包。建议部署时编译可开启
+同时注释了其他子模块内的：
+bootRepackage{
+    enabled = false
+}*/
+
+def springBootVersion = "1.5.1.RELEASE"
+
+configurations {
+    // 所有需要忽略的包定义在此
+    all*.exclude group: 'commons-httpclient'
+    all*.exclude group: 'commons-logging'
+    all*.exclude group: 'commons-beanutils', module: 'commons-beanutils'
+    //每次build时检查更新
+    all { resolutionStrategy.cacheChangingModulesFor(0, "seconds") }
+}
+
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
+    compile("org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion")
+
+//    compile("org.springframework.boot:spring-boot-starter-aop:$springBootVersion")
+//    compile("org.springframework.boot:spring-boot-starter-actuator:$springBootVersion")
+
+    compile("io.springfox:springfox-swagger2:2.5.0")
+    compile("io.springfox:springfox-swagger-ui:2.5.0")
+    compile("org.postgresql:postgresql:9.4.1208")
+    compile("com.numsg:numsg-odata-service:0.0.1")
+
+    // 通用依赖
+    compile(
+            "org.apache.httpcomponents:httpclient:4.5.2",
+            "org.apache.commons:commons-lang3:3.4",
+            "commons-io:commons-io:2.5",
+            "commons-net:commons-net:3.5"
+    )
+    // 测试依赖
+    testCompile(
+//            "org.springframework.boot:spring-boot-starter-test:$springBootVersion",
+//            "org.springframework:spring-test:$springBootVersion",
+            "org.testng:testng:6.9.10",
+            'org.mockito:mockito-all:2.0.2-beta',
+            'org.powermock:powermock-module-testng:1.6.5',
+            'org.powermock:powermock-api-mockito:1.6.5'
+    )
+}

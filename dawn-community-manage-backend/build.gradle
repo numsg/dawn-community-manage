@@ -1,0 +1,26 @@
+group 'com.gsafety.dawn.community'
+version '1.0.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'war'
+
+//apply plugin: 'org.springframework.boot'
+
+//buildscript {
+//    repositories {
+//        mavenCentral()
+//    }
+//    dependencies {
+//        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.1.RELEASE")
+//    }
+//}
+
+dependencies{
+    // 依赖模块
+    compile project(":dawn-community-manage-common")
+    compile project(":dawn-community-manage-webapi")
+}
+
+repositories {
+    mavenCentral()
+}

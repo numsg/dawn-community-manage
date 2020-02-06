@@ -28,7 +28,7 @@ spring:
     properties:
       enabled: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
 
 
 # log配置

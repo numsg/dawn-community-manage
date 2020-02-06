@@ -116,4 +116,17 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addRedirectViewController("/", "/swagger-ui.html");
     }
+
+    /**
+     * 跨域配置
+     * @param registry 跨域注册类
+     */
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowCredentials(true)
+                .allowedHeaders("*")
+                .allowedMethods("*")
+                .allowedOrigins("*");
+    }
 }

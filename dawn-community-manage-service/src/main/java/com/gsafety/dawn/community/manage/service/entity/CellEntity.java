@@ -19,9 +19,6 @@ public class CellEntity {
     @Column(name = "edit_time", nullable = false)
     private Date editTime;
 
-    @Column(name = "is_template" , nullable = false)
-    private boolean isTemplate;
-
     @Column(name = "extra_info")
     private String extraInfo;
 
@@ -135,11 +132,4 @@ public class CellEntity {
         this.widgetCount = widgetCount;
     }
 
-    public boolean isTemplate() {
-        return isTemplate;
-    }
-
-    public void setTemplate(boolean template) {
-        isTemplate = template;
-    }
 }

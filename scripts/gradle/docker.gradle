@@ -45,22 +45,22 @@ task copyDockerFile(type: Copy) {
 }
 
 // 如果没有指定imageVersion,并且是release分支，则镜像的版本号从tag中取最新的
-task getLatestTagWhenRelease() {
-    group = 'Docker'
-    def cmdBranch = 'git name-rev --name-only HEAD'
-    String currentBranch = cmdBranch.execute().text.trim().toString()
-    if( !hasImageVersion &&  currentBranch == "release") {
-        def prevCmd = "git rev-list --tags --max-count=1"
-        String id = prevCmd.execute().text.trim().toString()
-        def tagCmd = "git describe --tags $id"
-        String tag = tagCmd.execute().text.trim().toString()
-        imageVersion = tag ? tag: imageVersion
-    }
-}
+//task getLatestTagWhenRelease() {
+//    group = 'Docker'
+//    def cmdBranch = 'git name-rev --name-only HEAD'
+//    String currentBranch = cmdBranch.execute().text.trim().toString()
+//    if( !hasImageVersion &&  currentBranch == "release") {
+//        def prevCmd = "git rev-list --tags --max-count=1"
+//        String id = prevCmd.execute().text.trim().toString()
+//        def tagCmd = "git describe --tags $id"
+//        String tag = tagCmd.execute().text.trim().toString()
+//        imageVersion = tag ? tag: imageVersion
+//    }
+//}
 
 // 构建镜像
 task buildImage(type: DockerBuildImage) {
-    dependsOn getLatestTagWhenRelease
+    //dependsOn getLatestTagWhenRelease
     dependsOn copyDockerFile, copyJarToDockerFD
     group = 'Docker'
     inputDir = project.file('build/docker/')

@@ -44,14 +44,9 @@ public class CellServiceImpl implements CellService {
     @Override
     public CellModel updateOneCell(CellModel cellModel) {
         CellModel result = null;
-        // 需要手动转Boolean类型的isTemplate为int类型。
-        Integer isTemplate=0;
-        if(cellModel.getIsTemplate()){
-            isTemplate=1;
-        }
 
         Integer ok = cellRepository.updateOneCell(cellModel.getId(), cellModel.getData(), cellModel.getLayout(), cellModel.getName(), cellModel.getRules(), cellModel.getExtraInfo(), cellModel.getWidgetCount(),
-                cellModel.getWidgets(), cellModel.getEditTime(), cellModel.getConditions(), cellModel.getKey(),isTemplate);
+                cellModel.getWidgets(), cellModel.getEditTime(), cellModel.getConditions(), cellModel.getKey());
         if (ok > 0) {
             result = cellMapper.cellEntityToModel(cellRepository.getOne(cellModel.getId()));
         }

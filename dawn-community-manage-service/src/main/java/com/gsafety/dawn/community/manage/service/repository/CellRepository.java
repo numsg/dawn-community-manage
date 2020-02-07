@@ -39,12 +39,11 @@ public interface CellRepository extends JpaRepository<CellEntity,String> {
      * @param editTime    the edit time
      * @param conditions  the conditions
      * @param key         the key
-     * @param isTemplate  the is template
      * @return the integer
      */
     @Modifying
-    @Query(nativeQuery=true,value = "UPDATE b_cell SET data = ?2,layout = ?3,name = ?4,rules = ?5,extra_info = ?6,widget_count = ?7,widgets = ?8,edit_time = ?9,conditions = ?10,key = ?11,is_template=?12 WHERE id = ?1 ;")
-    Integer  updateOneCell(String id, String data, String layout, String name, String rules, String extraInfo, Integer widgetCount, String widgets, Date editTime, String conditions, String key, Integer isTemplate);
+    @Query(nativeQuery=true,value = "UPDATE b_cell SET data = ?2,layout = ?3,name = ?4,rules = ?5,extra_info = ?6,widget_count = ?7,widgets = ?8,edit_time = ?9,conditions = ?10,key = ?11 WHERE id = ?1 ;")
+    Integer  updateOneCell(String id, String data, String layout, String name, String rules, String extraInfo, Integer widgetCount, String widgets, Date editTime, String conditions, String key);
 
     /**
      * Query by name integer.

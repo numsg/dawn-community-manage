@@ -39,13 +39,6 @@ public class CellController {
     public ResponseEntity<CellModel> addOneCell(@RequestBody @ApiParam(value = "元件", required = true) CellModel cellModel) {
         cellModel.setId(UUID.randomUUID().toString());
         cellModel.setEditTime(new Date());
-//        if (cellModel.getIsTemplate() == null) {
-//            cellModel.setIsTemplate(false);
-//        }
-        // 保存模板
-//        if (cellModel.getIsTemplate()) {
-//            cellTemplateService.saveCellTemplateByCellConvert(cellModel);
-//        }
         CellModel result = cellService.addOneCell(cellModel);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -65,9 +58,6 @@ public class CellController {
 
         List<CellModel> result = new ArrayList<>();
         cellModels.forEach(cellModel -> {
-            if (cellModel.getIsTemplate() == null) {
-                cellModel.setIsTemplate(false);
-            }
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Calendar calendar = Calendar.getInstance();
             String dateNow = df.format(calendar.getTime());
@@ -90,13 +80,6 @@ public class CellController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = CellModel.class), @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class), @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
     public ResponseEntity<CellModel> updateOneCell(@RequestBody @ApiParam(value = "元件", required = true) CellModel cellModel) {
-        // 保存模板
-//        if (cellModel.getIsTemplate()) {
-//            cellTemplateService.saveCellTemplateByCellConvert(cellModel);
-//        }
-        if (cellModel.getIsTemplate() == null) {
-            cellModel.setIsTemplate(false);
-        }
         CellModel result = cellService.updateOneCell(cellModel);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

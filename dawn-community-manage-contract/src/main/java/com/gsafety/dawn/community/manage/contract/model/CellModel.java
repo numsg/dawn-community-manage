@@ -19,7 +19,6 @@ public class CellModel {
     private String widgets;
     private int widgetCount;
     private String extraInfo;
-    private Boolean isTemplate;
 
     /**
      * Instantiates a new Cell model.
@@ -28,8 +27,7 @@ public class CellModel {
         //空构造器
     }
 
-
-    public CellModel(String id, String key, String name, Date editTime, String layout, String data, String rules, String conditions, String widgets, int widgetCount, String extraInfo, Boolean isTemplate) {
+    public CellModel(String id, String key, String name, Date editTime, String layout, String data, String rules, String conditions, String widgets, int widgetCount, String extraInfo) {
         this.id = id;
         this.key = key;
         this.name = name;
@@ -41,7 +39,6 @@ public class CellModel {
         this.widgets = widgets;
         this.widgetCount = widgetCount;
         this.extraInfo = extraInfo;
-        this.isTemplate = isTemplate;
     }
 
     public String getId() {
@@ -132,11 +129,4 @@ public class CellModel {
         this.extraInfo = extraInfo;
     }
 
-    public Boolean getIsTemplate() {
-        return isTemplate;
-    }
-
-    public void setIsTemplate(Boolean template) {
-        isTemplate = template;
-    }
 }

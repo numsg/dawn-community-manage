@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- Don't forget to set "spring.application.name" in application.yml -->
+    <springProperty scope="context" name="springAppName" source="spring.application.name"/>
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-logs}/${springAppName}}"/>
+
+    <logger name="org.springframework.web" level="INFO"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoder 默认配置为PatternLayoutEncoder -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--每天生成一个日志文件，保存30天的日志文件。-->
+    <!-- ch.qos.logback.core.rolling.RollingFileAppender 文件日志输出 -->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--<file>E:\\event.log</file>-->
+        <file>${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}.json</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.json.%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <!-- Log all StructuredArgument instances -->
+                <arguments/>
+                <!-- Log all MDC fields except the ones from Sleuth - we add them below
+                     under cleaned up names -->
+                <!--<mdc>-->
+                    <!--<excludeMdcKeyName>X-B3-TraceId</excludeMdcKeyName>-->
+                    <!--<excludeMdcKeyName>X-B3-SpanId</excludeMdcKeyName>-->
+                    <!--<excludeMdcKeyName>X-B3-ParentSpanId</excludeMdcKeyName>-->
+                    <!--<excludeMdcKeyName>X-Span-Export</excludeMdcKeyName>-->
+                <!--</mdc>-->
+                <!-- Include Exception stack traces -->
+                <stackTrace/>
+                <timestamp>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+                <!-- Assign logger fields to JSON object -->
+                <pattern>
+                    <pattern>
+                        {
+                        "severity": "%level",
+                        "service": "${springAppName:-}",
+                        "thread": "%thread",
+                        "logger": "%logger",
+                        "message": "%message"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+    </appender>
+
+
+    <root >
+        <level value="info"/>
+       <!-- <level value="debug"/>
+        <level value="error"/>-->
+
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="file"/>
+        <appender-ref ref="JSON_FILE"/>
+    </root>
+
+</configuration>

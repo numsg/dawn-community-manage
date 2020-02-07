@@ -1,0 +1,37 @@
+
+// 全局配置信息，依实际项目进行修改
+apply from: "./scripts/gradle/config.gradle"
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+
+apply from: "./scripts/gradle/sonarqube.gradle"
+apply from: "./scripts/gradle/install-hooks.gradle"
+apply from: "./scripts/gradle/publish.gradle"
+
+buildscript {
+    ext {
+        springBootVersion = '2.0.2.RELEASE'
+    }
+    repositories {
+        maven {
+            url 'http://172.22.24.51:8081/nexus/content/groups/public/'
+        }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath ("net.ltgt.gradle:gradle-apt-plugin:0.9")
+    }
+}
+
+apply from: "./scripts/gradle/docker.gradle"
+
+// 所有子项目的通用配置
+subprojects {
+    apply from: "../scripts/gradle/subprojectset.gradle"
+    apply from: "../scripts/gradle/dependencies.gradle"
+    //安装钩子
+    //build.dependsOn installGitHooks;
+}

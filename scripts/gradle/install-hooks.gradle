@@ -1,0 +1,8 @@
+task installGitHooks(type: Copy) {
+
+    from new File(rootProject.rootDir, './scripts/git/pre-commit')
+    into { new File(project.projectDir, './.git/hooks') }
+
+    from new File(rootProject.rootDir, './scripts/git/commit-msg')
+    into { new File(project.projectDir, './.git/hooks') }
+}

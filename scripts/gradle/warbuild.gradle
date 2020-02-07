@@ -1,0 +1,25 @@
+apply plugin: 'java'
+apply plugin: 'war'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+//java编译的时候缺省状态下会因为中文字符而失败，例如：有中文注释时生成javadoc
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+war {
+    manifest {
+        attributes(
+                "Manifest-Version": "1.0",
+                "Implementation-Title": project.name,
+                "Implementation-Version": project.version,
+                "Implementation-Vendor": "Gsafety",
+                "Built-By": System.getProperty("user.name"),
+                // "Build-Jdk": System.getProperty("java.version"),
+                "Build-Time": new Date().format("yyyy-MM-dd HH:mm:ss"),
+                "Tool": org.gradle.util.GradleVersion.current().toString(),
+                "Created-By": org.gradle.internal.jvm.Jvm.current(),
+                // "Class-Path": configurations.compile.collect { it.getName() }.join(' ')
+        )
+    }
+}

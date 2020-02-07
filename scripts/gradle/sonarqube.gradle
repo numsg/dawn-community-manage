@@ -1,0 +1,39 @@
+apply plugin: "java"
+apply plugin: "maven"
+
+buildscript {
+    repositories {
+        maven {
+            url 'http://172.22.24.51:8081/nexus/content/groups/public/'
+        }
+    }
+    dependencies {
+        classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2'
+    }
+}
+
+apply plugin: org.sonarqube.gradle.SonarQubePlugin
+
+
+// sonar.analysis.mode的值有:
+//     publish 将报告发布到服务器
+//     preview 报告在本地生成
+//     issues  ？
+sonarqube {
+    properties {
+        property 'sonar.host.url', 'http://172.22.3.61:10083'
+        property 'sonar.login', 'gaoqiang'
+        property 'sonar.password', '123456'
+        property 'sonar.sourceEncoding', 'UTF-8'
+        property 'sonar.scm.provider', 'git'
+        property 'sonar.analysis.mode', 'publish'
+        property 'sonar.issuesReport.console.enable', 'true'
+        property 'sonar.issuesReport.html.enable', 'true'
+        property 'sonar.exclusions', 'src/main/java/com/gsafety/pms/base/support/contract/model/**,' +
+                'src/main/java/com/gsafety/pms/base/support/service/entity/**'
+        property 'sonar.coverage.exclusions', 'src/main/java/com/gsafety/pms/base/support/backend/configs/**,' +
+                'src/main/java/com/gsafety/pms/base/support/backend/aspectj/**,' +
+                'src/main/java/com/gsafety/pms/base/support/common/exception/**,' +
+                'src/main/java/com/gsafety/pms/base/support/common/util/**'
+    }
+}

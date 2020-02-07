@@ -1,0 +1,14 @@
+
+group 'com.gsafety.dawn.community'
+archivesBaseName = 'dawn-community-manage-common'
+
+apply from: "../scripts/gradle/publish.gradle"
+
+dependencies{
+    // 依赖模块
+}
+/*
+bootRepackage{
+    enabled = false
+}
+*/

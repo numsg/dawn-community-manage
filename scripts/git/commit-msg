@@ -1,0 +1,32 @@
+#!/bin/bash
+
+IGNORED='^Merge|^WIP\:'
+PATTERN='^(\w*)?\: (.+)$'
+COMMIT_MSG_FILE=$1
+COMMIT_MSG_HEADER=$(head -1 $1)
+TYPES=('feat' 'themes' 'i18n' 'fix' 'docs' 'style' 'refactor' 'perf' 'test' 'build' 'ci' 'chore' 'revert')
+
+ERROR_MSG="does not match '<type>: <subject>' !"
+
+if grep -qE "$IGNORED"<<<"$COMMIT_MSG_HEADER"; then
+    echo "Commit message validation ignored."
+    exit 0
+  #else
+  #  echo "not ignored, continue..." 
+fi
+
+if ! grep -qE "$PATTERN"<<<"$COMMIT_MSG_HEADER"; then
+  echo -e "$ERROR_MSG \n you commit message header: \n $COMMIT_MSG_HEADER" >&2
+  exit 1
+fi
+
+TYPE="$(grep -oE "$PATTERN"<<<"$COMMIT_MSG_HEADER" | cut -d: -f1)"
+
+if ! echo "${TYPES[*]}" | grep -wq "$TYPE"; then
+    echo -e "'$TYPE' is not allowed type ! \n ALLOWED TYPES:\n ${TYPES[*]}" >&2
+    exit 1
+  #else
+  #  echo "found"
+fi
+
+exit 0

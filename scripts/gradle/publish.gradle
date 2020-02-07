@@ -1,0 +1,31 @@
+apply plugin: 'maven-publish'
+
+//打包源代码
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+    }
+    repositories {
+        maven {
+            if (project.version.endsWith("SNAPSHOT")) {
+                url "http://172.22.24.51:8081/nexus/content/repositories/snapshots/"
+            } else {
+                url "http://172.22.24.51:8081/nexus/content/repositories/Releases/"
+            }
+            credentials {
+                username 'deployment'
+                password '123456'
+            }
+        }
+    }
+}

@@ -1,0 +1,89 @@
+buildscript {
+    repositories {
+        maven {
+            url 'http://172.22.24.51:8081/nexus/content/groups/public/'
+        }
+    }
+    dependencies {
+        classpath("com.bmuschko:gradle-docker-plugin:3.4.0")
+    }
+}
+
+apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
+
+
+def $dkConfig = ext.dockerConfig
+// docker远端配置信息
+docker {
+    // docker远端构建进程配置地址
+    url = $dkConfig.url
+    // docker发布仓库地址及认证信息
+    registryCredentials {
+        url = $dkConfig.registryCredentials.url
+        username = $dkConfig.registryCredentials.username
+        password = $dkConfig.registryCredentials.password
+        email = $dkConfig.registryCredentials.email
+    }
+}
+
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
+import com.bmuschko.gradle.docker.tasks.image.DockerRemoveImage
+//import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+
+// 拷贝jar包到docker发布目录
+task copyJarToDockerFD(type: Copy) {
+    dependsOn ":$jarProjectName:build"
+    from "$jarProjectName/build/libs/$jarArchivesBaseName" + "-" + project.version + "." + $dkConfig.publishType
+    into "build/docker/"
+}
+
+// 拷贝dockerfile到docker发布目录
+task copyDockerFile(type: Copy) {
+    from './Dockerfile'
+    into 'build/docker/'
+}
+
+// 如果没有指定imageVersion,并且是release分支，则镜像的版本号从tag中取最新的
+task getLatestTagWhenRelease() {
+    group = 'Docker'
+    def cmdBranch = 'git name-rev --name-only HEAD'
+    String currentBranch = cmdBranch.execute().text.trim().toString()
+    if( !hasImageVersion &&  currentBranch == "release") {
+        def prevCmd = "git rev-list --tags --max-count=1"
+        String id = prevCmd.execute().text.trim().toString()
+        def tagCmd = "git describe --tags $id"
+        String tag = tagCmd.execute().text.trim().toString()
+        imageVersion = tag ? tag: imageVersion
+    }
+}
+
+// 构建镜像
+task buildImage(type: DockerBuildImage) {
+    dependsOn getLatestTagWhenRelease
+    dependsOn copyDockerFile, copyJarToDockerFD
+    group = 'Docker'
+    inputDir = project.file('build/docker/')
+    tag = $dkConfig.imageDomain + "/$jarProjectName:" + "$imageVersion"
+}
+
+// 发布镜像
+task pushImageToRegister(type: DockerPushImage) {
+    group = 'Docker'
+    dependsOn buildImage
+    conventionMapping.imageName = { buildImage.getTag() }
+}
+
+// 移除build生成的镜像
+task removeBuildImage(type: DockerRemoveImage) {
+    group = 'Docker'
+    force = true
+    targetImageId { buildImage.getImageId() }
+}
+
+// 发布镜像
+task pushImage() {
+    dependsOn pushImageToRegister
+    dependsOn removeBuildImage
+    removeBuildImage.mustRunAfter pushImageToRegister
+}

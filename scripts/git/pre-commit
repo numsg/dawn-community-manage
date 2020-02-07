@@ -1,0 +1,8 @@
+#!bin/sh
+
+git stash -q --keep-index
+gradle clean sonarqube
+result=$?
+git stash pop -q
+
+exit $result

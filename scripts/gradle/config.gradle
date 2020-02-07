@@ -1,0 +1,40 @@
+// group名称   --依据实际项目修改
+group 'com.gsafety.dawn.community'
+// 版本号    --依据实际项目修改
+version '1.0.0-SNAPSHOT'
+
+ext {
+    // jar包所在模块名称  --依据实际项目修改
+    jarProjectName = 'dawn-community-manage-backend'
+    // jar包发布的实际名称  --依据实际项目修改
+    jarArchivesBaseName = 'dawn-community-manage-backend'
+    // jar包版本
+    jarVersion = version
+    // maven仓库地址
+    mavenUrl = 'http://172.22.24.51:8081/nexus/content/groups/public/'
+
+    // 是否指定了imageVersion
+    hasImageVersion = project.hasProperty('imageVersion')
+
+    // docker镜像版本号
+    imageVersion = project.hasProperty('imageVersion')? imageVersion : version
+
+    dockerConfig = [
+            // docker远端构建进程配置地址
+            url: 'http://172.22.3.101:2375/',
+            // docker发布仓库地址及认证信息
+            registryCredentials: [
+                    // 发布的镜像仓库地址
+                    url     : 'http://172.22.3.4',
+                   // username: 'Pms',
+                   // password: 'Pms123456',
+                     username : 'robot$pms',
+                     password : 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODE2Njk4OTgsImlhdCI6MTU3OTA3Nzg5OCwiaXNzIjoiaGFyYm9yLXRva2VuLWlzc3VlciIsImlkIjo0LCJwaWQiOjMsImFjY2VzcyI6W3siUmVzb3VyY2UiOiIvcHJvamVjdC8zL3JlcG9zaXRvcnkiLCJBY3Rpb24iOiJwdWxsIiwiRWZmZWN0IjoiIn0seyJSZXNvdXJjZSI6Ii9wcm9qZWN0L3Btcy9yZXBvc2l0b3J5IiwiQWN0aW9uIjoicHVsbCIsIkVmZmVjdCI6IiJ9LHsiUmVzb3VyY2UiOiIvcHJvamVjdC8zL3JlcG9zaXRvcnkiLCJBY3Rpb24iOiJwdXNoIiwiRWZmZWN0IjoiIn0seyJSZXNvdXJjZSI6Ii9wcm9qZWN0L3Btcy9yZXBvc2l0b3J5IiwiQWN0aW9uIjoicHVzaCIsIkVmZmVjdCI6IiJ9XX0.TQA1pZpws7a1LwCKyRBh5SJT-5h6dPnS_6q1ik8MTXLqx02OugBZLLhpr23B2xPYg7YRejHgvoCjIA8FjtKBQJP3QPMXpvv9HvIpca8kp8mt3DQ_rLoJ5SNrAilX9t-SEcXcOQ5twF-S8_HMJA4ZJ2bVRjcNAAYb-aFRKpKgvdhXxqkYrCK_o4Xa8dI_KfcXrwBbdIpD1QgiTYIMFTvfF7QSRkoVZZjKFdwdyPqp1Cdi3eZgen4135vCOsFilu3RdUg14-vraEefN0OpLSBurGPAFu9ki-l8c9dJZbiCfrXubhvB0L1EkTvKA195MGKV0Cwt-CybN6gLsY2FvZ8loWFVExo7J0X0cTWYAUX64n6gc0nJuuYnM2in-U_dEx6ro2nnU_jwyS819yU_vkDe4k72MMGlkHA4aUe8X62MvrSXSPLwwl-KEWgVciH87ID4SLOg0N_-R-o3PbYFR_-gzwP7g6ytFcQqnC4i6UtmA6kyxxw_7d894E28ciHPoKAeZu91Pi50xFiSx9b7-nK65Yg6_vTcyyWVakWtwTzaEdyxabC7TwXWJvP3EGelB5FUveXAm6W9x6mowY4iOuGzI2JQ0cloIX8XmW-NrrQCaCHHjlmNMOsDyN4HGg89G10EZFJeTUvW8ya_T5kwVJvqn9dUi2kGqBKsb9Ev6uszJxg',
+                    email   : 'admin@example.com'
+            ],
+            // image镜像对应的前缀域名  --依据实际项目修改
+            imageDomain        : '172.22.3.4/pms',
+            // 发布类型 jar or war，暂时只支持jar  --依据实际项目修改
+            publishType        : 'jar'
+    ]
+}

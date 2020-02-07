@@ -1,0 +1,42 @@
+server:
+  port: 8666      #以内嵌容器形式运行时，服务绑定的端口;当服务以war包形式部署在tomcat等容器中时，会忽略server.port配置节点
+
+spring:
+  application:
+    name: dawn-community-manage
+
+  datasource:
+    url: jdbc:postgresql://116.62.205.14:30015/dawn-db #业务数据库访问url
+    username: postgres    #业务数据库访问用户名
+    password: postgres  #业务数据库访问用户密码
+    driver-class-name: org.postgresql.Driver #数据库访问驱动名称
+    tomcat:   #默认使用tomcat连接池配置
+      max-idle:  10 #数据库连接池允许的最大空闲连接数
+      min-idle: 5 #数据库连接池允许最小的空闲连接数
+      initial-size: 5 #数据库连接池初始连接数
+      max-active:  100 #数据库连接池最大激活连接数
+
+  jpa:
+    show-sql: true                    #是否显示JPA查询的SQL。为true，日志中则会记录JPA查询数据库使用的SQL语句
+    database:   POSTGRESQL #ORACLE #              #spring JPA 使用的数据库类型
+    properties:
+      enabled: true
+    hibernate:
+      ddl-auto: update
+      naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties.hibernate.temp.use_jdbc_metadata_defaults: false   # 禁用Postgresql的特性检查（如CLOB），因为postgresql的驱动暂没有实现此特性
+    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+
+
+# log配置
+logging:
+  config: classpath:logback-spring.xml
+
+# app相关配置
+app:
+  language: en_US
+
+
+
+
+

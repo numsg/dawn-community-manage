@@ -1,0 +1,15 @@
+group 'com.gsafety.dawn.community'
+archivesBaseName = 'dawn-community-manage-contract'
+
+apply from: "../scripts/gradle/publish.gradle"
+
+dependencies{
+    // 依赖模块
+    compile project(":dawn-community-manage-common")
+    //规则引擎
+    compile('com.gsafety.pms.drools:pms-drools-support-contract:1.0.3-SNAPSHOT')
+//    compile  'com.gsafety.pms.base:dawn-community-manage-common:1.0.0-SNAPSHOT'
+}
+/*bootRepackage{
+    enabled = false
+}*/

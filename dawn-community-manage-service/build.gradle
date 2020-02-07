@@ -1,0 +1,51 @@
+group 'com.gsafety.dawn.community'
+
+apply plugin: "net.ltgt.apt"
+
+archivesBaseName = 'dawn-community-manage-service'
+
+apply from: "../scripts/gradle/publish.gradle"
+
+apply from: "../scripts/gradle/jacoco.gradle"
+
+dependencies{
+    // 依赖模块
+   /* compile project(":dawn-community-manage-contract")
+    compile project(":dawn-community-manage-common")*/
+
+    compile project(":dawn-community-manage-common")
+    compile project(":dawn-community-manage-contract")
+
+//    compile  'com.gsafety.dawn.community:dawn-community-manage-common:1.0.0-SNAPSHOT'
+//    compile  'com.gsafety.dawn.community:dawn-community-manage-contract:1.0.0-SNAPSHOT'
+
+    //mapstrut
+    compile  ('com.gsafety.odata:guppy-odata-service:2.0.4-SNAPSHOT'){changing=true}
+
+    compile 'org.mapstruct:mapstruct-jdk8:1.2.0.Final'
+    apt 'org.mapstruct:mapstruct-processor:1.2.0.Final'
+
+    test {
+        useTestNG()
+    }
+}
+
+/*bootRepackage{
+    enabled = false
+}*/
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs = [
+            '-Amapstruct.suppressGeneratorTimestamp=true'
+    ]
+}
+
+
+
+
+
+
+
+
+
+

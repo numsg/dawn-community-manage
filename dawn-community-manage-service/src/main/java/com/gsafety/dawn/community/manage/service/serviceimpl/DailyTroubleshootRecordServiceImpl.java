@@ -13,6 +13,7 @@ import com.gsafety.dawn.community.manage.service.entity.EpidemicPersonEntity;
 import com.gsafety.dawn.community.manage.service.repository.DSourceDataRepository;
 import com.gsafety.dawn.community.manage.service.repository.DailyTroubleshootRecordRepository;
 import com.gsafety.dawn.community.manage.service.repository.EpidemicPersonRepository;
+import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.slf4j.Logger;
@@ -84,10 +85,10 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     private static final Timestamp TS = DateUtil.convertNowDate();
 
     // 一天开始时间
-    private static final String STARTTIME = DateUtil.getStartTime();
+    private static final Timestamp STARTTIME = DateUtil.getStartTime();
 
     // 一天结束时间
-    private static final String ENDTIME = DateUtil.getEndTime();
+    private static final Timestamp ENDTIME = DateUtil.getEndTime();
 
 
     @Override
@@ -292,7 +293,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 
     // 排查每个小区今日登记的人员
     @Override
-    public Map<String, List<DailyTroubleshootRecordModel>> registerToda(String startTime , String endTime) {
+    public Map<String, List<DailyTroubleshootRecordModel>> registerToda(Timestamp startTime , Timestamp endTime) {
         return recordMapper.entitiesToModels(
                 recordRepository.todayRecord(startTime, endTime))
                 .stream()

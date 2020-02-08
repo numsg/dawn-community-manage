@@ -120,17 +120,17 @@ public class DailyTroubleshootRecordController {
     }
 
 
-    @GetMapping(value = "/daily-troubleshoot-record/{startTime}/{endTime}")
-    @ApiOperation(value = "按时间段查询", notes = "queryRoubleshootRecordToday")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Map.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
-            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
-    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<Map<String , List<DailyTroubleshootRecordModel>>> queryRoubleshootRecordToday(@PathVariable @ApiParam(value = "startTime", required = true)  String startTime , @PathVariable @ApiParam(value = "endTime", required = true) String endTime) {
-        Map<String, List<DailyTroubleshootRecordModel>> result = dailyTroubleshootRecordService.registerToda(startTime , endTime);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
+//    @GetMapping(value = "/daily-troubleshoot-record/{startTime}/{endTime}")
+//    @ApiOperation(value = "按时间段查询", notes = "queryRoubleshootRecordToday")
+//    @ApiResponses(value = {
+//            @ApiResponse(code = 200, message = "OK", response = Map.class),
+//            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+//            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+//    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+//    public ResponseEntity<Map<String , List<DailyTroubleshootRecordModel>>> queryRoubleshootRecordToday(@PathVariable @ApiParam(value = "startTime", required = true)  String startTime , @PathVariable @ApiParam(value = "endTime", required = true) String endTime) {
+//        Map<String, List<DailyTroubleshootRecordModel>> result = dailyTroubleshootRecordService.registerToda(startTime , endTime);
+//        return new ResponseEntity<>(result, HttpStatus.OK);
+//    }
 
 
     @GetMapping(value = "/daily-troubleshoot-record/statistics", produces = MediaType.APPLICATION_JSON_VALUE)

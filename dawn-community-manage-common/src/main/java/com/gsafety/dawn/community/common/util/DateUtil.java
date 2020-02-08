@@ -31,7 +31,7 @@ public class DateUtil {
     }
 
 
-    public static String getStartTime() {
+    public static Timestamp getStartTime() {
         Calendar todayStart = Calendar.getInstance();
         todayStart.set(Calendar.HOUR_OF_DAY, 0);
         todayStart.set(Calendar.MINUTE, 0);
@@ -40,10 +40,10 @@ public class DateUtil {
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String format = df.format(todayStart.getTime());
-        return format;
+        return   Timestamp.valueOf(format);
     }
 
-    public static String getEndTime() {
+    public static Timestamp getEndTime() {
         Calendar todayEnd = Calendar.getInstance();
         todayEnd.set(Calendar.HOUR_OF_DAY, 23);
         todayEnd.set(Calendar.MINUTE, 59);
@@ -52,7 +52,7 @@ public class DateUtil {
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String format = df.format(todayEnd.getTime());
-        return format;
+        return   Timestamp.valueOf(format);
     }
 
 }

@@ -2,8 +2,10 @@ package com.gsafety.dawn.community.manage.contract.service;
 
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
 import com.gsafety.dawn.community.manage.contract.model.DiagnosisCountModel;
+import org.apache.commons.net.ntp.TimeStamp;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +33,7 @@ public interface DailyTroubleshootRecordService {
     List<DailyTroubleshootRecordModel> pagQuery(int skip , int top);
 
     // 排查每个小区今日登记的人员
-    Map<String , List<DailyTroubleshootRecordModel>> registerToda(String startTime , String endTime);
+    Map<String , List<DailyTroubleshootRecordModel>> registerToda(Timestamp startTime , Timestamp endTime);
 
     // 统计
     List<DiagnosisCountModel> DiagnosisCount();

@@ -1,5 +1,6 @@
 package com.gsafety.dawn.community.manage.webapi.controller;
 
+import com.gsafety.dawn.community.manage.contract.model.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.model.EpidemicPersonModel;
 import com.gsafety.dawn.community.manage.contract.service.EpidemicPersonService;
 import com.gsafety.java.common.exception.HttpError;
@@ -11,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -42,7 +45,20 @@ public class EpidemicPersonController {
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
     public ResponseEntity<EpidemicPersonModel> modifyOneEpidemicPerson(@PathVariable @ApiParam(value = "疫情人员id", required = true) String id,
                                                                        @RequestBody @ApiParam(value = "疫情人员信息", required = true) EpidemicPersonModel epidemicPersonModel) {
+        epidemicPersonModel.setUpdateTime(new Date());
         EpidemicPersonModel result = epidemicPersonService.modifyOneEpidemicPerson(id,epidemicPersonModel);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/epidemic-person", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "统计诊断各个状况的数量", notes = "DiagnosisCount()")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = DiagnosisCountModel.class,responseContainer = "List" ),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+    public ResponseEntity<List<DiagnosisCountModel>> DiagnosisCount() {
+        List<DiagnosisCountModel> result = epidemicPersonService.DiagnosisCount();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

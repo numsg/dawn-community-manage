@@ -13,8 +13,13 @@ import java.util.Date;
 @Transactional
 public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEntity, String> {
     @Modifying
-    @Query(nativeQuery = true, value = "UPDATE p_epidemic_person SET name = ?2, gender=?3, address=?4, district=?5, medical_condition=?6," +
-            " special_situation=?7, submit_time=?8, note=?9, disease_time=?10, multi_tenancy=?11, expend_property=?12 WHERE id = ?1 ;")
-    Integer updateEpidemicPerson(String id, String name, String gender, String address, String district, String medicalCondition,
-                           String specialSituation, Date submitTime, String note, Date diseaseTime, String multiTenancy, String expendProperty);
+    @Query(nativeQuery = true, value = "UPDATE b_epidemic_person SET name = ?2, gender=?3, age=?4, village_id=?5,temperature=?6," +
+            "diagnosis_situation=?7, medical_condition=?8,special_situation=?9, submit_time=?10,disease_time=?11," +
+            "update_time=?12, note=?13,  multi_tenancy=?14, expend_property=?15,mobile_number=?16 WHERE id = ?1 ;")
+    Integer updateEpidemicPerson(String id, String name, String gender, Integer age, String villageId, String temperature,
+                                 String diagnosisSituation, String medicalCondition, String specialSituation, Date submitTime,
+                                 Date diseaseTime, Date updateTime, String note, String multiTenancy, String expendProperty,String mobileNumber);
+
+    @Query(nativeQuery = true, value = "select count(*) from b_epidemic_person  WHERE diagnosis_situation = ?1 ;")
+    Integer queryCountByDiagnosisSituation(String diagnosisSituation);
 }

@@ -5,14 +5,18 @@ import java.util.Date;
 public class EpidemicPersonModel {
     private String id;
     private String name;
+    private Integer age;
     private String gender;
-    private String address;
-    private String district;
+    private String mobileNumber;
+    private String villageId;
+    private String temperature;
+    private String diagnosisSituation;
     private String medicalCondition;
     private String specialSituation;
     private Date submitTime;
-    private String note;
     private Date diseaseTime;
+    private Date updateTime;
+    private String note;
     private String multiTenancy;
     private String expendProperty;
 
@@ -20,17 +24,21 @@ public class EpidemicPersonModel {
         //无参构造
     }
 
-    public EpidemicPersonModel(String id, String name, String gender, String address, String district, String medicalCondition, String specialSituation, Date submitTime, String note, Date diseaseTime, String multiTenancy, String expendProperty) {
+    public EpidemicPersonModel(String id, String name, Integer age, String gender, String mobileNumber, String villageId, String temperature, String diagnosisSituation, String medicalCondition, String specialSituation, Date submitTime, Date diseaseTime, Date updateTime, String note, String multiTenancy, String expendProperty) {
         this.id = id;
         this.name = name;
+        this.age = age;
         this.gender = gender;
-        this.address = address;
-        this.district = district;
+        this.mobileNumber = mobileNumber;
+        this.villageId = villageId;
+        this.temperature = temperature;
+        this.diagnosisSituation = diagnosisSituation;
         this.medicalCondition = medicalCondition;
         this.specialSituation = specialSituation;
         this.submitTime = submitTime;
-        this.note = note;
         this.diseaseTime = diseaseTime;
+        this.updateTime = updateTime;
+        this.note = note;
         this.multiTenancy = multiTenancy;
         this.expendProperty = expendProperty;
     }
@@ -43,12 +51,28 @@ public class EpidemicPersonModel {
         this.id = id;
     }
 
+    public String getMobileNumber() {
+        return mobileNumber;
+    }
+
+    public void setMobileNumber(String mobileNumber) {
+        this.mobileNumber = mobileNumber;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 
     public String getGender() {
@@ -59,20 +83,28 @@ public class EpidemicPersonModel {
         this.gender = gender;
     }
 
-    public String getAddress() {
-        return address;
+    public String getVillageId() {
+        return villageId;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setVillageId(String villageId) {
+        this.villageId = villageId;
     }
 
-    public String getDistrict() {
-        return district;
+    public String getTemperature() {
+        return temperature;
     }
 
-    public void setDistrict(String district) {
-        this.district = district;
+    public void setTemperature(String temperature) {
+        this.temperature = temperature;
+    }
+
+    public String getDiagnosisSituation() {
+        return diagnosisSituation;
+    }
+
+    public void setDiagnosisSituation(String diagnosisSituation) {
+        this.diagnosisSituation = diagnosisSituation;
     }
 
     public String getMedicalCondition() {
@@ -99,8 +131,20 @@ public class EpidemicPersonModel {
         this.submitTime = submitTime;
     }
 
+    public Date getDiseaseTime() {
+        return diseaseTime;
+    }
+
     public void setDiseaseTime(Date diseaseTime) {
         this.diseaseTime = diseaseTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     public String getNote() {
@@ -109,10 +153,6 @@ public class EpidemicPersonModel {
 
     public void setNote(String note) {
         this.note = note;
-    }
-
-    public Date getDiseaseTime() {
-        return diseaseTime;
     }
 
     public String getMultiTenancy() {

@@ -1,13 +1,10 @@
 package com.gsafety.dawn.community.manage.service.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "p_epidemic_person")
+@Table(name = "b_epidemic_person")
 public class EpidemicPersonEntity {
     @Id
     @Column(name = "id", length = 64, nullable = false)
@@ -16,19 +13,31 @@ public class EpidemicPersonEntity {
     @Column(name = "name", length = 128, nullable = false)
     private String name;
 
-    @Column(name = "gender", length = 2 )
+    @Column(name = "age", length = 3)
+    private Integer age;
+
+    @Column(name = "gender", length = 64 )
     private String gender;
 
-    @Column(name = "address", length = 128)
-    private String address;
+    @Column(name = "mobile_number", length = 11 )
+    private String mobileNumber;
 
-    @Column(name = "district", length = 128)
-    private String district;
+    @Column(name = "village_id", length = 64)
+    private String villageId;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "village_id", nullable = false,insertable=false,updatable = false)
+//    private DSourceDataEntity dSourceDataEntity;
 
-    @Column(name = "medical_condition", length = 2000)
+    @Column(name = "temperature", length = 6,nullable = false)
+    private String temperature;
+
+    @Column(name = "diagnosis_situation", length = 64)
+    private String diagnosisSituation;
+
+    @Column(name = "medical_condition", length = 64)
     private String medicalCondition;
 
-    @Column(name = "special_situation", length = 2000)
+    @Column(name = "special_situation", length = 64)
     private String specialSituation;
 
     @Column(name = "submit_time",nullable = false)
@@ -40,10 +49,13 @@ public class EpidemicPersonEntity {
     @Column(name = "disease_time")
     private Date diseaseTime;
 
-    @Column(name = "multi_tenancy", length = 2000)
+    @Column(name = "update_time")
+    private Date updateTime;
+
+    @Column(name = "multi_tenancy")
     private String multiTenancy;
 
-    @Column(name = "expend_property", length = 2000)
+    @Column(name = "expend_property")
     private String expendProperty;
 
     public String getId() {
@@ -54,12 +66,28 @@ public class EpidemicPersonEntity {
         this.id = id;
     }
 
+    public String getMobileNumber() {
+        return mobileNumber;
+    }
+
+    public void setMobileNumber(String mobileNumber) {
+        this.mobileNumber = mobileNumber;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 
     public String getGender() {
@@ -70,20 +98,28 @@ public class EpidemicPersonEntity {
         this.gender = gender;
     }
 
-    public String getAddress() {
-        return address;
+    public String getVillageId() {
+        return villageId;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setVillageId(String villageId) {
+        this.villageId = villageId;
     }
 
-    public String getDistrict() {
-        return district;
+    public String getTemperature() {
+        return temperature;
     }
 
-    public void setDistrict(String district) {
-        this.district = district;
+    public void setTemperature(String temperature) {
+        this.temperature = temperature;
+    }
+
+    public String getDiagnosisSituation() {
+        return diagnosisSituation;
+    }
+
+    public void setDiagnosisSituation(String diagnosisSituation) {
+        this.diagnosisSituation = diagnosisSituation;
     }
 
     public String getMedicalCondition() {
@@ -124,6 +160,14 @@ public class EpidemicPersonEntity {
 
     public void setDiseaseTime(Date diseaseTime) {
         this.diseaseTime = diseaseTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     public String getMultiTenancy() {

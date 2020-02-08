@@ -3,6 +3,7 @@ package com.gsafety.dawn.community.manage.webapi.controller;
 import com.gsafety.dawn.community.manage.contract.model.CellTypeModel;
 import com.gsafety.dawn.community.manage.contract.model.CommunityIdsModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
+import com.gsafety.dawn.community.manage.contract.model.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.service.DailyTroubleshootRecordService;
 import com.gsafety.java.common.exception.HttpError;
 import com.gsafety.springboot.common.annotation.LimitIPRequestAnnotation;
@@ -128,6 +129,19 @@ public class DailyTroubleshootRecordController {
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
     public ResponseEntity<Map<String , List<DailyTroubleshootRecordModel>>> queryRoubleshootRecordToday(@PathVariable @ApiParam(value = "startTime", required = true)  String startTime , @PathVariable @ApiParam(value = "endTime", required = true) String endTime) {
         Map<String, List<DailyTroubleshootRecordModel>> result = dailyTroubleshootRecordService.registerToda(startTime , endTime);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/daily-troubleshoot-record/statistics", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "统计日常排查数量", notes = "DiagnosisCount()")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = DiagnosisCountModel.class,responseContainer = "List" ),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+    public ResponseEntity<List<DiagnosisCountModel>> DiagnosisCount() {
+        List<DiagnosisCountModel> result = dailyTroubleshootRecordService.DiagnosisCount();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

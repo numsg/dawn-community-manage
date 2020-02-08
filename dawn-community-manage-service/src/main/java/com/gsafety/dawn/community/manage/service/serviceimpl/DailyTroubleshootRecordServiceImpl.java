@@ -3,10 +3,14 @@ package com.gsafety.dawn.community.manage.service.serviceimpl;
 import com.gsafety.dawn.community.common.util.DateUtil;
 import com.gsafety.dawn.community.common.util.ExcelUtil;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
+import com.gsafety.dawn.community.manage.contract.model.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.service.DailyTroubleshootRecordService;
+import com.gsafety.dawn.community.manage.service.datamappers.DSourceDataMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.DailyTroubleshootRecordMapper;
+import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
 import com.gsafety.dawn.community.manage.service.entity.DailyTroubleshootRecordEntity;
 import com.gsafety.dawn.community.manage.service.entity.EpidemicPersonEntity;
+import com.gsafety.dawn.community.manage.service.repository.DSourceDataRepository;
 import com.gsafety.dawn.community.manage.service.repository.DailyTroubleshootRecordRepository;
 import com.gsafety.dawn.community.manage.service.repository.EpidemicPersonRepository;
 import org.apache.poi.ss.usermodel.Row;
@@ -64,6 +68,15 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     @Autowired
     EpidemicPersonRepository epidemicPersonRepository;
 
+    // 社区id
+    private static final String commId = "a2e01f0e-6c86-4a41-bcf3-c07c1ffa2f82";
+
+    @Autowired
+    private DSourceDataRepository dSourceDataRepository;
+
+    @Autowired
+    private DSourceDataMapper dSourceDataMapper;
+
     // 日志
     private static Logger logger = LoggerFactory.getLogger(DailyTroubleshootRecordServiceImpl.class);
 
@@ -81,14 +94,14 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     public DailyTroubleshootRecordModel addDailyRecord(DailyTroubleshootRecordModel dailyTroubleshootRecordModel) {
 
         // 今日记录
-//        List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.todayRecord(STARTTIME, ENDTIME);
-//        List<DailyTroubleshootRecordEntity> collect = recordEntities.stream()
-//                .filter(a ->
-//                        a.getName().equals(dailyTroubleshootRecordModel.getName()) &&
-//                        a.getPhone().equals(dailyTroubleshootRecordModel.getPhone()))
-//                .collect(Collectors.toList());
-//        if(!collect.isEmpty())
-//            return null;
+        List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.todayRecord(STARTTIME, ENDTIME);
+        List<DailyTroubleshootRecordEntity> collect = recordEntities.stream()
+                .filter(a ->
+                        a.getName().equals(dailyTroubleshootRecordModel.getName()) &&
+                        a.getPhone().equals(dailyTroubleshootRecordModel.getPhone()))
+                .collect(Collectors.toList());
+        if(!collect.isEmpty())
+            return null;
 
         recordRepository.queryAllByNameAndPhone(dailyTroubleshootRecordModel.getName(), dailyTroubleshootRecordModel.getPhone());
         DailyTroubleshootRecordEntity recordEntity = recordMapper.modelToEntity(dailyTroubleshootRecordModel);
@@ -153,13 +166,21 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         for (int rowNum = firstSheetNumber + 1; rowNum < endRow; rowNum++) {
             Row row = sheet.getRow(rowNum);
 
+            String plot = ExcelUtil.convertCellValueToString(row.getCell(6));
+
+            List<DSourceDataEntity> dataList = dSourceDataRepository.findAllByName(plot);
+            if(dataList.isEmpty())
+                continue;
+
+            plot = dataList.get(0).getId();
+
             String name = ExcelUtil.convertCellValueToString(row.getCell(0));
             String idCard = ExcelUtil.convertCellValueToString(row.getCell(1));
             String sex = ExcelUtil.convertCellValueToString(row.getCell(2));
             String age = ExcelUtil.convertCellValueToString(row.getCell(3));
             String phone = ExcelUtil.convertCellValueToString(row.getCell(4));
             String address = ExcelUtil.convertCellValueToString(row.getCell(5));
-            String plot = ExcelUtil.convertCellValueToString(row.getCell(6));
+
             String build = ExcelUtil.convertCellValueToString(row.getCell(7));
             String unit = ExcelUtil.convertCellValueToString(row.getCell(8));
             String roomNo = ExcelUtil.convertCellValueToString(row.getCell(9));
@@ -276,5 +297,18 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
                 recordRepository.todayRecord(startTime, endTime))
                 .stream()
                 .collect(groupingBy(DailyTroubleshootRecordModel::getPlot));
+    }
+
+    @Override
+    public List<DiagnosisCountModel> DiagnosisCount() {
+        List<DiagnosisCountModel> diagnosisCountModels = new ArrayList<>();
+        List<DSourceDataEntity> dSourceDataEntities = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(commId);
+        dSourceDataEntities.forEach(dSourceDataEntity -> {
+            DiagnosisCountModel diagnosisCountModel=new DiagnosisCountModel();
+            diagnosisCountModel.setdSourceDataModel(dSourceDataMapper.entityToModel(dSourceDataEntity));
+            diagnosisCountModel.setCount(recordRepository.queryCountByDiagnosisSituation(dSourceDataEntity.getId()));
+            diagnosisCountModels.add(diagnosisCountModel);
+        });
+        return diagnosisCountModels;
     }
 }

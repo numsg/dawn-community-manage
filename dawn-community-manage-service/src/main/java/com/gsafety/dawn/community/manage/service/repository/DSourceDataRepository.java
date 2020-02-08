@@ -1,5 +1,6 @@
 package com.gsafety.dawn.community.manage.service.repository;
 
+import com.gsafety.dawn.community.manage.contract.model.DataSourceModel;
 import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -70,4 +71,9 @@ public interface DSourceDataRepository extends JpaRepository<DSourceDataEntity,S
     @Modifying
     @Query(nativeQuery = true,value ="UPDATE b_d_source_data SET sort = ?2 , pid=?3  WHERE id = ?1 ;")
     Integer updateDSourceDataSort(String districtLevelId, String sort, String pid);
+
+
+    @Query()
+    List<DSourceDataEntity> findAllByName(String name);
+
 }

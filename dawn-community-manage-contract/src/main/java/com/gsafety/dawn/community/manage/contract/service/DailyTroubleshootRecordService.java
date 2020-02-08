@@ -1,6 +1,7 @@
 package com.gsafety.dawn.community.manage.contract.service;
 
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
+import com.gsafety.dawn.community.manage.contract.model.DiagnosisCountModel;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -31,4 +32,8 @@ public interface DailyTroubleshootRecordService {
 
     // 排查每个小区今日登记的人员
     Map<String , List<DailyTroubleshootRecordModel>> registerToda(String startTime , String endTime);
+
+    // 统计
+    List<DiagnosisCountModel> DiagnosisCount();
+
 }

@@ -1,6 +1,10 @@
 package com.gsafety.dawn.community.manage.contract.model;
 
+import com.gsafety.java.common.utils.HttpClientUtil;
+import com.gsafety.java.common.utils.HttpClientUtilImpl;
+
 import java.util.Date;
+import java.util.List;
 
 /**
  * @create 2020-02-08 12:33
@@ -183,6 +187,29 @@ public class DailyTroubleshootRecordModel {
     public void setMultiTenancy(String multiTenancy) {
         this.multiTenancy = multiTenancy;
     }
+
+
+
+
+//    public static void requestData(){
+//        String url = "http://39.105.209.108:8090/api/search/v2";
+//        HttpClientUtil httpClientUtil = new HttpClientUtilImpl();
+//
+//        RequestModel requestModel = new RequestModel();
+//        requestModel.setPageNo("0");
+//        requestModel.setPageSize("1");
+//        requestModel.setStartDate("2019-03-08");
+//        requestModel.setEndDate("2020-03-08");
+//        requestModel.setKeyWords("");
+//
+//        List list = httpClientUtil.httpPost(url, requestModel, List.class, DailyTroubleshootRecordModel.class);
+//
+//        System.out.println(list);
+//    }
+//
+//    public static void main(String args[]){
+//        requestData();
+//    }
 }
 
 

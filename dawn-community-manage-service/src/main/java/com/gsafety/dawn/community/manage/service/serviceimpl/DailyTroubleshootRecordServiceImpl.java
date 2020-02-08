@@ -241,7 +241,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
      * @return the epidemic person entity
      */
     // 当体温大于37.3时 往Epidmicperson表中插入数据
-    public EpidemicPersonEntity addEpidMic(DailyTroubleshootRecordEntity dailyTroubleshootRecordEntity) {
+    public void addEpidMic(DailyTroubleshootRecordEntity dailyTroubleshootRecordEntity) {
         if (dailyTroubleshootRecordEntity.isExceedTemp()) {
             EpidemicPersonEntity epidemicPersonEntity = new EpidemicPersonEntity();
 
@@ -252,9 +252,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             epidemicPersonEntity.setName(dailyTroubleshootRecordEntity.getName());
             epidemicPersonEntity.setMobileNumber(dailyTroubleshootRecordEntity.getPhone());
 
-            return epidemicPersonRepository.save(epidemicPersonEntity);
-        } else {
-            return null;
+            epidemicPersonRepository.save(epidemicPersonEntity);
         }
     }
 

@@ -36,6 +36,7 @@ logging:
 app:
   language: en_US
   multiTenancy: 123456
+  bodyTemperature: 37.3
 
 
 

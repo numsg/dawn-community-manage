@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 
 /**
  * @create 2020-02-08 12:17
@@ -68,7 +69,7 @@ public class DailyTroubleshootRecordEntity {
 
     // 填报时间
     @Column(name = "create_time",length = 128)
-    private String createTime;
+    private Date createTime;
 
     // 多租户
     @Column(name="multi_tenancy")
@@ -190,11 +191,11 @@ public class DailyTroubleshootRecordEntity {
         this.confirmed_diagnosis = confirmed_diagnosis;
     }
 
-    public String getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 

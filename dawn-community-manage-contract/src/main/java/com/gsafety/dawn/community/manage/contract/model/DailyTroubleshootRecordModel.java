@@ -1,5 +1,7 @@
 package com.gsafety.dawn.community.manage.contract.model;
 
+import java.util.Date;
+
 /**
  * @create 2020-02-08 12:33
  */
@@ -45,7 +47,7 @@ public class DailyTroubleshootRecordModel {
     private String confirmed_diagnosis;
 
     // 填报时间
-    private String createTime;
+    private Date createTime;
 
     // 多租户
     private String multiTenancy;
@@ -166,11 +168,11 @@ public class DailyTroubleshootRecordModel {
         this.confirmed_diagnosis = confirmed_diagnosis;
     }
 
-    public String getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 

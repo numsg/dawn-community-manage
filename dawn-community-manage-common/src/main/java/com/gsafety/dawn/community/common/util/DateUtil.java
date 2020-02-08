@@ -29,4 +29,30 @@ public class DateUtil {
         Timestamp ts = Timestamp.valueOf(dateNow);
         return ts;
     }
+
+
+    public static String getStartTime() {
+        Calendar todayStart = Calendar.getInstance();
+        todayStart.set(Calendar.HOUR_OF_DAY, 0);
+        todayStart.set(Calendar.MINUTE, 0);
+        todayStart.set(Calendar.SECOND, 0);
+        todayStart.set(Calendar.MILLISECOND, 0);
+
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String format = df.format(todayStart.getTime());
+        return format;
+    }
+
+    public static String getEndTime() {
+        Calendar todayEnd = Calendar.getInstance();
+        todayEnd.set(Calendar.HOUR_OF_DAY, 23);
+        todayEnd.set(Calendar.MINUTE, 59);
+        todayEnd.set(Calendar.SECOND, 59);
+        todayEnd.set(Calendar.MILLISECOND, 999);
+
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String format = df.format(todayEnd.getTime());
+        return format;
+    }
+
 }

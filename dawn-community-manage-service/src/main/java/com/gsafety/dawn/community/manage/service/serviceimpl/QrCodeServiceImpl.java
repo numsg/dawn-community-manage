@@ -51,6 +51,7 @@ public class QrCodeServiceImpl implements QrCodeService {
         }
 
         List<String> businessIds = qrCodeModels.stream()
+                .filter(item -> StringUtil.isNotEmpty(item.getBusinessId()) && StringUtil.isNotEmpty(item.getContent()))
                 .map(QrCodeModel::getBusinessId)
                 .distinct()
                 .collect(Collectors.toList());

@@ -22,7 +22,7 @@ public class QrCodeController {
     @Autowired
     private QrCodeService qrCodeService;
 
-    @ApiOperation(value = "生成单个二维码", notes = "genQrCode")
+    @ApiOperation(value = "生成单个二维码并保存", notes = "genQrCode")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "OK", response = QrCodeModel.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
@@ -35,7 +35,7 @@ public class QrCodeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
-    @ApiOperation(value = "批量生成二维码", notes = "batchGenQrCode")
+    @ApiOperation(value = "批量生成二维码并保存", notes = "batchGenQrCode")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "OK", response = QrCodeModel.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
@@ -54,13 +54,13 @@ public class QrCodeController {
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
             @ApiResponse(code = 400, message = "Param invalid", response = HttpError.class),
             @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
-    @PostMapping("/qr-codes/{businessId}")
+    @GetMapping("/qr-codes/{businessId}")
     public ResponseEntity<QrCodeModel> findByBusinessId(@PathVariable String businessId) {
         QrCodeModel result = qrCodeService.findByBusinessId(businessId);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    @ApiOperation(value = "根据业务ID集合查询二维码详情", notes = "findByBusinessIds")
+    @ApiOperation(value = "根据业务ID集合查询二维码详情集合", notes = "findByBusinessIds")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = QrCodeModel.class, responseContainer = "List"),
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),

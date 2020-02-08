@@ -3,6 +3,8 @@ package com.gsafety.dawn.community.common.util;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.UUID;
+
 /**
  * The type String util.
  */
@@ -30,6 +32,15 @@ public class StringUtil {
      */
     public static boolean isNotEmpty(String str) {
         return StringUtils.isNotBlank(str);
+    }
+
+    /**
+     * 生成UUID(不包含中划线"-")
+     *
+     * @return 生成的UUID字符串
+     */
+    public static String genUUID() {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 
 }

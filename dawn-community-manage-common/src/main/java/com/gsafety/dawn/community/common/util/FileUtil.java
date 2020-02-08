@@ -18,6 +18,21 @@ public class FileUtil {
     }
 
     /**
+     * 获取文件后缀
+     *
+     * @param path
+     * @return
+     */
+    public static String getFileExt(String path) {
+        String ext = null;
+        int i = path.lastIndexOf('.');
+        if (i > 0 && i < path.length() - 1) {
+            ext = path.substring(i + 1).toLowerCase();
+        }
+        return ext;
+    }
+
+    /**
      * 把上传的图片转换成转换成byte
      *
      * @param file the file

@@ -35,6 +35,7 @@ logging:
 # app相关配置
 app:
   language: en_US
+  multiTenancy: 123456
 
 
 

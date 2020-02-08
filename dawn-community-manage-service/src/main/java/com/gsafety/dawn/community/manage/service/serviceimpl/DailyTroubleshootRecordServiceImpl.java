@@ -81,14 +81,14 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     public DailyTroubleshootRecordModel addDailyRecord(DailyTroubleshootRecordModel dailyTroubleshootRecordModel) {
 
         // 今日记录
-        List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.todayRecord(STARTTIME, ENDTIME);
-        List<DailyTroubleshootRecordEntity> collect = recordEntities.stream()
-                .filter(a ->
-                        a.getName().equals(dailyTroubleshootRecordModel.getName()) &&
-                        a.getPhone().equals(dailyTroubleshootRecordModel.getPhone()))
-                .collect(Collectors.toList());
-        if(!collect.isEmpty())
-            return null;
+//        List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.todayRecord(STARTTIME, ENDTIME);
+//        List<DailyTroubleshootRecordEntity> collect = recordEntities.stream()
+//                .filter(a ->
+//                        a.getName().equals(dailyTroubleshootRecordModel.getName()) &&
+//                        a.getPhone().equals(dailyTroubleshootRecordModel.getPhone()))
+//                .collect(Collectors.toList());
+//        if(!collect.isEmpty())
+//            return null;
 
         recordRepository.queryAllByNameAndPhone(dailyTroubleshootRecordModel.getName(), dailyTroubleshootRecordModel.getPhone());
         DailyTroubleshootRecordEntity recordEntity = recordMapper.modelToEntity(dailyTroubleshootRecordModel);
@@ -156,13 +156,18 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             String name = ExcelUtil.convertCellValueToString(row.getCell(0));
             String idCard = ExcelUtil.convertCellValueToString(row.getCell(1));
             String sex = ExcelUtil.convertCellValueToString(row.getCell(2));
-            String phone = ExcelUtil.convertCellValueToString(row.getCell(3));
-            String address = ExcelUtil.convertCellValueToString(row.getCell(4));
-            String plot = ExcelUtil.convertCellValueToString(row.getCell(5));
-            String build = ExcelUtil.convertCellValueToString(row.getCell(6));
-            String unit = ExcelUtil.convertCellValueToString(row.getCell(7));
-            String roomNo = ExcelUtil.convertCellValueToString(row.getCell(8));
-            String tempture = ExcelUtil.convertCellValueToString(row.getCell(9));
+            String age = ExcelUtil.convertCellValueToString(row.getCell(3));
+            String phone = ExcelUtil.convertCellValueToString(row.getCell(4));
+            String address = ExcelUtil.convertCellValueToString(row.getCell(5));
+            String plot = ExcelUtil.convertCellValueToString(row.getCell(6));
+            String build = ExcelUtil.convertCellValueToString(row.getCell(7));
+            String unit = ExcelUtil.convertCellValueToString(row.getCell(8));
+            String roomNo = ExcelUtil.convertCellValueToString(row.getCell(9));
+            String tempture = ExcelUtil.convertCellValueToString(row.getCell(10));
+            String contact = ExcelUtil.convertCellValueToString(row.getCell(11));
+            String other = ExcelUtil.convertCellValueToString(row.getCell(12));
+            String opinion = ExcelUtil.convertCellValueToString(row.getCell(13));
+            String note = ExcelUtil.convertCellValueToString(row.getCell(14));
             if ("".equals(name) || "".equals(phone) || "".equals(address))
                 continue;
             DailyTroubleshootRecordEntity recordEntity = new DailyTroubleshootRecordEntity();
@@ -170,8 +175,28 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             recordEntity.setCreateTime(TS);
             recordEntity.setMultiTenancy(multiTenancy);
             recordEntity.setAddress(address);
-            recordEntity.setBodyTemperature(tempture);
-            recordEntity.setBodyTemperature(tempture);
+
+            recordEntity.setOtherSymptoms(other);
+            recordEntity.setMedicalOpinion(opinion);
+            recordEntity.setNote(note);
+
+            if(!"".equals(age) && age != null){
+                recordEntity.setAge(Integer.valueOf(age));
+            }
+
+
+            if(contact.equals("t")){
+                recordEntity.setContact(true);
+            } else {
+                recordEntity.setContact(false);
+            }
+
+            if(tempture.equals("t")){
+                recordEntity.setExceedTemp(true);
+            } else {
+                recordEntity.setExceedTemp(false);
+            }
+
             recordEntity.setBuilding(build);
             recordEntity.setPlot(plot);
             recordEntity.setCode(UUID.randomUUID().toString());
@@ -193,14 +218,13 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
      * @param dailyTroubleshootRecordEntity the daily troubleshoot record entity
      * @return the epidemic person entity
      */
-// 当体温大于37.3时 往Epidmicperson表中插入数据
+    // 当体温大于37.3时 往Epidmicperson表中插入数据
     public EpidemicPersonEntity addEpidMic(DailyTroubleshootRecordEntity dailyTroubleshootRecordEntity) {
-        if (!"".equals(dailyTroubleshootRecordEntity.getBodyTemperature()) && dailyTroubleshootRecordEntity.getBodyTemperature() != null && Double.valueOf(dailyTroubleshootRecordEntity.getBodyTemperature()) > Double.valueOf(bodyTemperature)) {
+        if (dailyTroubleshootRecordEntity.isExceedTemp()) {
             EpidemicPersonEntity epidemicPersonEntity = new EpidemicPersonEntity();
 
             epidemicPersonEntity.setId(UUID.randomUUID().toString());
             epidemicPersonEntity.setSubmitTime(TS);
-            epidemicPersonEntity.setTemperature(dailyTroubleshootRecordEntity.getBodyTemperature());
             epidemicPersonEntity.setGender(dailyTroubleshootRecordEntity.getSex());
             epidemicPersonEntity.setMultiTenancy(multiTenancy);
             epidemicPersonEntity.setName(dailyTroubleshootRecordEntity.getName());
@@ -234,7 +258,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     public Map<String, List<DailyTroubleshootRecordModel>> excessiveBodyTemperature() {
         return recordMapper.entitiesToModels(recordRepository.findAll())
                 .stream()
-                .filter(a -> Double.valueOf(a.getBodyTemperature()) > Double.valueOf(bodyTemperature))
+                .filter(DailyTroubleshootRecordModel::isExceedTemp)
                 .collect(groupingBy(DailyTroubleshootRecordModel::getPlot));
     }
 

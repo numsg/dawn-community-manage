@@ -42,7 +42,7 @@ public class DailyTroubleshootRecordModel {
     private String roomNo;
 
     // 体温body temperature
-    private String bodyTemperature;
+//    private String bodyTemperature;
 
     // 过去14天是否离开过本地区
     private Boolean isLeaveArea;
@@ -55,6 +55,28 @@ public class DailyTroubleshootRecordModel {
 
     // 多租户
     private String multiTenancy;
+
+
+
+    // 年龄
+    private int age;
+
+    // 体温是否大于37.3
+    private boolean isExceedTemp;
+
+    // 是否有接触史
+    private boolean isContact;
+
+    // 其它症状
+    private String otherSymptoms;
+
+    // 医疗意见
+    private String medicalOpinion;
+
+    // 备注
+    private String note;
+
+
 
     public DailyTroubleshootRecordModel() {
         // 空构造
@@ -148,13 +170,13 @@ public class DailyTroubleshootRecordModel {
         this.roomNo = roomNo;
     }
 
-    public String getBodyTemperature() {
-        return bodyTemperature;
-    }
-
-    public void setBodyTemperature(String bodyTemperature) {
-        this.bodyTemperature = bodyTemperature;
-    }
+//    public String getBodyTemperature() {
+//        return bodyTemperature;
+//    }
+//
+//    public void setBodyTemperature(String bodyTemperature) {
+//        this.bodyTemperature = bodyTemperature;
+//    }
 
     public Boolean getLeaveArea() {
         return isLeaveArea;
@@ -189,27 +211,53 @@ public class DailyTroubleshootRecordModel {
     }
 
 
+    public int getAge() {
+        return age;
+    }
 
+    public void setAge(int age) {
+        this.age = age;
+    }
 
-//    public static void requestData(){
-//        String url = "http://39.105.209.108:8090/api/search/v2";
-//        HttpClientUtil httpClientUtil = new HttpClientUtilImpl();
-//
-//        RequestModel requestModel = new RequestModel();
-//        requestModel.setPageNo("0");
-//        requestModel.setPageSize("1");
-//        requestModel.setStartDate("2019-03-08");
-//        requestModel.setEndDate("2020-03-08");
-//        requestModel.setKeyWords("");
-//
-//        List list = httpClientUtil.httpPost(url, requestModel, List.class, DailyTroubleshootRecordModel.class);
-//
-//        System.out.println(list);
-//    }
-//
-//    public static void main(String args[]){
-//        requestData();
-//    }
+    public boolean isExceedTemp() {
+        return isExceedTemp;
+    }
+
+    public void setExceedTemp(boolean exceedTemp) {
+        isExceedTemp = exceedTemp;
+    }
+
+    public boolean isContact() {
+        return isContact;
+    }
+
+    public void setContact(boolean contact) {
+        isContact = contact;
+    }
+
+    public String getOtherSymptoms() {
+        return otherSymptoms;
+    }
+
+    public void setOtherSymptoms(String otherSymptoms) {
+        this.otherSymptoms = otherSymptoms;
+    }
+
+    public String getMedicalOpinion() {
+        return medicalOpinion;
+    }
+
+    public void setMedicalOpinion(String medicalOpinion) {
+        this.medicalOpinion = medicalOpinion;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
 }
 
 

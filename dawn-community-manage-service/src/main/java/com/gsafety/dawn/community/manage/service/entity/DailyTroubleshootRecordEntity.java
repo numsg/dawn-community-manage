@@ -56,8 +56,8 @@ public class DailyTroubleshootRecordEntity {
     private String roomNo;
 
     // 体温body temperature
-    @Column(name = "body_temperature",length = 128)
-    private String bodyTemperature;
+//    @Column(name = "body_temperature",length = 128)
+//    private String bodyTemperature;
 
     // 过去14天是否离开过本地区
     @Column(name = "whether_leave_area",length = 128)
@@ -74,6 +74,31 @@ public class DailyTroubleshootRecordEntity {
     // 多租户
     @Column(name="multi_tenancy")
     private String multiTenancy;
+
+
+    // 年龄
+    @Column(name="age")
+    private int age;
+
+    // 体温是否大于37.3
+    @Column(name="is_exceed_temp")
+    private boolean isExceedTemp;
+
+    // 是否有接触史
+    @Column(name="is_contact")
+    private boolean isContact;
+
+    // 其它症状
+    @Column(name="other_symptoms")
+    private String otherSymptoms;
+
+    // 医疗意见
+    @Column(name="medical_opinion")
+    private String medicalOpinion;
+
+    // 备注
+    @Column(name="note")
+    private String note;
 
     public DailyTroubleshootRecordEntity() {
         // 空构造
@@ -167,14 +192,6 @@ public class DailyTroubleshootRecordEntity {
         this.roomNo = roomNo;
     }
 
-    public String getBodyTemperature() {
-        return bodyTemperature;
-    }
-
-    public void setBodyTemperature(String bodyTemperature) {
-        this.bodyTemperature = bodyTemperature;
-    }
-
     public Boolean getLeaveArea() {
         return isLeaveArea;
     }
@@ -205,5 +222,53 @@ public class DailyTroubleshootRecordEntity {
 
     public void setMultiTenancy(String multiTenancy) {
         this.multiTenancy = multiTenancy;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public boolean isExceedTemp() {
+        return isExceedTemp;
+    }
+
+    public void setExceedTemp(boolean exceedTemp) {
+        isExceedTemp = exceedTemp;
+    }
+
+    public boolean isContact() {
+        return isContact;
+    }
+
+    public void setContact(boolean contact) {
+        isContact = contact;
+    }
+
+    public String getOtherSymptoms() {
+        return otherSymptoms;
+    }
+
+    public void setOtherSymptoms(String otherSymptoms) {
+        this.otherSymptoms = otherSymptoms;
+    }
+
+    public String getMedicalOpinion() {
+        return medicalOpinion;
+    }
+
+    public void setMedicalOpinion(String medicalOpinion) {
+        this.medicalOpinion = medicalOpinion;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }

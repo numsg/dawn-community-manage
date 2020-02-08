@@ -68,6 +68,7 @@ public class DailyTroubleshootRecordController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+
     @GetMapping(value = "/daily-troubleshoot-record")
     @ApiOperation(value = "查询所有记录按小区分类", notes = "queryRoubleshootRecord()")
     @ApiResponses(value = {

@@ -5,7 +5,7 @@ import com.gsafety.dawn.community.common.util.ExcelUtil;
 import com.gsafety.dawn.community.manage.contract.model.DailyStatisticModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleFilterModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
-import com.gsafety.dawn.community.manage.contract.model.DiagnosisCountModel;
+import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.service.DailyTroubleshootRecordService;
 import com.gsafety.dawn.community.manage.service.datamappers.BasciInformationMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.DSourceDataMapper;

@@ -3,8 +3,7 @@ package com.gsafety.dawn.community.manage.contract.service;
 import com.gsafety.dawn.community.manage.contract.model.DailyStatisticModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleFilterModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
-import com.gsafety.dawn.community.manage.contract.model.DiagnosisCountModel;
-import org.apache.commons.net.ntp.TimeStamp;
+import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;

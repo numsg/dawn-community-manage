@@ -1,6 +1,7 @@
 package com.gsafety.dawn.community.manage.webapi.controller;
 
 import com.gsafety.dawn.community.manage.contract.model.*;
+import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.service.DailyTroubleshootRecordService;
 import com.gsafety.java.common.exception.HttpError;
 import com.gsafety.springboot.common.annotation.LimitIPRequestAnnotation;

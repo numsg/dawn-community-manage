@@ -74,5 +74,11 @@ public class DateUtil {
         return todayEnd.getTime();
     }
 
+    public  static Date getDayStartDate(){
+        return new Date();
+    }
 
+    public  static Date getDayEndDate(){
+        return new Date();
+    }
 }

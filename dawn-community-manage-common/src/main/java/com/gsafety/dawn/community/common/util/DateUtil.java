@@ -75,10 +75,17 @@ public class DateUtil {
     }
 
     public  static Date getDayStartDate(){
-        return new Date();
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.set(calendar1.get(Calendar.YEAR), calendar1.get(Calendar.MONTH), calendar1.get(Calendar.DAY_OF_MONTH),
+                0, 0, 0);
+        return calendar1.getTime();
     }
 
     public  static Date getDayEndDate(){
-        return new Date();
+        Calendar calendar1 = Calendar.getInstance();
+        Calendar calendar2 = Calendar.getInstance();
+        calendar1.set(calendar2.get(Calendar.YEAR), calendar2.get(Calendar.MONTH), calendar2.get(Calendar.DAY_OF_MONTH),
+                23, 59, 59);
+        return calendar1.getTime();
     }
 }

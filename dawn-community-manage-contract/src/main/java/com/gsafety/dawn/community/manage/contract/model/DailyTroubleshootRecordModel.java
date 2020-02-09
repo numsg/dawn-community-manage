@@ -17,6 +17,8 @@ public class DailyTroubleshootRecordModel {
 
     private String name;
 
+//    private String basicInformationId;
+
     // 身份证号码
     private String identificationNumber;
 
@@ -56,8 +58,6 @@ public class DailyTroubleshootRecordModel {
     // 多租户
     private String multiTenancy;
 
-
-
     // 年龄
     private int age;
 
@@ -76,11 +76,17 @@ public class DailyTroubleshootRecordModel {
     // 备注
     private String note;
 
-
-
     public DailyTroubleshootRecordModel() {
         // 空构造
     }
+
+//    public String getBasicInformationId() {
+//        return basicInformationId;
+//    }
+//
+//    public void setBasicInformationId(String basicInformationId) {
+//        this.basicInformationId = basicInformationId;
+//    }
 
     public String getId() {
         return id;

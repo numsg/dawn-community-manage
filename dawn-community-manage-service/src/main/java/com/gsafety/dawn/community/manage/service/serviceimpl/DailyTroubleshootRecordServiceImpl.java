@@ -2,18 +2,22 @@ package com.gsafety.dawn.community.manage.service.serviceimpl;
 
 import com.gsafety.dawn.community.common.util.DateUtil;
 import com.gsafety.dawn.community.common.util.ExcelUtil;
+import com.gsafety.dawn.community.manage.contract.model.DailyStatisticModel;
+import com.gsafety.dawn.community.manage.contract.model.DailyTroubleFilterModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
 import com.gsafety.dawn.community.manage.contract.model.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.service.DailyTroubleshootRecordService;
+import com.gsafety.dawn.community.manage.service.datamappers.BasciInformationMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.DSourceDataMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.DailyTroubleshootRecordMapper;
 import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
 import com.gsafety.dawn.community.manage.service.entity.DailyTroubleshootRecordEntity;
 import com.gsafety.dawn.community.manage.service.entity.EpidemicPersonEntity;
+import com.gsafety.dawn.community.manage.service.repository.BasicInformationRepository;
 import com.gsafety.dawn.community.manage.service.repository.DSourceDataRepository;
 import com.gsafety.dawn.community.manage.service.repository.DailyTroubleshootRecordRepository;
 import com.gsafety.dawn.community.manage.service.repository.EpidemicPersonRepository;
-import org.apache.commons.net.ntp.TimeStamp;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.slf4j.Logger;
@@ -87,6 +91,12 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     @Autowired
     private DSourceDataMapper dSourceDataMapper;
 
+    @Autowired
+    BasciInformationMapper basciInformationMapper;
+
+    @Autowired
+    BasicInformationRepository basicInformationRepository;
+
     // 日志
     private static Logger logger = LoggerFactory.getLogger(DailyTroubleshootRecordServiceImpl.class);
 
@@ -124,6 +134,9 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         DailyTroubleshootRecordEntity result = recordRepository.save(recordEntity);
 
         addEpidMic(result);
+
+        //
+
 
         return recordMapper.entityToModel(result);
     }
@@ -366,5 +379,109 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             diagnosisCountModels.add(diagnosisCountModel);
         });
         return diagnosisCountModels;
+    }
+
+
+    @Override  //  DailyTroubleFilterModel dailyTroubleFilterModel
+    public List<DailyStatisticModel> queryByConditions() {
+        // 查所有小区
+        List<DailyStatisticModel> dailyStatisticModels = new ArrayList<>();
+        List<DSourceDataEntity> allByDataSource = dSourceDataRepository.findAllByDataSourceId(commId);
+
+        for(int i = 0 ; i < allByDataSource.size() ; i++){
+            DSourceDataEntity dataSourceEntity = allByDataSource.get(i);
+
+            // 根据小区查所有楼栋
+            List<DailyTroubleshootRecordEntity> recordEntityList = recordRepository.queryAllByPlot(dataSourceEntity.getId());
+            for(int j = 0 ; j < recordEntityList.size() ; j++){
+                DailyTroubleshootRecordEntity recordEntity = recordEntityList.get(j);
+                List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByPlotAndbAndBuilding(dataSourceEntity.getId(), recordEntity.getBuilding());
+                for(int k=0 ; k < recordEntities.size() ; k++){
+                    DailyTroubleshootRecordEntity unit = recordEntities.get(k);
+                    DailyStatisticModel dailyStatisticModel = new DailyStatisticModel();
+                    dailyStatisticModel.setPlotId(dataSourceEntity.getId());
+                    dailyStatisticModel.setPlotName(dataSourceEntity.getName());
+                    dailyStatisticModel.setBuilding(recordEntity.getBuilding());
+                    dailyStatisticModel.setUnitNumber(unit.getUnitNumber());
+                    dailyStatisticModels.add(dailyStatisticModel);
+                }
+            }
+        }
+        Set<DailyStatisticModel> set = new TreeSet<>(new Comparator<DailyStatisticModel>() {
+            @Override
+            public int compare(DailyStatisticModel t1, DailyStatisticModel t2) {
+                int count = 1;
+                if(StringUtils.equals(t1.getPlotId(), t2.getPlotId()) &&
+                        StringUtils.equals(t1.getBuilding(),t2.getBuilding())
+                        && StringUtils.equals(t1.getUnitNumber(),t2.getUnitNumber())){
+                    count = 0;
+                }
+                return count;
+            }
+        });
+        set.addAll(dailyStatisticModels);
+        List<DailyStatisticModel> result = new ArrayList<>(set);
+
+        for(int t = 0 ; t < result.size() ; t++){
+            DailyStatisticModel dailyStatisticModel = result.get(t);
+
+            Integer integer = recordRepository.todayRecordCon(STARTTIME, ENDTIME, dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber());
+            dailyStatisticModel.setChecked(integer);
+        }
+        return result;
+    }
+
+    @Override
+    public List<DailyTroubleshootRecordModel> queryByPlotAndBuild(DailyTroubleFilterModel dailyTroubleFilterModel) {
+
+        String plot = dailyTroubleFilterModel.getDailyStatisticModel().getPlotId();
+        String building = dailyTroubleFilterModel.getDailyStatisticModel().getBuilding();
+        String unitNumber = dailyTroubleFilterModel.getDailyStatisticModel().getUnitNumber();
+        List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByPlotAndBuildingAndUnitNumber(plot, building, unitNumber , STARTTIME , ENDTIME);
+        // 暂不处理 小区
+        // dailyTroubleFilterModel.getPlots()
+        // 是否发热
+        if(dailyTroubleFilterModel.getIsFaver().size() != 2 && dailyTroubleFilterModel.getIsFaver().size() != 0){
+            recordEntities = recordEntities.stream().filter(a -> a.isExceedTemp() == dailyTroubleFilterModel.getIsFaver().get(0)).collect(Collectors.toList());
+        }
+        // plots
+        if(dailyTroubleFilterModel.getPlots().size() > 0 ){
+           recordEntities = recordEntities.stream().filter(a -> dailyTroubleFilterModel.getPlots().contains(a.getPlot())).collect(Collectors.toList());
+        }
+        //  medicalOpinion
+        List<DailyTroubleshootRecordEntity> opions = new ArrayList<>();
+        if(dailyTroubleFilterModel.getMedicalOpinion().size() > 0){
+            String medicalOpinion = "";
+            for(int i = 0 ; i < dailyTroubleFilterModel.getMedicalOpinion().size() ; i++){
+                medicalOpinion += dailyTroubleFilterModel.getMedicalOpinion().get(i);
+            }
+            for(int t = 0 ; t <recordEntities.size() ; t++){
+                if(recordEntities.get(t).getMedicalOpinion().contains(medicalOpinion)){
+                    opions.add(recordEntities.get(t));
+                }
+            }
+        } else {
+            opions = recordEntities;
+        }
+
+        // 关键字
+        List<DailyTroubleshootRecordEntity> troubleshootRecordEntities = new ArrayList<>();
+        if(!"".equals(dailyTroubleFilterModel.getKeyWord())){
+            String keyWord = dailyTroubleFilterModel.getKeyWord();
+            for(int i = 0 ; i < opions.size() ; i++ ){
+                if(opions.get(i).getName().contains(keyWord)
+                        || opions.get(i).getPhone().contains(keyWord)
+                        || opions.get(i).getAddress().contains(keyWord)){
+                    troubleshootRecordEntities.add(opions.get(i));
+                }
+            }
+        } else {
+            troubleshootRecordEntities = opions;
+        }
+        // 分页
+        long skip = dailyTroubleFilterModel.getPage() * dailyTroubleFilterModel.getPageSize();
+        List<DailyTroubleshootRecordEntity> collect = troubleshootRecordEntities.stream().skip(skip).limit(Long.valueOf(dailyTroubleFilterModel.getPageSize())).collect(Collectors.toList());
+
+        return recordMapper.entitiesToModels(collect);
     }
 }

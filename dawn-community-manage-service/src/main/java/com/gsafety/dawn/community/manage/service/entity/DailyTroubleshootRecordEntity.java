@@ -1,9 +1,6 @@
 package com.gsafety.dawn.community.manage.service.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -22,6 +19,13 @@ public class DailyTroubleshootRecordEntity {
 
     @Column(name = "name",length = 128,nullable = false)
     private String name;
+
+    // 关联
+//    @Column(name = "b_basic_information_id",length = 64, nullable = false)
+//    private String basicInformationId;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "b_basic_information_id", nullable = false,insertable=false,updatable = false)
+//    private BasicInformationEntity basicInformationEntity;
 
     // 身份证号码
     @Column(name = "identification_number",length = 64)
@@ -75,7 +79,6 @@ public class DailyTroubleshootRecordEntity {
     @Column(name="multi_tenancy")
     private String multiTenancy;
 
-
     // 年龄
     @Column(name="age")
     private int age;
@@ -93,11 +96,11 @@ public class DailyTroubleshootRecordEntity {
     private String otherSymptoms;
 
     // 医疗意见
-    @Column(name="medical_opinion")
+    @Column(name="medical_opinion", length = 10240)
     private String medicalOpinion;
 
     // 备注
-    @Column(name="note")
+    @Column(name="note", length = 10240)
     private String note;
 
     public DailyTroubleshootRecordEntity() {
@@ -271,4 +274,20 @@ public class DailyTroubleshootRecordEntity {
     public void setNote(String note) {
         this.note = note;
     }
+
+//    public String getBasicInformationId() {
+//        return basicInformationId;
+//    }
+//
+//    public void setBasicInformationId(String basicInformationId) {
+//        this.basicInformationId = basicInformationId;
+//    }
+//
+//    public BasicInformationEntity getBasicInformationEntity() {
+//        return basicInformationEntity;
+//    }
+//
+//    public void setBasicInformationEntity(BasicInformationEntity basicInformationEntity) {
+//        this.basicInformationEntity = basicInformationEntity;
+//    }
 }

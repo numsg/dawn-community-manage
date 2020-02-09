@@ -76,4 +76,8 @@ public interface DSourceDataRepository extends JpaRepository<DSourceDataEntity,S
     @Query()
     List<DSourceDataEntity> findAllByName(String name);
 
+
+    @Query()
+    List<DSourceDataEntity> findAllByDataSourceId(String dataSOurceId);
+
 }

@@ -6,6 +6,7 @@ import java.util.Date;
  * @create 2020-02-07 22:54
  */
 public class ResourceInOutRecordModel {
+
     private String id;
 
     // 资源id

@@ -1,5 +1,7 @@
 package com.gsafety.dawn.community.manage.contract.service;
 
+import com.gsafety.dawn.community.manage.contract.model.DailyStatisticModel;
+import com.gsafety.dawn.community.manage.contract.model.DailyTroubleFilterModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
 import com.gsafety.dawn.community.manage.contract.model.DiagnosisCountModel;
 import org.apache.commons.net.ntp.TimeStamp;
@@ -37,5 +39,11 @@ public interface DailyTroubleshootRecordService {
 
     // 统计
     List<DiagnosisCountModel> DiagnosisCount();
+
+    // 初始查询
+    List<DailyStatisticModel> queryByConditions();
+
+    // 查询小区-楼栋-单元下的用户
+    List<DailyTroubleshootRecordModel> queryByPlotAndBuild(DailyTroubleFilterModel dailyTroubleFilterModel);
 
 }

@@ -1,9 +1,6 @@
 package com.gsafety.dawn.community.manage.webapi.controller;
 
-import com.gsafety.dawn.community.manage.contract.model.CellTypeModel;
-import com.gsafety.dawn.community.manage.contract.model.CommunityIdsModel;
-import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
-import com.gsafety.dawn.community.manage.contract.model.DiagnosisCountModel;
+import com.gsafety.dawn.community.manage.contract.model.*;
 import com.gsafety.dawn.community.manage.contract.service.DailyTroubleshootRecordService;
 import com.gsafety.java.common.exception.HttpError;
 import com.gsafety.springboot.common.annotation.LimitIPRequestAnnotation;
@@ -144,5 +141,33 @@ public class DailyTroubleshootRecordController {
         List<DiagnosisCountModel> result = dailyTroubleshootRecordService.DiagnosisCount();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+
+    @PostMapping(value = "/daily-troubleshoot-record/multi-criteria-query", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "分组统计", notes = "multiCriteriaQuery()")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = List.class,responseContainer = "List" ),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+    public ResponseEntity<List<DailyStatisticModel>> multiCriteriaQuery()  {
+        List<DailyStatisticModel> recordMaps = dailyTroubleshootRecordService.queryByConditions();
+        return new ResponseEntity<>(recordMaps, HttpStatus.OK);
+    }
+
+
+    @PostMapping(value = "/daily-troubleshoot-record/group-condition", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "分组统计加条件过滤", notes = "groupConditionQuery( )")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = List.class,responseContainer = "List" ),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+    public ResponseEntity<List<DailyTroubleshootRecordModel>> groupConditionQuery( @RequestBody @ApiParam(value = "日常排查记录", required = true) DailyTroubleFilterModel filterModel )  {
+        List<DailyTroubleshootRecordModel> recordMaps = dailyTroubleshootRecordService.queryByPlotAndBuild(filterModel);
+        return new ResponseEntity<>(recordMaps, HttpStatus.OK);
+    }
+
+
 
 }

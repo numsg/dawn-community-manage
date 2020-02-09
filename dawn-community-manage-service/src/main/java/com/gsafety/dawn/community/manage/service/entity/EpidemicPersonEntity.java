@@ -28,7 +28,7 @@ public class EpidemicPersonEntity {
 //    @JoinColumn(name = "village_id", nullable = false,insertable=false,updatable = false)
 //    private DSourceDataEntity dSourceDataEntity;
 
-    @Column(name = "temperature", length = 6,nullable = false)
+    @Column(name = "temperature", length = 6)
     private String temperature;
 
     @Column(name = "diagnosis_situation", length = 64)

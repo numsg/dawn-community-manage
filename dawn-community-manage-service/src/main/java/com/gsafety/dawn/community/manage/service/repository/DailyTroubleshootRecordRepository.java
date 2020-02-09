@@ -29,4 +29,5 @@ public interface DailyTroubleshootRecordRepository extends JpaRepository<DailyTr
 //    @Query()
 //    List<DailyTroubleshootRecordModel> queryAllByPlot(String plot);
 
+
 }

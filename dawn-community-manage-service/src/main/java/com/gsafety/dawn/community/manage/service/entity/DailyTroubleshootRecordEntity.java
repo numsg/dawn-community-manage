@@ -89,7 +89,7 @@ public class DailyTroubleshootRecordEntity {
     private boolean isContact;
 
     // 其它症状
-    @Column(name="other_symptoms")
+    @Column(name="other_symptoms" , length = 10240)
     private String otherSymptoms;
 
     // 医疗意见

@@ -7,7 +7,6 @@ import com.gsafety.dawn.community.manage.contract.model.DailyTroubleFilterModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DailyStatisticPageModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
-import com.gsafety.dawn.community.manage.contract.model.*;
 import com.gsafety.dawn.community.manage.contract.model.total.PendingInvestigatModel;
 import com.gsafety.dawn.community.manage.contract.model.total.PlotLinkageModel;
 import com.gsafety.dawn.community.manage.contract.service.BasicInformationService;
@@ -15,7 +14,6 @@ import com.gsafety.dawn.community.manage.contract.service.DailyTroubleshootRecor
 import com.gsafety.dawn.community.manage.service.datamappers.BasciInformationMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.DSourceDataMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.DailyTroubleshootRecordMapper;
-import com.gsafety.dawn.community.manage.service.entity.BasicInformationEntity;
 import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
 import com.gsafety.dawn.community.manage.service.entity.DailyTroubleshootRecordEntity;
 import com.gsafety.dawn.community.manage.service.entity.EpidemicPersonEntity;
@@ -26,7 +24,7 @@ import com.gsafety.dawn.community.manage.service.repository.EpidemicPersonReposi
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.drools.core.util.ArrayIterator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +40,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Comparator.comparing;
+
 import static java.util.stream.Collectors.*;
 
 /**
@@ -417,7 +415,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 
 
     @Override  //  DailyTroubleFilterModel dailyTroubleFilterModel
-    public List<DailyStatisticModel> queryByConditions(PlotLinkageModel plotLinkageModel) {
+    public List<DailyStatisticModel> queryByConditions() {
         // 查所有小区
         List<DailyStatisticModel> dailyStatisticModels = new ArrayList<>();
         List<DSourceDataEntity> allByDataSource = dSourceDataRepository.findAllByDataSourceId(commId);
@@ -467,16 +465,30 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             List<DailyTroubleshootRecordEntity> allPersons = recordRepository.queryUnchecked(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber());
             List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByPlotAndBuildingAndUnitNumber(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber(), STARTTIME, ENDTIME);
 
-            if(allPersons.size() > integer){
-                dailyStatisticModel.setUnchecked(allPersons.size() - integer);
-            }
+            List<DailyTroubleshootRecordEntity> temp = allPersons.stream()
+                    .filter(item -> !recordEntities.stream()
+                            .map(e -> e.getName() + e.getPhone())
+                            .collect(toList())
+                            .contains(item.getName() + item.getPhone())).collect(toList());
 
+
+            Set<DailyStatisticModel> set2 = new TreeSet<>(new Comparator<DailyStatisticModel>() {
+                @Override
+                public int compare(DailyStatisticModel t1, DailyStatisticModel t2) {
+                    int count = 1;
+                    if(StringUtils.equals(t1.getPlotId(), t2.getPlotId()) &&
+                            StringUtils.equals(t1.getBuilding(),t2.getBuilding())
+                            && StringUtils.equals(t1.getUnitNumber(),t2.getUnitNumber())){
+                        count = 0;
+                    }
+                    return count;
+                }
+            });
+            set.addAll(dailyStatisticModels);
+            dailyStatisticModel.setUnchecked(new ArrayList<>(temp).size());
         }
         return result;
     }
-
-
-
 
     @Override
     public List<DailyTroubleshootRecordModel> queryByPlotAndBuild(DailyTroubleFilterModel dailyTroubleFilterModel) {
@@ -497,13 +509,10 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         //  medicalOpinion
         List<DailyTroubleshootRecordEntity> opions = new ArrayList<>();
         if(dailyTroubleFilterModel.getMedicalOpinion().size() > 0){
-
 //            for(int i = 0 ; i < dailyTroubleFilterModel.getMedicalOpinion().size() ; i++){
 //                medicalOpinion += dailyTroubleFilterModel.getMedicalOpinion().get(i);
 //            }
-
             String medicalOpinion = dailyTroubleFilterModel.getMedicalOpinion().stream().collect(Collectors.joining());
-
             for(int t = 0 ; t <recordEntities.size() ; t++){
                 if(recordEntities.get(t).getMedicalOpinion().contains(medicalOpinion)){
                     opions.add(recordEntities.get(t));

@@ -154,8 +154,8 @@ public class DailyTroubleshootRecordController {
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
             @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<List<DailyStatisticModel>> multiCriteriaQuery(@RequestBody @ApiParam(value = "日常排查记录", required = true)PlotLinkageModel plotLinkageModel)  {
-        List<DailyStatisticModel> recordMaps = dailyTroubleshootRecordService.queryByConditions(plotLinkageModel);
+    public ResponseEntity<List<DailyStatisticModel>> multiCriteriaQuery()  {
+        List<DailyStatisticModel> recordMaps = dailyTroubleshootRecordService.queryByConditions();
         return new ResponseEntity<>(recordMaps, HttpStatus.OK);
     }
 
@@ -184,6 +184,5 @@ public class DailyTroubleshootRecordController {
         DailyStatisticPageModel recordMaps = dailyTroubleshootRecordService.queryPendingInvestigation(pendingInvestigatModel);
         return new ResponseEntity<>(recordMaps, HttpStatus.OK);
     }
-
 
 }

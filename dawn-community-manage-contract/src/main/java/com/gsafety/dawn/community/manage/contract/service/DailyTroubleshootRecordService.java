@@ -43,7 +43,7 @@ public interface DailyTroubleshootRecordService {
     List<DiagnosisCountModel> DiagnosisCount();
 
     // 初始查询
-    List<DailyStatisticModel> queryByConditions(PlotLinkageModel plotLinkageModel);
+    List<DailyStatisticModel> queryByConditions();
 
     // 查询小区-楼栋-单元下的用户
     List<DailyTroubleshootRecordModel> queryByPlotAndBuild(DailyTroubleFilterModel dailyTroubleFilterModel);

@@ -30,13 +30,18 @@ public interface DailyTroubleshootRecordRepository extends JpaRepository<DailyTr
     List<DailyTroubleshootRecordEntity> queryAllByPlot(String plot);
 
     @Query(nativeQuery = true , value = "select * from b_daily_troubleshoot_record where plot = ?1 and building = ?2 ;")
-    List<DailyTroubleshootRecordEntity> queryAllByPlotAndbAndBuilding(String plot , String build);
-
+    List<DailyTroubleshootRecordEntity> queryAllByPlotAndbAndBuilding(String plot , String building);
 
     @Query(nativeQuery = true , value = "select count(*) from b_daily_troubleshoot_record  where plot = ?3 and building = ?4 and unit_number = ?5 and create_time between ?1 and ?2 ;")
     Integer todayRecordCon(Timestamp t1 , Timestamp t2 , String plot , String build , String unitNumber);
 
     @Query(nativeQuery = true , value = "SELECT * from b_daily_troubleshoot_record where plot = ?1 and building = ?2 and unit_number = ?3 and create_time between ?4 and ?5 ;")
     List<DailyTroubleshootRecordEntity> queryAllByPlotAndBuildingAndUnitNumber(String plot , String building , String unit_number , Timestamp t1 , Timestamp t2);
+
+
+
+
+    @Query(nativeQuery = true , value = "select * from b_daily_troubleshoot_record where plot = ?1 and building = ?2 and unit_number = ?3 ; ")
+    List<DailyTroubleshootRecordEntity> queryUnchecked(String plot , String building , String unitNumber);
 
 }

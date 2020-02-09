@@ -6,7 +6,9 @@ import com.gsafety.dawn.community.manage.service.datamappers.BasciInformationMap
 import com.gsafety.dawn.community.manage.service.entity.BasicInformationEntity;
 import com.gsafety.dawn.community.manage.service.repository.BasicInformationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +18,8 @@ import java.util.UUID;
  * @outhor liujian
  * @create 2020-02-09 16:15
  */
+@Service
+@Transactional
 public class BasicInformationServiceImpl implements BasicInformationService {
 
     @Autowired
@@ -23,7 +27,6 @@ public class BasicInformationServiceImpl implements BasicInformationService {
 
     @Autowired
     BasicInformationRepository basicInformationRepository;
-
 
     @Override
     public void addPerson(BasicInformationModel basicInformationModel) {

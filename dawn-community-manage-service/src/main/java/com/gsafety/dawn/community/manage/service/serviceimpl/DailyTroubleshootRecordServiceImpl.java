@@ -6,10 +6,13 @@ import com.gsafety.dawn.community.manage.contract.model.DailyStatisticModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleFilterModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
+import com.gsafety.dawn.community.manage.contract.model.*;
+import com.gsafety.dawn.community.manage.contract.service.BasicInformationService;
 import com.gsafety.dawn.community.manage.contract.service.DailyTroubleshootRecordService;
 import com.gsafety.dawn.community.manage.service.datamappers.BasciInformationMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.DSourceDataMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.DailyTroubleshootRecordMapper;
+import com.gsafety.dawn.community.manage.service.entity.BasicInformationEntity;
 import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
 import com.gsafety.dawn.community.manage.service.entity.DailyTroubleshootRecordEntity;
 import com.gsafety.dawn.community.manage.service.entity.EpidemicPersonEntity;
@@ -97,6 +100,9 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     @Autowired
     BasicInformationRepository basicInformationRepository;
 
+    @Autowired
+    BasicInformationService basicInformationService;
+
     // 日志
     private static Logger logger = LoggerFactory.getLogger(DailyTroubleshootRecordServiceImpl.class);
 
@@ -114,8 +120,8 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     public DailyTroubleshootRecordModel addDailyRecord(DailyTroubleshootRecordModel dailyTroubleshootRecordModel) {
 
         // 今日记录
-//        List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.todayRecord(STARTTIME, ENDTIME);
-//        List<DailyTroubleshootRecordEntity> collect = recordEntities.stream()
+//        List<DailyTroubleshootRecordEntity> todayRecords = recordRepository.todayRecord(STARTTIME, ENDTIME);
+//        List<DailyTroubleshootRecordEntity> collect = todayRecords.stream()
 //                .filter(a ->
 //                        a.getName().equals(dailyTroubleshootRecordModel.getName()) &&
 //                        a.getPhone().equals(dailyTroubleshootRecordModel.getPhone()))
@@ -123,9 +129,12 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 //        if(!collect.isEmpty())
 //            return null;
 
-        List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByNameAndPhone(dailyTroubleshootRecordModel.getName(), dailyTroubleshootRecordModel.getPhone());
-        if(!recordEntities.isEmpty())
-            return null;
+        // 可以重复
+//        List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByNameAndPhone(dailyTroubleshootRecordModel.getName(), dailyTroubleshootRecordModel.getPhone());
+//        if(!recordEntities.isEmpty())
+//            return null;
+
+        //
         DailyTroubleshootRecordEntity recordEntity = recordMapper.modelToEntity(dailyTroubleshootRecordModel);
         recordEntity.setId(UUID.randomUUID().toString());
         recordEntity.setCode(UUID.randomUUID().toString());
@@ -133,10 +142,11 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         recordEntity.setMultiTenancy(multiTenancy);
         DailyTroubleshootRecordEntity result = recordRepository.save(recordEntity);
 
+        // 体温异常添加到其它数据库
         addEpidMic(result);
 
-        //
-
+        // 往基本信息表插入数据
+        addToBasicInformation(result);
 
         return recordMapper.entityToModel(result);
     }
@@ -147,7 +157,9 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         if (exists) {
             dailyTroubleshootRecordModel.setCreateTime(TS);
             DailyTroubleshootRecordEntity recordEntity = recordRepository.saveAndFlush(recordMapper.modelToEntity(dailyTroubleshootRecordModel));
+            // 往疫情表添加数据
             addEpidMic(recordEntity);
+            //
             return recordMapper.entityToModel(recordEntity);
         }
         return null;
@@ -170,6 +182,9 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             logger.error(e.getMessage(), e);
         }
         List<DailyTroubleshootRecordEntity> result = saveRecord(recordEntities);
+        // 往基本信息表插入数据
+        result.forEach(a -> addToBasicInformation(a));
+        // 往疫情表插入数据
         result.forEach(a -> addEpidMic(a));
         return recordMapper.entitiesToModels(result);
     }
@@ -403,6 +418,8 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
                     dailyStatisticModel.setPlotName(dataSourceEntity.getName());
                     dailyStatisticModel.setBuilding(recordEntity.getBuilding());
                     dailyStatisticModel.setUnitNumber(unit.getUnitNumber());
+
+
                     dailyStatisticModels.add(dailyStatisticModel);
                 }
             }
@@ -427,13 +444,22 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 
             Integer integer = recordRepository.todayRecordCon(STARTTIME, ENDTIME, dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber());
             dailyStatisticModel.setChecked(integer);
+
+            // 统计未排查的人数 统计有误
+            List<DailyTroubleshootRecordEntity> unckecked = recordRepository.queryUnchecked(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber());
+            if(unckecked.size() > integer){
+                dailyStatisticModel.setUnchecked(unckecked.size() - integer);
+            }
+
         }
         return result;
     }
 
+    //
+
+
     @Override
     public List<DailyTroubleshootRecordModel> queryByPlotAndBuild(DailyTroubleFilterModel dailyTroubleFilterModel) {
-
         String plot = dailyTroubleFilterModel.getDailyStatisticModel().getPlotId();
         String building = dailyTroubleFilterModel.getDailyStatisticModel().getBuilding();
         String unitNumber = dailyTroubleFilterModel.getDailyStatisticModel().getUnitNumber();
@@ -483,5 +509,21 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         List<DailyTroubleshootRecordEntity> collect = troubleshootRecordEntities.stream().skip(skip).limit(Long.valueOf(dailyTroubleFilterModel.getPageSize())).collect(Collectors.toList());
 
         return recordMapper.entitiesToModels(collect);
+    }
+
+//    // 往基础数据表添加数据
+    public void addToBasicInformation(DailyTroubleshootRecordEntity recordEntity){
+        List<BasicInformationEntity> allByNameAndPhone = basicInformationRepository.findAllByNameAndPhone(recordEntity.getName(), recordEntity.getPhone());
+        BasicInformationModel basicInformationModel = new BasicInformationModel();
+        basicInformationModel.setAddress(recordEntity.getAddress());
+        basicInformationModel.setIdentificationNumber(recordEntity.getIdentificationNumber());
+        basicInformationModel.setName(recordEntity.getName());
+        basicInformationModel.setPhone(recordEntity.getPhone());
+        basicInformationModel.setSex(recordEntity.getSex());
+        if(allByNameAndPhone.isEmpty()){
+            basicInformationService.addPerson(basicInformationModel);
+        } else {
+            basicInformationService.updatePerson(basicInformationModel);
+        }
     }
 }

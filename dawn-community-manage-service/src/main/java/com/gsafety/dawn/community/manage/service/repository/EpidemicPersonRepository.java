@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.List;
 
 @Repository
 @Transactional
@@ -22,4 +23,9 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
 
     @Query(nativeQuery = true, value = "select count(*) from b_epidemic_person  WHERE diagnosis_situation = ?1 ;")
     Integer queryCountByDiagnosisSituation(String diagnosisSituation);
+
+    List<EpidemicPersonEntity> queryAllByDiagnosisSituationAndMultiTenancyOrderByUpdateTimeAsc(String diagnosisId,String communityId);
+
+    @Query(nativeQuery = true, value = "select to_char(update_time,'YYYY-MM-DD') as update_time  from b_epidemic_person GROUP BY to_char(update_time,'YYYY-MM-DD')  ;")
+    List<EpidemicPersonEntity> queryDate();
 }

@@ -1,7 +1,8 @@
 package com.gsafety.dawn.community.manage.webapi.controller;
 
-import com.gsafety.dawn.community.manage.contract.model.DiagnosisCountModel;
+import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.model.EpidemicPersonModel;
+import com.gsafety.dawn.community.manage.contract.model.total.SpecialCountModel;
 import com.gsafety.dawn.community.manage.contract.service.EpidemicPersonService;
 import com.gsafety.java.common.exception.HttpError;
 import com.gsafety.springboot.common.annotation.LimitIPRequestAnnotation;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +34,7 @@ public class EpidemicPersonController {
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
     public ResponseEntity<EpidemicPersonModel> addOneEpidemicPerson(@RequestBody @ApiParam(value = "疫情人员信息", required = true) EpidemicPersonModel epidemicPersonModel) {
         epidemicPersonModel.setId(UUID.randomUUID().toString());
+        epidemicPersonModel.setUpdateTime(epidemicPersonModel.getSubmitTime());
         EpidemicPersonModel result = epidemicPersonService.addOneEpidemicPerson(epidemicPersonModel);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -50,15 +53,51 @@ public class EpidemicPersonController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/epidemic-person", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "统计诊断各个状况的数量", notes = "DiagnosisCount()")
+    @DeleteMapping(value = "/epidemic-person/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "删除一个疫情人员信息", notes = "deleteOneEpidemicPerson(id)")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = Boolean.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+    public ResponseEntity<Boolean> deleteOneEpidemicPerson(@PathVariable @ApiParam(value = "疫情人员id", required = true) String id) {
+        Boolean result = epidemicPersonService.deleteOneEpidemicPerson(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/epidemic-person/total/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "统计诊断每种的数量", notes = "diagnosisCount()")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = DiagnosisCountModel.class,responseContainer = "List" ),
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
             @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<List<DiagnosisCountModel>> DiagnosisCount() {
-        List<DiagnosisCountModel> result = epidemicPersonService.DiagnosisCount();
+    public ResponseEntity<List<DiagnosisCountModel>> diagnosisCount() {
+        List<DiagnosisCountModel> result = epidemicPersonService.diagnosisCount();
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/epidemic-person/total/confirmed-suspected/{communityId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "累计确诊/疑似数量统计", notes = "diagnosisCountWithConfirmedAndSuspected()")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = DiagnosisCountModel.class,responseContainer = "List" ),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+    public ResponseEntity<List<SpecialCountModel>> diagnosisCountWithConfirmedAndSuspected(@PathVariable @ApiParam(value = "社区id") String communityId) {
+        List<SpecialCountModel> result = epidemicPersonService.diagnosisCountWithConfirmedAndSuspected(communityId);;
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/epidemic-person/total/health-death/{communityId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "累计治愈/死亡数量统计", notes = "diagnosisCountWithHealthAndDeath()")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = DiagnosisCountModel.class,responseContainer = "List" ),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+    public ResponseEntity<List<SpecialCountModel>> diagnosisCountWithHealthAndDeath(@PathVariable @ApiParam(value = "社区id") String communityId) {
+        List<SpecialCountModel> result = epidemicPersonService.diagnosisCountWithHealthAndDeath(communityId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

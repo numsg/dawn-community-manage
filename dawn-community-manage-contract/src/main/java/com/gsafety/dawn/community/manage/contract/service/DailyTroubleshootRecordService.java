@@ -3,7 +3,10 @@ package com.gsafety.dawn.community.manage.contract.service;
 import com.gsafety.dawn.community.manage.contract.model.DailyStatisticModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleFilterModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
+import com.gsafety.dawn.community.manage.contract.model.total.DailyStatisticPageModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
+import com.gsafety.dawn.community.manage.contract.model.total.PendingInvestigatModel;
+import com.gsafety.dawn.community.manage.contract.model.total.PlotLinkageModel;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
@@ -40,9 +43,12 @@ public interface DailyTroubleshootRecordService {
     List<DiagnosisCountModel> DiagnosisCount();
 
     // 初始查询
-    List<DailyStatisticModel> queryByConditions();
+    List<DailyStatisticModel> queryByConditions(PlotLinkageModel plotLinkageModel);
 
     // 查询小区-楼栋-单元下的用户
     List<DailyTroubleshootRecordModel> queryByPlotAndBuild(DailyTroubleFilterModel dailyTroubleFilterModel);
+
+    // 查询待排查
+    DailyStatisticPageModel queryPendingInvestigation(PendingInvestigatModel pendingInvestigatModel);
 
 }

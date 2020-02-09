@@ -5,8 +5,11 @@ import com.gsafety.dawn.community.common.util.ExcelUtil;
 import com.gsafety.dawn.community.manage.contract.model.DailyStatisticModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleFilterModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
+import com.gsafety.dawn.community.manage.contract.model.total.DailyStatisticPageModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.model.*;
+import com.gsafety.dawn.community.manage.contract.model.total.PendingInvestigatModel;
+import com.gsafety.dawn.community.manage.contract.model.total.PlotLinkageModel;
 import com.gsafety.dawn.community.manage.contract.service.BasicInformationService;
 import com.gsafety.dawn.community.manage.contract.service.DailyTroubleshootRecordService;
 import com.gsafety.dawn.community.manage.service.datamappers.BasciInformationMapper;
@@ -23,6 +26,7 @@ import com.gsafety.dawn.community.manage.service.repository.EpidemicPersonReposi
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.drools.core.util.ArrayIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +42,8 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.*;
 
 /**
  * description:
@@ -146,7 +151,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         addEpidMic(result);
 
         // 往基本信息表插入数据
-        addToBasicInformation(result);
+//        addToBasicInformation(result);
 
         return recordMapper.entityToModel(result);
     }
@@ -183,7 +188,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         }
         List<DailyTroubleshootRecordEntity> result = saveRecord(recordEntities);
         // 往基本信息表插入数据
-        result.forEach(a -> addToBasicInformation(a));
+//        result.forEach(a -> addToBasicInformation(a));
         // 往疫情表插入数据
         result.forEach(a -> addEpidMic(a));
         return recordMapper.entitiesToModels(result);
@@ -234,13 +239,18 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 
             // 其它症状
             String other = ExcelUtil.convertCellValueToString(row.getCell(12));
-            String dataIds = getDataIds(other);
-            other = dataIds.substring(0 , dataIds.length() - 1);
+//            String dataIds = getDataIds(other);
+//            if(dataIds != null){
+//                other = dataIds.substring(0 , dataIds.length() - 1);
+//            }
+
 
             // 分类诊疗意见
             String opinion = ExcelUtil.convertCellValueToString(row.getCell(13));
-            String dataIdO = getDataIds(opinion);
-            opinion = dataIdO.substring(0 , dataIdO.length() - 1 );
+//            String dataIdO = getDataIds(opinion);
+//            if(dataIdO != null){
+//                opinion = dataIdO.substring(0 , dataIdO.length() - 1 );
+//            }
 
             String name = ExcelUtil.convertCellValueToString(row.getCell(0));
             String idCard = ExcelUtil.convertCellValueToString(row.getCell(1));
@@ -257,7 +267,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 
 
             String note = ExcelUtil.convertCellValueToString(row.getCell(14));
-            if ("".equals(name) || "".equals(phone) || "".equals(address))
+            if ("".equals(name) || "".equals(phone) || "".equals(build) || "".equals(unit))
                 continue;
             DailyTroubleshootRecordEntity recordEntity = new DailyTroubleshootRecordEntity();
             recordEntity.setId(UUID.randomUUID().toString());
@@ -398,7 +408,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 
 
     @Override  //  DailyTroubleFilterModel dailyTroubleFilterModel
-    public List<DailyStatisticModel> queryByConditions() {
+    public List<DailyStatisticModel> queryByConditions(PlotLinkageModel plotLinkageModel) {
         // 查所有小区
         List<DailyStatisticModel> dailyStatisticModels = new ArrayList<>();
         List<DSourceDataEntity> allByDataSource = dSourceDataRepository.findAllByDataSourceId(commId);
@@ -418,7 +428,6 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
                     dailyStatisticModel.setPlotName(dataSourceEntity.getName());
                     dailyStatisticModel.setBuilding(recordEntity.getBuilding());
                     dailyStatisticModel.setUnitNumber(unit.getUnitNumber());
-
 
                     dailyStatisticModels.add(dailyStatisticModel);
                 }
@@ -446,16 +455,18 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             dailyStatisticModel.setChecked(integer);
 
             // 统计未排查的人数 统计有误
-            List<DailyTroubleshootRecordEntity> unckecked = recordRepository.queryUnchecked(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber());
-            if(unckecked.size() > integer){
-                dailyStatisticModel.setUnchecked(unckecked.size() - integer);
+            List<DailyTroubleshootRecordEntity> allPersons = recordRepository.queryUnchecked(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber());
+            List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByPlotAndBuildingAndUnitNumber(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber(), STARTTIME, ENDTIME);
+
+            if(allPersons.size() > integer){
+                dailyStatisticModel.setUnchecked(allPersons.size() - integer);
             }
 
         }
         return result;
     }
 
-    //
+
 
 
     @Override
@@ -477,10 +488,13 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         //  medicalOpinion
         List<DailyTroubleshootRecordEntity> opions = new ArrayList<>();
         if(dailyTroubleFilterModel.getMedicalOpinion().size() > 0){
-            String medicalOpinion = "";
-            for(int i = 0 ; i < dailyTroubleFilterModel.getMedicalOpinion().size() ; i++){
-                medicalOpinion += dailyTroubleFilterModel.getMedicalOpinion().get(i);
-            }
+
+//            for(int i = 0 ; i < dailyTroubleFilterModel.getMedicalOpinion().size() ; i++){
+//                medicalOpinion += dailyTroubleFilterModel.getMedicalOpinion().get(i);
+//            }
+
+            String medicalOpinion = dailyTroubleFilterModel.getMedicalOpinion().stream().collect(Collectors.joining());
+
             for(int t = 0 ; t <recordEntities.size() ; t++){
                 if(recordEntities.get(t).getMedicalOpinion().contains(medicalOpinion)){
                     opions.add(recordEntities.get(t));
@@ -507,23 +521,54 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         // 分页
         long skip = dailyTroubleFilterModel.getPage() * dailyTroubleFilterModel.getPageSize();
         List<DailyTroubleshootRecordEntity> collect = troubleshootRecordEntities.stream().skip(skip).limit(Long.valueOf(dailyTroubleFilterModel.getPageSize())).collect(Collectors.toList());
-
         return recordMapper.entitiesToModels(collect);
     }
 
 //    // 往基础数据表添加数据
-    public void addToBasicInformation(DailyTroubleshootRecordEntity recordEntity){
-        List<BasicInformationEntity> allByNameAndPhone = basicInformationRepository.findAllByNameAndPhone(recordEntity.getName(), recordEntity.getPhone());
-        BasicInformationModel basicInformationModel = new BasicInformationModel();
-        basicInformationModel.setAddress(recordEntity.getAddress());
-        basicInformationModel.setIdentificationNumber(recordEntity.getIdentificationNumber());
-        basicInformationModel.setName(recordEntity.getName());
-        basicInformationModel.setPhone(recordEntity.getPhone());
-        basicInformationModel.setSex(recordEntity.getSex());
-        if(allByNameAndPhone.isEmpty()){
-            basicInformationService.addPerson(basicInformationModel);
-        } else {
-            basicInformationService.updatePerson(basicInformationModel);
+//    public void addToBasicInformation(DailyTroubleshootRecordEntity recordEntity){
+//        List<BasicInformationEntity> allByNameAndPhone = basicInformationRepository.findAllByNameAndPhone(recordEntity.getName(), recordEntity.getPhone());
+//        BasicInformationModel basicInformationModel = new BasicInformationModel();
+//        basicInformationModel.setAddress(recordEntity.getAddress());
+//        basicInformationModel.setIdentificationNumber(recordEntity.getIdentificationNumber());
+//        basicInformationModel.setName(recordEntity.getName());
+//        basicInformationModel.setPhone(recordEntity.getPhone());
+//        basicInformationModel.setSex(recordEntity.getSex());
+//        if(allByNameAndPhone.isEmpty()){
+//            basicInformationService.addPerson(basicInformationModel);
+//        } else {
+//            basicInformationService.updatePerson(basicInformationModel);
+//        }
+//    }
+
+
+    // 该小区所有人（查plot、） - 该小区所有今日已排查 = 该小区未排查
+    @Override
+    public DailyStatisticPageModel queryPendingInvestigation(PendingInvestigatModel pendModel) {
+
+        DailyStatisticPageModel dailyStatisticPageModel = new DailyStatisticPageModel();
+        List<DailyTroubleshootRecordEntity> alreadyPends =
+                recordRepository.queryAllByPlotAndBuildingAndUnitNumber
+                        (pendModel.getPlot() , pendModel.getBuilding() , pendModel.getUnitNumber()
+                                , STARTTIME , ENDTIME);
+        List<DailyTroubleshootRecordEntity> allPerson = recordRepository.queryUnchecked(pendModel.getPlot() , pendModel.getBuilding() , pendModel.getUnitNumber());
+        if(alreadyPends.isEmpty()){
+            dailyStatisticPageModel.setTotal(allPerson.size());
+            dailyStatisticPageModel.setDailyTroubleshootRecordModels(recordMapper.entitiesToModels(allPerson));
+            return dailyStatisticPageModel;
         }
+        List<DailyTroubleshootRecordEntity> result = allPerson.stream()
+                .filter(item -> !alreadyPends.stream()
+                        .map(e -> e.getName() + e.getPhone())
+                        .collect(toList())
+                        .contains(item.getName() + item.getPhone())).collect(toList());
+        long skip = pendModel.getPage() * pendModel.getPageSize();
+        int total = result.size();
+        List<DailyTroubleshootRecordEntity> collect = result.stream().skip(skip).limit(Long.valueOf(pendModel.getPageSize())).collect(toList());
+        List<DailyTroubleshootRecordModel> dailyTroubleshootRecordModels = recordMapper.entitiesToModels(collect);
+
+        dailyStatisticPageModel.setTotal(total);
+        dailyStatisticPageModel.setDailyTroubleshootRecordModels(dailyTroubleshootRecordModels);
+
+        return dailyStatisticPageModel;
     }
 }

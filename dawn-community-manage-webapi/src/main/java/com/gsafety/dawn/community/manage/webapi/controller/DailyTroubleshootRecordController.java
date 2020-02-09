@@ -1,7 +1,10 @@
 package com.gsafety.dawn.community.manage.webapi.controller;
 
 import com.gsafety.dawn.community.manage.contract.model.*;
+import com.gsafety.dawn.community.manage.contract.model.total.DailyStatisticPageModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
+import com.gsafety.dawn.community.manage.contract.model.total.PendingInvestigatModel;
+import com.gsafety.dawn.community.manage.contract.model.total.PlotLinkageModel;
 import com.gsafety.dawn.community.manage.contract.service.DailyTroubleshootRecordService;
 import com.gsafety.java.common.exception.HttpError;
 import com.gsafety.springboot.common.annotation.LimitIPRequestAnnotation;
@@ -151,8 +154,8 @@ public class DailyTroubleshootRecordController {
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
             @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<List<DailyStatisticModel>> multiCriteriaQuery()  {
-        List<DailyStatisticModel> recordMaps = dailyTroubleshootRecordService.queryByConditions();
+    public ResponseEntity<List<DailyStatisticModel>> multiCriteriaQuery(@RequestBody @ApiParam(value = "日常排查记录", required = true)PlotLinkageModel plotLinkageModel)  {
+        List<DailyStatisticModel> recordMaps = dailyTroubleshootRecordService.queryByConditions(plotLinkageModel);
         return new ResponseEntity<>(recordMaps, HttpStatus.OK);
     }
 
@@ -169,6 +172,18 @@ public class DailyTroubleshootRecordController {
         return new ResponseEntity<>(recordMaps, HttpStatus.OK);
     }
 
+
+    @PostMapping(value = "/daily-troubleshoot-record/un-checked", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "未排查询", notes = "unCheckedQuery()")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = DailyStatisticPageModel.class,responseContainer = "List" ),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+    public ResponseEntity<DailyStatisticPageModel> unCheckedQuery(@RequestBody @ApiParam(value = "查询未排查", required = true)PendingInvestigatModel pendingInvestigatModel)  {
+        DailyStatisticPageModel recordMaps = dailyTroubleshootRecordService.queryPendingInvestigation(pendingInvestigatModel);
+        return new ResponseEntity<>(recordMaps, HttpStatus.OK);
+    }
 
 
 }

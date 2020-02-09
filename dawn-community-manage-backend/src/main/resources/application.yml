@@ -6,7 +6,7 @@ spring:
     name: dawn-community-manage
 
   datasource:
-    url: jdbc:postgresql://116.62.205.14:30022/dawn-db #业务数据库访问url
+    url: jdbc:postgresql://116.62.205.14:30015/test #业务数据库访问url
     username: postgres    #业务数据库访问用户名
     password: postgres  #业务数据库访问用户密码
     driver-class-name: org.postgresql.Driver #数据库访问驱动名称
@@ -32,9 +32,10 @@ spring:
 logging:
   config: classpath:logback-spring.xml
 
+access:
+  data-collection: http://39.105.209.108:8090/api
 # app相关配置
 app:
-  language: en_US
   multiTenancy: 123456
   bodyTemperature: 37.3
   statisticalUrl: http://39.105.209.108:8090/api/search/v2

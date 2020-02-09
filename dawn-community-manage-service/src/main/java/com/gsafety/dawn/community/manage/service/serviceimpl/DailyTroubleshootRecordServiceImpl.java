@@ -93,6 +93,8 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     @Value("${app.medicalAdvice}")
     private String medicalAdvice;
 
+
+
     @Autowired
     private DSourceDataRepository dSourceDataRepository;
 
@@ -120,6 +122,12 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     // 一天结束时间
     private static final Timestamp ENDTIME = DateUtil.getEndTime();
 
+    // 男
+    private static final String maleId = "3f265ff3-75b8-49f1-9669-4506535a500c";
+    //女
+    private static final String femaleId = "2ae58f9e-65f2-4f2a-8244-ac01d668b7b5";
+    // 性别未知
+    private static final String noSexId="13a5633b-57fa-4850-9c36-61356bd99c50";
 
     @Override
     public DailyTroubleshootRecordModel addDailyRecord(DailyTroubleshootRecordModel dailyTroubleshootRecordModel) {
@@ -151,7 +159,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         addEpidMic(result);
 
         // 往基本信息表插入数据
-//        addToBasicInformation(result);
+        addToBasicInformation(result);
 
         return recordMapper.entityToModel(result);
     }
@@ -164,7 +172,8 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             DailyTroubleshootRecordEntity recordEntity = recordRepository.saveAndFlush(recordMapper.modelToEntity(dailyTroubleshootRecordModel));
             // 往疫情表添加数据
             addEpidMic(recordEntity);
-            //
+            //往基本信息表插入数据
+            addToBasicInformation(recordEntity);
             return recordMapper.entityToModel(recordEntity);
         }
         return null;
@@ -188,9 +197,12 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         }
         List<DailyTroubleshootRecordEntity> result = saveRecord(recordEntities);
         // 往基本信息表插入数据
-//        result.forEach(a -> addToBasicInformation(a));
         // 往疫情表插入数据
-        result.forEach(a -> addEpidMic(a));
+        result.forEach(a -> {
+            addToBasicInformation(a);
+            addEpidMic(a);
+        });
+
         return recordMapper.entitiesToModels(result);
     }
 
@@ -267,8 +279,10 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 
 
             String note = ExcelUtil.convertCellValueToString(row.getCell(14));
-            if ("".equals(name) || "".equals(phone) || "".equals(build) || "".equals(unit))
+            if ("".equals(name)||"".equals(address) || "".equals(phone) || "".equals(build) || "".equals(unit))
                 continue;
+           if(name==null ||address==null|| phone==null || build ==null || unit ==null)
+               continue;
             DailyTroubleshootRecordEntity recordEntity = new DailyTroubleshootRecordEntity();
             recordEntity.setId(UUID.randomUUID().toString());
             recordEntity.setCreateTime(TS);
@@ -283,24 +297,17 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
                 recordEntity.setAge(Integer.valueOf(age));
             }
 
-
-            if (contact.equals("t")) {
-                recordEntity.setContact(true);
-            } else {
-                recordEntity.setContact(false);
+            if (sex==null || "".equals(sex)){
+                recordEntity.setSex(noSexId);
+            }else{
+                recordEntity.setSex(sex.equals("男") ? maleId:femaleId);
             }
-
-            if (tempture.equals("t")) {
-                recordEntity.setExceedTemp(true);
-            } else {
-                recordEntity.setExceedTemp(false);
-            }
-
+            recordEntity.setContact(contact.equals("t"));
+            recordEntity.setExceedTemp(tempture.equals("t"));
             recordEntity.setBuilding(build);
             recordEntity.setPlot(plot);
             recordEntity.setCode(UUID.randomUUID().toString());
             recordEntity.setIdentificationNumber(idCard);
-            recordEntity.setSex(sex);
             recordEntity.setUnitNumber(unit);
             recordEntity.setRoomNo(roomNo);
             recordEntity.setName(name);
@@ -325,6 +332,8 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             epidemicPersonEntity.setId(UUID.randomUUID().toString());
             epidemicPersonEntity.setSubmitTime(TS);
             epidemicPersonEntity.setGender(dailyTroubleshootRecordEntity.getSex());
+            epidemicPersonEntity.setSubmitTime(dailyTroubleshootRecordEntity.getCreateTime());
+           // epidemicPersonEntity.setUpdateTime(dailyTroubleshootRecordEntity.getCreateTime());
             epidemicPersonEntity.setMultiTenancy(multiTenancy);
             epidemicPersonEntity.setName(dailyTroubleshootRecordEntity.getName());
             epidemicPersonEntity.setMobileNumber(dailyTroubleshootRecordEntity.getPhone());
@@ -525,20 +534,20 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     }
 
 //    // 往基础数据表添加数据
-//    public void addToBasicInformation(DailyTroubleshootRecordEntity recordEntity){
-//        List<BasicInformationEntity> allByNameAndPhone = basicInformationRepository.findAllByNameAndPhone(recordEntity.getName(), recordEntity.getPhone());
-//        BasicInformationModel basicInformationModel = new BasicInformationModel();
-//        basicInformationModel.setAddress(recordEntity.getAddress());
-//        basicInformationModel.setIdentificationNumber(recordEntity.getIdentificationNumber());
-//        basicInformationModel.setName(recordEntity.getName());
-//        basicInformationModel.setPhone(recordEntity.getPhone());
-//        basicInformationModel.setSex(recordEntity.getSex());
-//        if(allByNameAndPhone.isEmpty()){
-//            basicInformationService.addPerson(basicInformationModel);
-//        } else {
-//            basicInformationService.updatePerson(basicInformationModel);
-//        }
-//    }
+    public void addToBasicInformation(DailyTroubleshootRecordEntity recordEntity){
+        List<BasicInformationEntity> allByNameAndPhone = basicInformationRepository.findAllByNameAndPhone(recordEntity.getName(), recordEntity.getPhone());
+        BasicInformationModel basicInformationModel = new BasicInformationModel();
+        basicInformationModel.setAddress(recordEntity.getAddress());
+        basicInformationModel.setIdentificationNumber(recordEntity.getIdentificationNumber());
+        basicInformationModel.setName(recordEntity.getName());
+        basicInformationModel.setPhone(recordEntity.getPhone());
+        basicInformationModel.setSex(recordEntity.getSex());
+        if(allByNameAndPhone.isEmpty()){
+            basicInformationService.addPerson(basicInformationModel);
+        } else {
+            basicInformationService.updatePerson(basicInformationModel);
+        }
+    }
 
 
     // 该小区所有人（查plot、） - 该小区所有今日已排查 = 该小区未排查

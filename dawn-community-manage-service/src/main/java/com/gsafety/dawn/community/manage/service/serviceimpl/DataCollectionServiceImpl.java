@@ -25,40 +25,46 @@ public class DataCollectionServiceImpl {
     @Value("${access.data-collection}")
     private String dataCollectionUrl;
 
+    @Value("${app.villageId}")
+    private String villageId;
+
+    @Value("${app.pageSize}")
+    private Integer pageSize;
+
     // 男
-    private String maleId = "3f265ff3-75b8-49f1-9669-4506535a500c";
+    private static final String maleId = "3f265ff3-75b8-49f1-9669-4506535a500c";
     //女
-    private String femaleId = "2ae58f9e-65f2-4f2a-8244-ac01d668b7b5";
+    private static final String femaleId = "2ae58f9e-65f2-4f2a-8244-ac01d668b7b5";
 
     // 其他症状
     //0:无
-    private String noId = "26d8ca3b-8b7b-4109-a992-8052f9defb9d";
+    private static final String noId = "26d8ca3b-8b7b-4109-a992-8052f9defb9d";
     //1:乏力
-    private String feebleId = "5e647e8b-6396-4e56-854b-ed1be1c60ae3";
+    private static final String feebleId = "5e647e8b-6396-4e56-854b-ed1be1c60ae3";
     //2:干咳
-    private String hooseId = "e081de69-a984-4abb-a2a1-ed9996a63917";
+    private static final  String hooseId = "e081de69-a984-4abb-a2a1-ed9996a63917";
     //3:肌痛
-    private String musclePainId = "0e2adfab-bb9d-4ef9-a4db-6a5baa2d7788";
+    private static final String musclePainId = "0e2adfab-bb9d-4ef9-a4db-6a5baa2d7788";
     //4:寒战
-    private String aguedId = "be64af80-00ee-4ea5-94ba-3246d7d16230";
+    private static final String aguedId = "be64af80-00ee-4ea5-94ba-3246d7d16230";
     //5:呼吸困难
-    private String breathId = "b01b1538-31f3-428b-9e33-531af1f40f83";
+    private static final String breathId = "b01b1538-31f3-428b-9e33-531af1f40f83";
     //6:咽痛
-    private String pharyngalgiaId = "3dbbfced-ca40-437b-91d5-70f0c12b32ea";
+    private static final String pharyngalgiaId = "3dbbfced-ca40-437b-91d5-70f0c12b32ea";
     //7:头疼
-    private String headacheId = "ee377b8b-220f-4e8b-a6ce-fe47082e227b";
+    private static final String headacheId = "ee377b8b-220f-4e8b-a6ce-fe47082e227b";
     //8:眩晕
-    private String dizzyId = "ce0902a6-e3ee-4055-b1c3-d41a365a5522";
+    private static final String dizzyId = "ce0902a6-e3ee-4055-b1c3-d41a365a5522";
     //9:腹痛
-    private String bellyacheId = "e1ed1513-cfa1-4343-aa50-a4ab76c09c46";
+    private static final String bellyacheId = "e1ed1513-cfa1-4343-aa50-a4ab76c09c46";
     //10:腹泻
-    private String diarrhoeaId = "5f98d8f5-40e9-427d-90c0-e1849a87ae19";
+    private static final String diarrhoeaId = "5f98d8f5-40e9-427d-90c0-e1849a87ae19";
     //11:恶心
-    private String nauseaId = "1720a8db-a0b4-43d2-8f52-3a4df8e3fca5";
+    private static final String nauseaId = "1720a8db-a0b4-43d2-8f52-3a4df8e3fca5";
     //12:呕吐
-    private String vomitId = "2fdd7934-7823-4227-8712-7488ebc7704e";
+    private static final String vomitId = "2fdd7934-7823-4227-8712-7488ebc7704e";
     //13:鼻塞
-    private String nasalObstructionId = "f0671f8a-233f-44a5-a785-9e9ab0c18fe8";
+    private static final String nasalObstructionId = "f0671f8a-233f-44a5-a785-9e9ab0c18fe8";
 
     //分类诊疗医疗意见：
     // 0:确诊患者，
@@ -77,7 +83,7 @@ public class DataCollectionServiceImpl {
     private String url = "/search/v2";
 
     // 杨桥湖社区id
-    private static final String communityId = "a2e01f0e-6c86-4a41-bcf3-c07c1ffa2f82";
+    private static final String communityDataSourceId = "a2e01f0e-6c86-4a41-bcf3-c07c1ffa2f82";
     // 其他状况id
     private static final String otherSymptomId = "582daff0-56a5-45a4-9ca7-dc098c688753";
     @Autowired
@@ -104,20 +110,28 @@ public class DataCollectionServiceImpl {
 
         System.out.println(formatter.format(startTimeDate));
         System.out.println(formatter.format(endTimeDate));
-
+        System.out.println(villageId);
         RequestModel requestModel = new RequestModel();
-        requestModel.setPageSize(20);
+        requestModel.setPageSize(pageSize);
         requestModel.setKeyWords("");
+        requestModel.setCurrentVillage(villageId);
         requestModel.setStartDate(startTimeDate);
         requestModel.setEndDate(DateUtil.getDayEndDate());
-
         Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
         if (map.get("data") != null && map.get("success").equals(true)) {
             Map data = JsonUtil.fromJson(toJson(map.get("data")), Map.class);
             Integer total = Integer.parseInt(JsonUtil.fromJson(toJson(data.get("total")), String.class));
-            int pageTotal = total / requestModel.getPageSize();
 
-            plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(communityId);
+            int pageTotal=1;
+            if (total>pageSize){
+                if (total%pageSize==0){
+                    pageTotal=total/pageSize;
+                }else{
+                    pageTotal=total/pageSize+1;
+                }
+            }
+
+            plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(communityDataSourceId);
             otherSymptoms = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(otherSymptomId);
 
             for (int i = 1; i <= pageTotal; i++) {
@@ -145,8 +159,9 @@ public class DataCollectionServiceImpl {
             Map objMap = JsonUtil.fromJson(toJson(obj), Map.class);
             DailyTroubleshootRecordEntity entity = new DailyTroubleshootRecordEntity();
             if (objMap.get("name") == null || objMap.get("phone") == null || objMap.get("residence") == null || objMap.get("sex") == null) {
-                break;
+                continue;
             }
+
             entity.setId(objMap.get("id").toString());
             entity.setName(objMap.get("name").toString());
             entity.setPhone(objMap.get("phone").toString());
@@ -183,8 +198,8 @@ public class DataCollectionServiceImpl {
                 entity.setConfirmed_diagnosis(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
                 entity.setMedicalOpinion(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
             }
-            entity.setMultiTenancy("123456");
-            //entity.setMultiTenancy(objMap.get("currentVillage").toString());
+            entity.setMultiTenancy(villageId);
+           // entity.setMultiTenancy(objMap.get("currentVillage").toString());
             //entity.setLeaveArea();
             //entity.setPlot(objMap.get("communityCode").toString());
 

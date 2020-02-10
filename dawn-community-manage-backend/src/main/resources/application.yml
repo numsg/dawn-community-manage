@@ -6,7 +6,7 @@ spring:
     name: dawn-community-manage
 
   datasource:
-    url: jdbc:postgresql://116.62.205.14:30022/dawn-db #业务数据库访问url
+    url: jdbc:postgresql://116.62.205.14:30015/test #业务数据库访问url
     username: postgres    #业务数据库访问用户名
     password: postgres  #业务数据库访问用户密码
     driver-class-name: org.postgresql.Driver #数据库访问驱动名称
@@ -42,6 +42,9 @@ app:
   commId: a2e01f0e-6c86-4a41-bcf3-c07c1ffa2f82
   otherSymptomId: 582daff0-56a5-45a4-9ca7-dc098c688753
   medicalAdvice: fdd092c0-3227-495b-a83a-0bdc68e67708
+  waitTime: 7200000
+  villageId: 420802001013
+  pageSize: 10
 
 
 

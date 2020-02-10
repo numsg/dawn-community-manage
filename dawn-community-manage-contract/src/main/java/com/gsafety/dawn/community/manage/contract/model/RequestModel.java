@@ -2,12 +2,6 @@ package com.gsafety.dawn.community.manage.contract.model;
 
 import java.util.Date;
 
-/**
- * description:
- *
- * @outhor liujian
- * @create 2020-02-08 22:29
- */
 public class RequestModel {
 
     private int pageNo;
@@ -19,6 +13,8 @@ public class RequestModel {
     private Date endDate;
 
     private String keyWords;
+
+    private String currentVillage;
 
     public RequestModel() {
         // 空构造
@@ -62,5 +58,13 @@ public class RequestModel {
 
     public void setKeyWords(String keyWords) {
         this.keyWords = keyWords;
+    }
+
+    public String getCurrentVillage() {
+        return currentVillage;
+    }
+
+    public void setCurrentVillage(String currentVillage) {
+        this.currentVillage = currentVillage;
     }
 }

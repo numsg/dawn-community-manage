@@ -1,5 +1,6 @@
 package com.gsafety.dawn.community.manage.service.serviceimpl;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletContextEvent;
@@ -13,11 +14,14 @@ public class DataMoveTaskImpl extends DataCollectionServiceImpl implements Servl
 
     private Timer timer = null;
 
+    @Value("${app.waitTime}")
+    private Integer waitTime;
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         timer = new Timer(true);
         sce.getServletContext().log("定时器已启动");
-        timer.schedule(new OneTask(), 10000, 3600000);//延迟60秒，定时1小时
+        timer.schedule(new OneTask(), 10000, waitTime);//延迟60秒，定时1小时
     }
 
     @Override

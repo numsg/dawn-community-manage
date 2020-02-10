@@ -278,10 +278,10 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 
 
             String note = ExcelUtil.convertCellValueToString(row.getCell(14));
-            if ("".equals(name) || "".equals(address) || "".equals(phone) || "".equals(build) || "".equals(unit))
+            if ("".equals(name)|| "".equals(phone) || "".equals(build) || "".equals(unit))
                 continue;
-            if (name == null || address == null || phone == null || build == null || unit == null)
-                continue;
+           if(name==null || phone==null || build ==null || unit ==null)
+               continue;
             DailyTroubleshootRecordEntity recordEntity = new DailyTroubleshootRecordEntity();
             recordEntity.setId(UUID.randomUUID().toString());
             recordEntity.setCreateTime(TS);
@@ -301,8 +301,17 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             } else {
                 recordEntity.setSex(sex.equals("男") ? maleId : femaleId);
             }
-            recordEntity.setContact(contact.equals("t"));
-            recordEntity.setExceedTemp(tempture.equals("t"));
+            if(contact.equals("t")){
+                recordEntity.setContact(true);
+            }else{
+                recordEntity.setContact(false);
+            }
+            if(tempture.equals("t")){
+                recordEntity.setExceedTemp(true);
+            }else{
+                recordEntity.setExceedTemp(false);
+            }
+
             recordEntity.setBuilding(build);
             recordEntity.setPlot(plot);
             recordEntity.setCode(UUID.randomUUID().toString());

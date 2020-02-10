@@ -46,7 +46,7 @@ public class TimerServiceImpl extends DataCollectionServiceImpl implements Servl
 
         @Override
         public void run() {
-            System.out.println("开始一次数据迁移");
+            System.out.println("开始一次数据同步");
             timeQuery();
             }
         }

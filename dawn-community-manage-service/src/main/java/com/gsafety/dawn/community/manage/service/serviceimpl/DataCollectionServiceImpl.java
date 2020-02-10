@@ -143,6 +143,7 @@ public class DataCollectionServiceImpl{
     }
 
     public Boolean getDataFromAccess(RequestModel requestModel) {
+        Boolean result=false;
         Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
         if (map.get("data") == null || map.get("success").equals(false)) {
             return false;
@@ -212,10 +213,11 @@ public class DataCollectionServiceImpl{
             startTimeDate = entity.getCreateTime();
 
             if (!recordRepository.existsById(entity.getId())) {
+                result=true;
                 recordRepository.save(entity);
             }
         }
-        return true;
+        return result;
     }
 
     private String splitOtherSymptom(String symptoms) {

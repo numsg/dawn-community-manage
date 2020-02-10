@@ -94,7 +94,6 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     private String medicalAdvice;
 
 
-
     @Autowired
     private DSourceDataRepository dSourceDataRepository;
 
@@ -127,7 +126,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     //女
     private static final String femaleId = "2ae58f9e-65f2-4f2a-8244-ac01d668b7b5";
     // 性别未知
-    private static final String noSexId="13a5633b-57fa-4850-9c36-61356bd99c50";
+    private static final String noSexId = "13a5633b-57fa-4850-9c36-61356bd99c50";
 
     @Override
     public DailyTroubleshootRecordModel addDailyRecord(DailyTroubleshootRecordModel dailyTroubleshootRecordModel) {
@@ -279,10 +278,10 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 
 
             String note = ExcelUtil.convertCellValueToString(row.getCell(14));
-            if ("".equals(name)||"".equals(address) || "".equals(phone) || "".equals(build) || "".equals(unit))
+            if ("".equals(name) || "".equals(address) || "".equals(phone) || "".equals(build) || "".equals(unit))
                 continue;
-           if(name==null ||address==null|| phone==null || build ==null || unit ==null)
-               continue;
+            if (name == null || address == null || phone == null || build == null || unit == null)
+                continue;
             DailyTroubleshootRecordEntity recordEntity = new DailyTroubleshootRecordEntity();
             recordEntity.setId(UUID.randomUUID().toString());
             recordEntity.setCreateTime(TS);
@@ -297,10 +296,10 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
                 recordEntity.setAge(Integer.valueOf(age));
             }
 
-            if (sex==null || "".equals(sex)){
+            if (sex == null || "".equals(sex)) {
                 recordEntity.setSex(noSexId);
-            }else{
-                recordEntity.setSex(sex.equals("男") ? maleId:femaleId);
+            } else {
+                recordEntity.setSex(sex.equals("男") ? maleId : femaleId);
             }
             recordEntity.setContact(contact.equals("t"));
             recordEntity.setExceedTemp(tempture.equals("t"));
@@ -333,7 +332,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             epidemicPersonEntity.setSubmitTime(TS);
             epidemicPersonEntity.setGender(dailyTroubleshootRecordEntity.getSex());
             epidemicPersonEntity.setSubmitTime(dailyTroubleshootRecordEntity.getCreateTime());
-           // epidemicPersonEntity.setUpdateTime(dailyTroubleshootRecordEntity.getCreateTime());
+            // epidemicPersonEntity.setUpdateTime(dailyTroubleshootRecordEntity.getCreateTime());
             epidemicPersonEntity.setMultiTenancy(multiTenancy);
             epidemicPersonEntity.setName(dailyTroubleshootRecordEntity.getName());
             epidemicPersonEntity.setMobileNumber(dailyTroubleshootRecordEntity.getPhone());
@@ -343,13 +342,13 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     }
 
     // 获取ids
-    public String getDataIds(String data){
+    public String getDataIds(String data) {
         if (!"".equals(data) || data != null) {
             String realOther = "";
             String[] split = data.split(",");
-            for (int t = 0; t <split.length ; t++){
+            for (int t = 0; t < split.length; t++) {
                 List<DSourceDataEntity> allByName = dSourceDataRepository.findAllByName(split[t]);
-                if(!allByName.isEmpty()){
+                if (!allByName.isEmpty()) {
                     realOther += allByName.get(0).getId() + ",";
                 }
             }
@@ -416,80 +415,121 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     }
 
 
-    @Override  //  DailyTroubleFilterModel dailyTroubleFilterModel
+//    @Override  //  DailyTroubleFilterModel dailyTroubleFilterModel
+//    public List<DailyStatisticModel> queryByConditions() {
+//        // 查所有小区
+//        List<DailyStatisticModel> dailyStatisticModels = new ArrayList<>();
+//        List<DSourceDataEntity> allByDataSource = dSourceDataRepository.findAllByDataSourceId(commId);
+//
+//        for (int i = 0; i < allByDataSource.size(); i++) {
+//            DSourceDataEntity dataSourceEntity = allByDataSource.get(i);
+//
+//            // 根据小区查所有楼栋
+//            List<DailyTroubleshootRecordEntity> recordEntityList = recordRepository.queryAllByPlot(dataSourceEntity.getId());
+//            for (int j = 0; j < recordEntityList.size(); j++) {
+//                DailyTroubleshootRecordEntity recordEntity = recordEntityList.get(j);
+//                List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByPlotAndbAndBuilding(dataSourceEntity.getId(), recordEntity.getBuilding());
+//                for (int k = 0; k < recordEntities.size(); k++) {
+//                    DailyTroubleshootRecordEntity unit = recordEntities.get(k);
+//                    DailyStatisticModel dailyStatisticModel = new DailyStatisticModel();
+//                    dailyStatisticModel.setPlotId(dataSourceEntity.getId());
+//                    dailyStatisticModel.setPlotName(dataSourceEntity.getName());
+//                    dailyStatisticModel.setBuilding(recordEntity.getBuilding());
+//                    dailyStatisticModel.setUnitNumber(unit.getUnitNumber());
+//
+//                    dailyStatisticModels.add(dailyStatisticModel);
+//                }
+//            }
+//        }
+//        Set<DailyStatisticModel> set = new TreeSet<>(new Comparator<DailyStatisticModel>() {
+//            @Override
+//            public int compare(DailyStatisticModel t1, DailyStatisticModel t2) {
+//                int count = 1;
+//                if (StringUtils.equals(t1.getPlotId(), t2.getPlotId()) &&
+//                        StringUtils.equals(t1.getBuilding(), t2.getBuilding())
+//                        && StringUtils.equals(t1.getUnitNumber(), t2.getUnitNumber())) {
+//                    count = 0;
+//                }
+//                return count;
+//            }
+//        });
+//        set.addAll(dailyStatisticModels);
+//        List<DailyStatisticModel> result = new ArrayList<>(set);
+//
+//        for (int t = 0; t < result.size(); t++) {
+//            DailyStatisticModel dailyStatisticModel = result.get(t);
+//
+//            Integer integer = recordRepository.todayRecordCon(STARTTIME, ENDTIME, dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber());
+//            dailyStatisticModel.setChecked(integer);
+//
+//            // 统计未排查的人数 统计有误
+//            List<DailyTroubleshootRecordEntity> allPersons = recordRepository.queryUnchecked(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber());
+//            List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByPlotAndBuildingAndUnitNumber(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber(), STARTTIME, ENDTIME);
+//
+//            List<DailyTroubleshootRecordEntity> temp = allPersons.stream()
+//                    .filter(item -> !recordEntities.stream()
+//                            .map(e -> e.getName() + e.getPhone())
+//                            .collect(toList())
+//                            .contains(item.getName() + item.getPhone())).collect(toList());
+//
+//
+//            Set<DailyStatisticModel> set2 = new TreeSet<>(new Comparator<DailyStatisticModel>() {
+//                @Override
+//                public int compare(DailyStatisticModel t1, DailyStatisticModel t2) {
+//                    int count = 1;
+//                    if (StringUtils.equals(t1.getPlotId(), t2.getPlotId()) &&
+//                            StringUtils.equals(t1.getBuilding(), t2.getBuilding())
+//                            && StringUtils.equals(t1.getUnitNumber(), t2.getUnitNumber())) {
+//                        count = 0;
+//                    }
+//                    return count;
+//                }
+//            });
+//            set.addAll(dailyStatisticModels);
+//            dailyStatisticModel.setUnchecked(new ArrayList<>(temp).size());
+//        }
+//        return result;
+//    }
+
+
+
+    // 重写 分组查询统计
+
+
+    @Override
     public List<DailyStatisticModel> queryByConditions() {
-        // 查所有小区
         List<DailyStatisticModel> dailyStatisticModels = new ArrayList<>();
-        List<DSourceDataEntity> allByDataSource = dSourceDataRepository.findAllByDataSourceId(commId);
-
-        for(int i = 0 ; i < allByDataSource.size() ; i++){
-            DSourceDataEntity dataSourceEntity = allByDataSource.get(i);
-
-            // 根据小区查所有楼栋
-            List<DailyTroubleshootRecordEntity> recordEntityList = recordRepository.queryAllByPlot(dataSourceEntity.getId());
-            for(int j = 0 ; j < recordEntityList.size() ; j++){
-                DailyTroubleshootRecordEntity recordEntity = recordEntityList.get(j);
-                List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByPlotAndbAndBuilding(dataSourceEntity.getId(), recordEntity.getBuilding());
-                for(int k=0 ; k < recordEntities.size() ; k++){
-                    DailyTroubleshootRecordEntity unit = recordEntities.get(k);
-                    DailyStatisticModel dailyStatisticModel = new DailyStatisticModel();
-                    dailyStatisticModel.setPlotId(dataSourceEntity.getId());
-                    dailyStatisticModel.setPlotName(dataSourceEntity.getName());
-                    dailyStatisticModel.setBuilding(recordEntity.getBuilding());
-                    dailyStatisticModel.setUnitNumber(unit.getUnitNumber());
-
-                    dailyStatisticModels.add(dailyStatisticModel);
-                }
+        // 根据plot、build、unit去重
+        List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryDistPlotBuildUnit();
+        for (int i = 0 ; i < recordEntities.size() ; i++){
+            DailyStatisticModel dailyStatisticModel = new DailyStatisticModel();
+            DailyTroubleshootRecordEntity recordEntity = recordEntities.get(i);
+            String plot = recordEntity.getPlot();
+            String building = recordEntity.getBuilding();
+            String unit = recordEntity.getUnitNumber();
+            dailyStatisticModel.setPlotId(plot);
+            dailyStatisticModel.setBuilding(building);
+            dailyStatisticModel.setUnitNumber(unit);
+            // 小区名称
+            if(!"".equals(plot) && plot != null){
+                DSourceDataEntity dSourceDataEntity = dSourceDataRepository.getOne(plot);
+                if(dSourceDataEntity != null && dSourceDataEntity.getName() != null)
+                    dailyStatisticModel.setPlotName(dSourceDataEntity.getName());
             }
+            // 今日已排查
+            List<DailyTroubleshootRecordEntity> alreadyChecked = recordRepository.queryTodayChecked(plot, building, unit, STARTTIME, ENDTIME);
+            int checked = alreadyChecked.size();
+            dailyStatisticModel.setChecked(checked);
+            int fever = (int) alreadyChecked.stream().filter(DailyTroubleshootRecordEntity::isExceedTemp).count() ;
+            dailyStatisticModel.setFeverCount(fever);
+            // 小区人数总和
+            List<DailyTroubleshootRecordEntity> allPerson = recordRepository.queryPersonGroup(plot, building, unit);
+            // 今日未排查
+            dailyStatisticModel.setUnchecked(allPerson.size() - checked);
+            dailyStatisticModels.add(dailyStatisticModel);
         }
-        Set<DailyStatisticModel> set = new TreeSet<>(new Comparator<DailyStatisticModel>() {
-            @Override
-            public int compare(DailyStatisticModel t1, DailyStatisticModel t2) {
-                int count = 1;
-                if(StringUtils.equals(t1.getPlotId(), t2.getPlotId()) &&
-                        StringUtils.equals(t1.getBuilding(),t2.getBuilding())
-                        && StringUtils.equals(t1.getUnitNumber(),t2.getUnitNumber())){
-                    count = 0;
-                }
-                return count;
-            }
-        });
-        set.addAll(dailyStatisticModels);
-        List<DailyStatisticModel> result = new ArrayList<>(set);
+        return  dailyStatisticModels;
 
-        for(int t = 0 ; t < result.size() ; t++){
-            DailyStatisticModel dailyStatisticModel = result.get(t);
-
-            Integer integer = recordRepository.todayRecordCon(STARTTIME, ENDTIME, dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber());
-            dailyStatisticModel.setChecked(integer);
-
-            // 统计未排查的人数 统计有误
-            List<DailyTroubleshootRecordEntity> allPersons = recordRepository.queryUnchecked(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber());
-            List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByPlotAndBuildingAndUnitNumber(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber(), STARTTIME, ENDTIME);
-
-            List<DailyTroubleshootRecordEntity> temp = allPersons.stream()
-                    .filter(item -> !recordEntities.stream()
-                            .map(e -> e.getName() + e.getPhone())
-                            .collect(toList())
-                            .contains(item.getName() + item.getPhone())).collect(toList());
-
-
-            Set<DailyStatisticModel> set2 = new TreeSet<>(new Comparator<DailyStatisticModel>() {
-                @Override
-                public int compare(DailyStatisticModel t1, DailyStatisticModel t2) {
-                    int count = 1;
-                    if(StringUtils.equals(t1.getPlotId(), t2.getPlotId()) &&
-                            StringUtils.equals(t1.getBuilding(),t2.getBuilding())
-                            && StringUtils.equals(t1.getUnitNumber(),t2.getUnitNumber())){
-                        count = 0;
-                    }
-                    return count;
-                }
-            });
-            set.addAll(dailyStatisticModels);
-            dailyStatisticModel.setUnchecked(new ArrayList<>(temp).size());
-        }
-        return result;
     }
 
     @Override
@@ -497,26 +537,26 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         String plot = dailyTroubleFilterModel.getDailyStatisticModel().getPlotId();
         String building = dailyTroubleFilterModel.getDailyStatisticModel().getBuilding();
         String unitNumber = dailyTroubleFilterModel.getDailyStatisticModel().getUnitNumber();
-        List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByPlotAndBuildingAndUnitNumber(plot, building, unitNumber , STARTTIME , ENDTIME);
+        List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByPlotAndBuildingAndUnitNumber(plot, building, unitNumber, STARTTIME, ENDTIME);
         // 暂不处理 小区
         // dailyTroubleFilterModel.getPlots()
         // 是否发热
-        if(dailyTroubleFilterModel.getIsFaver().size() != 2 && dailyTroubleFilterModel.getIsFaver().size() != 0){
+        if (dailyTroubleFilterModel.getIsFaver().size() != 2 && dailyTroubleFilterModel.getIsFaver().size() != 0) {
             recordEntities = recordEntities.stream().filter(a -> a.isExceedTemp() == dailyTroubleFilterModel.getIsFaver().get(0)).collect(Collectors.toList());
         }
         // plots
-        if(dailyTroubleFilterModel.getPlots().size() > 0 ){
-           recordEntities = recordEntities.stream().filter(a -> dailyTroubleFilterModel.getPlots().contains(a.getPlot())).collect(Collectors.toList());
+        if (dailyTroubleFilterModel.getPlots().size() > 0) {
+            recordEntities = recordEntities.stream().filter(a -> dailyTroubleFilterModel.getPlots().contains(a.getPlot())).collect(Collectors.toList());
         }
         //  medicalOpinion
         List<DailyTroubleshootRecordEntity> opions = new ArrayList<>();
-        if(dailyTroubleFilterModel.getMedicalOpinion().size() > 0){
+        if (dailyTroubleFilterModel.getMedicalOpinion().size() > 0) {
 //            for(int i = 0 ; i < dailyTroubleFilterModel.getMedicalOpinion().size() ; i++){
 //                medicalOpinion += dailyTroubleFilterModel.getMedicalOpinion().get(i);
 //            }
             String medicalOpinion = dailyTroubleFilterModel.getMedicalOpinion().stream().collect(Collectors.joining());
-            for(int t = 0 ; t <recordEntities.size() ; t++){
-                if(recordEntities.get(t).getMedicalOpinion().contains(medicalOpinion)){
+            for (int t = 0; t < recordEntities.size(); t++) {
+                if (recordEntities.get(t).getMedicalOpinion().contains(medicalOpinion)) {
                     opions.add(recordEntities.get(t));
                 }
             }
@@ -526,12 +566,12 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 
         // 关键字
         List<DailyTroubleshootRecordEntity> troubleshootRecordEntities = new ArrayList<>();
-        if(!"".equals(dailyTroubleFilterModel.getKeyWord())){
+        if (!"".equals(dailyTroubleFilterModel.getKeyWord())) {
             String keyWord = dailyTroubleFilterModel.getKeyWord();
-            for(int i = 0 ; i < opions.size() ; i++ ){
-                if(opions.get(i).getName().contains(keyWord)
+            for (int i = 0; i < opions.size(); i++) {
+                if (opions.get(i).getName().contains(keyWord)
                         || opions.get(i).getPhone().contains(keyWord)
-                        || opions.get(i).getAddress().contains(keyWord)){
+                        || opions.get(i).getAddress().contains(keyWord)) {
                     troubleshootRecordEntities.add(opions.get(i));
                 }
             }
@@ -544,8 +584,8 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         return recordMapper.entitiesToModels(collect);
     }
 
-//    // 往基础数据表添加数据
-    public void addToBasicInformation(DailyTroubleshootRecordEntity recordEntity){
+    //    // 往基础数据表添加数据
+    public void addToBasicInformation(DailyTroubleshootRecordEntity recordEntity) {
         List<BasicInformationEntity> allByNameAndPhone = basicInformationRepository.findAllByNameAndPhone(recordEntity.getName(), recordEntity.getPhone());
         BasicInformationModel basicInformationModel = new BasicInformationModel();
         basicInformationModel.setId(UUID.randomUUID().toString());
@@ -555,7 +595,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         basicInformationModel.setName(recordEntity.getName());
         basicInformationModel.setPhone(recordEntity.getPhone());
         basicInformationModel.setSex(recordEntity.getSex());
-        if(allByNameAndPhone.isEmpty()){
+        if (allByNameAndPhone.isEmpty()) {
             basicInformationService.addPerson(basicInformationModel);
         } else {
             basicInformationService.updatePerson(basicInformationModel);
@@ -570,10 +610,10 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         DailyStatisticPageModel dailyStatisticPageModel = new DailyStatisticPageModel();
         List<DailyTroubleshootRecordEntity> alreadyPends =
                 recordRepository.queryAllByPlotAndBuildingAndUnitNumber
-                        (pendModel.getPlot() , pendModel.getBuilding() , pendModel.getUnitNumber()
-                                , STARTTIME , ENDTIME);
-        List<DailyTroubleshootRecordEntity> allPerson = recordRepository.queryUnchecked(pendModel.getPlot() , pendModel.getBuilding() , pendModel.getUnitNumber());
-        if(alreadyPends.isEmpty()){
+                        (pendModel.getPlot(), pendModel.getBuilding(), pendModel.getUnitNumber()
+                                , STARTTIME, ENDTIME);
+        List<DailyTroubleshootRecordEntity> allPerson = recordRepository.queryUnchecked(pendModel.getPlot(), pendModel.getBuilding(), pendModel.getUnitNumber());
+        if (alreadyPends.isEmpty()) {
             dailyStatisticPageModel.setTotal(allPerson.size());
             dailyStatisticPageModel.setDailyTroubleshootRecordModels(recordMapper.entitiesToModels(allPerson));
             return dailyStatisticPageModel;

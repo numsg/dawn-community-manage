@@ -16,6 +16,8 @@ public class DailyStatisticModel {
 
     String unitNumber;
 
+    int feverCount;
+
     int checked;
 
     int unchecked;
@@ -70,5 +72,13 @@ public class DailyStatisticModel {
 
     public void setUnchecked(int unchecked) {
         this.unchecked = unchecked;
+    }
+
+    public int getFeverCount() {
+        return feverCount;
+    }
+
+    public void setFeverCount(int feverCount) {
+        this.feverCount = feverCount;
     }
 }

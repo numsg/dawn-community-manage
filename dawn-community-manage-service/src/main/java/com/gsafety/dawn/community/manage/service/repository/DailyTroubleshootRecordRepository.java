@@ -40,8 +40,25 @@ public interface DailyTroubleshootRecordRepository extends JpaRepository<DailyTr
 
 
 
-
     @Query(nativeQuery = true , value = "select * from b_daily_troubleshoot_record where plot = ?1 and building = ?2 and unit_number = ?3 ; ")
     List<DailyTroubleshootRecordEntity> queryUnchecked(String plot , String building , String unitNumber);
 
+
+
+
+    // 查询根据 plot、unit_number、build 去重
+    @Query(nativeQuery = true , value = "select distinct on (plot,building,unit_number) * from b_daily_troubleshoot_record ; ")
+    List<DailyTroubleshootRecordEntity> queryDistPlotBuildUnit();
+
+    // 查询分组里面的所有人并根据phone、name去重 distinct on (name,phone)
+    @Query(nativeQuery = true , value = "select  * from b_daily_troubleshoot_record where plot = ?1 and building = ?2 and unit_number = ?3 ;")
+    List<DailyTroubleshootRecordEntity> queryPersonGroup(String plot , String building , String unit_number);
+
+    // 查询分组里面所有今日已排查 distinct on (name,phone)
+    @Query(nativeQuery = true , value = "select  * from b_daily_troubleshoot_record where plot = ?1 and building = ?2 and unit_number = ?3 and create_time between ?4 and ?5 ;")
+    List<DailyTroubleshootRecordEntity> queryTodayChecked(String plot , String building , String unit_number , Timestamp t1 , Timestamp t2 );
+
+    // 查询分组里面所有今日未排查 distinct on (name,phone)
+    @Query(nativeQuery = true , value = "select  * from b_daily_troubleshoot_record where plot = ?1 and building = ?2 and unit_number = ?3 and create_time not between ?4 and ?5 ;")
+    List<DailyTroubleshootRecordEntity> queryTodayUnchecked(String plot , String building , String unit_number , Timestamp t1 , Timestamp t2);
 }

@@ -34,7 +34,7 @@ public class BasicInformationServiceImpl implements BasicInformationService {
         if(allByNameAndPhone.isEmpty()){
            basicInformationModel.setId(UUID.randomUUID().toString());
            basicInformationModel.setCode(UUID.randomUUID().toString());
-           basicInformationRepository.save(basciInformationMapper.modelToEntity(basicInformationModel));
+           basicInformationRepository.saveAndFlush(basciInformationMapper.modelToEntity(basicInformationModel));
         }
     }
 
@@ -42,7 +42,7 @@ public class BasicInformationServiceImpl implements BasicInformationService {
     public void updatePerson(BasicInformationModel basicInformationModel) {
         List<BasicInformationEntity> allByNameAndPhone = basicInformationRepository.findAllByNameAndPhone(basicInformationModel.getName(), basicInformationModel.getPhone());
         if(!allByNameAndPhone.isEmpty()){
-            basicInformationRepository.save(basciInformationMapper.modelToEntity(basicInformationModel));
+            basicInformationRepository.saveAndFlush(basciInformationMapper.modelToEntity(basicInformationModel));
         }
     }
 }

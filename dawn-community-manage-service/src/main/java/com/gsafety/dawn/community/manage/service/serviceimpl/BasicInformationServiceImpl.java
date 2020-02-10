@@ -32,8 +32,8 @@ public class BasicInformationServiceImpl implements BasicInformationService {
     public void addPerson(BasicInformationModel basicInformationModel) {
         List<BasicInformationEntity> allByNameAndPhone = basicInformationRepository.findAllByNameAndPhone(basicInformationModel.getName(), basicInformationModel.getPhone());
         if(allByNameAndPhone.isEmpty()){
-           basicInformationModel.setId(UUID.randomUUID().toString());
-           basicInformationModel.setCode(UUID.randomUUID().toString());
+//           basicInformationModel.setId(UUID.randomUUID().toString());
+//           basicInformationModel.setCode(UUID.randomUUID().toString());
            basicInformationRepository.saveAndFlush(basciInformationMapper.modelToEntity(basicInformationModel));
         }
     }

@@ -18,5 +18,4 @@ public interface BasciInformationMapper {
 
     List<BasicInformationEntity> modelsToEntities(List<BasicInformationModel> models);
 
-
 }

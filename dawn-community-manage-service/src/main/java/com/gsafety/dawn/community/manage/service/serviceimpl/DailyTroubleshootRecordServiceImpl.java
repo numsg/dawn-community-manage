@@ -2,6 +2,7 @@ package com.gsafety.dawn.community.manage.service.serviceimpl;
 
 import com.gsafety.dawn.community.common.util.DateUtil;
 import com.gsafety.dawn.community.common.util.ExcelUtil;
+import com.gsafety.dawn.community.manage.contract.model.BasicInformationModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyStatisticModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleFilterModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
@@ -14,6 +15,7 @@ import com.gsafety.dawn.community.manage.contract.service.DailyTroubleshootRecor
 import com.gsafety.dawn.community.manage.service.datamappers.BasciInformationMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.DSourceDataMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.DailyTroubleshootRecordMapper;
+import com.gsafety.dawn.community.manage.service.entity.BasicInformationEntity;
 import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
 import com.gsafety.dawn.community.manage.service.entity.DailyTroubleshootRecordEntity;
 import com.gsafety.dawn.community.manage.service.entity.EpidemicPersonEntity;
@@ -546,6 +548,8 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     public void addToBasicInformation(DailyTroubleshootRecordEntity recordEntity){
         List<BasicInformationEntity> allByNameAndPhone = basicInformationRepository.findAllByNameAndPhone(recordEntity.getName(), recordEntity.getPhone());
         BasicInformationModel basicInformationModel = new BasicInformationModel();
+        basicInformationModel.setId(UUID.randomUUID().toString());
+        basicInformationModel.setCode(UUID.randomUUID().toString());
         basicInformationModel.setAddress(recordEntity.getAddress());
         basicInformationModel.setIdentificationNumber(recordEntity.getIdentificationNumber());
         basicInformationModel.setName(recordEntity.getName());

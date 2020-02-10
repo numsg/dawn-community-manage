@@ -2,6 +2,7 @@ package com.gsafety.dawn.community.manage.service.serviceimpl;
 
 import com.gsafety.dawn.community.common.util.DateUtil;
 import com.gsafety.dawn.community.manage.contract.model.RequestModel;
+import com.gsafety.dawn.community.manage.contract.service.TimerService;
 import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
 import com.gsafety.dawn.community.manage.service.entity.DailyTroubleshootRecordEntity;
 import com.gsafety.dawn.community.manage.service.repository.DSourceDataRepository;
@@ -21,7 +22,7 @@ import static com.gsafety.java.common.utils.JsonUtil.toJson;
 
 @Service
 @Transactional
-public class DataCollectionServiceImpl {
+public class DataCollectionServiceImpl{
     @Value("${access.data-collection}")
     private String dataCollectionUrl;
 
@@ -138,7 +139,6 @@ public class DataCollectionServiceImpl {
                 requestModel.setPageNo(i);
                 getDataFromAccess(requestModel);
             }
-
         }
     }
 
@@ -284,8 +284,6 @@ public class DataCollectionServiceImpl {
         } else if (number.equals("13")) {
             result = nasalObstructionId;
         }
-
-
         return result;
     }
 }

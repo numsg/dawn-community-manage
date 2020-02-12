@@ -8,8 +8,10 @@ import com.gsafety.dawn.community.manage.contract.service.TimerService;
 import com.gsafety.dawn.community.manage.contract.service.refactor.TroubleshootRecordService;
 import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
 import com.gsafety.dawn.community.manage.service.entity.DailyTroubleshootRecordEntity;
+import com.gsafety.dawn.community.manage.service.entity.DataSourceEntity;
 import com.gsafety.dawn.community.manage.service.repository.DSourceDataRepository;
 import com.gsafety.dawn.community.manage.service.repository.DailyTroubleshootRecordRepository;
+import com.gsafety.dawn.community.manage.service.repository.DataSourceRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootRecordRepository;
 import com.gsafety.java.common.utils.HttpClientUtil;
 import com.gsafety.java.common.utils.JsonUtil;
@@ -26,12 +28,12 @@ import static com.gsafety.java.common.utils.JsonUtil.toJson;
 
 @Service
 @Transactional
-public class DataCollectionServiceImpl{
+public class DataCollectionServiceImpl {
     @Value("${access.data-collection}")
     private String dataCollectionUrl;
 
-    @Value("${app.villageId}")
-    private String villageId;
+   // @Value("${app.villageId}")
+   // private String villageId;
 
     @Value("${app.pageSize}")
     private Integer pageSize;
@@ -47,7 +49,7 @@ public class DataCollectionServiceImpl{
     //1:乏力
     private static final String feebleId = "5e647e8b-6396-4e56-854b-ed1be1c60ae3";
     //2:干咳
-    private static final  String hooseId = "e081de69-a984-4abb-a2a1-ed9996a63917";
+    private static final String hooseId = "e081de69-a984-4abb-a2a1-ed9996a63917";
     //3:肌痛
     private static final String musclePainId = "0e2adfab-bb9d-4ef9-a4db-6a5baa2d7788";
     //4:寒战
@@ -77,7 +79,7 @@ public class DataCollectionServiceImpl{
     //1:疑似患者，6293737c-5775-426d-9845-f919eafba1be
     private static final String suspectedPatientId = "6293737c-5775-426d-9845-f919eafba1be";
     //3:一版发热患者，c0bb07b2-db54-4fd1-89d3-20b0672a2779
-    private static final  String feverPatientId = "c0bb07b2-db54-4fd1-89d3-20b0672a2779";
+    private static final String feverPatientId = "c0bb07b2-db54-4fd1-89d3-20b0672a2779";
 
     //2:CT诊断肺炎患者 c9eedfbc-ae5a-40b7-8a62-c049c5678deb
     private static final String CTPatientId = "c9eedfbc-ae5a-40b7-8a62-c049c5678deb";
@@ -88,7 +90,7 @@ public class DataCollectionServiceImpl{
     private String url = "/search/v2";
 
     // 杨桥湖社区id
-    private static final String communityDataSourceId = "a2e01f0e-6c86-4a41-bcf3-c07c1ffa2f82";
+    // private static final String communityDataSourceId = "a2e01f0e-6c86-4a41-bcf3-c07c1ffa2f82";
     // 其他状况id
     private static final String otherSymptomId = "582daff0-56a5-45a4-9ca7-dc098c688753";
     @Autowired
@@ -106,10 +108,13 @@ public class DataCollectionServiceImpl{
     @Autowired
     private TroubleshootRecordService troubleshootRecordService;
 
+    @Autowired
+    private DataSourceRepository dataSourceRepository;
 
     private Date startTimeDate = DateUtil.getDayStartDate();
     // 小区
-    private List<DSourceDataEntity> plots = new ArrayList<>();
+    //private List<DSourceDataEntity> plots = new ArrayList<>();
+    
     // 其他诊断状况
     private List<DSourceDataEntity> otherSymptoms = new ArrayList<>();
 
@@ -122,11 +127,10 @@ public class DataCollectionServiceImpl{
 
         System.out.println(formatter.format(startTimeDate));
         System.out.println(formatter.format(endTimeDate));
-        //System.out.println(villageId);
         RequestModel requestModel = new RequestModel();
         requestModel.setPageSize(pageSize);
         requestModel.setKeyWords("");
-        //requestModel.setCurrentVillage(villageId); // 改为查询所有社区
+        // 改为查询所有社区
         requestModel.setStartDate(startTimeDate);
         requestModel.setEndDate(DateUtil.getDayEndDate());
         Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
@@ -134,20 +138,21 @@ public class DataCollectionServiceImpl{
             Map data = JsonUtil.fromJson(toJson(map.get("data")), Map.class);
             Integer total = Integer.parseInt(JsonUtil.fromJson(toJson(data.get("total")), String.class));
 
-            int pageTotal=1;
-            if (total>pageSize){
-                if (total%pageSize==0){
-                    pageTotal=total/pageSize;
-                }else{
-                    pageTotal=total/pageSize+1;
+            int pageTotal = 1;
+            if (total > pageSize) {
+                if (total % pageSize == 0) {
+                    pageTotal = total / pageSize;
+                } else {
+                    pageTotal = total / pageSize + 1;
                 }
             }
 
-            plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(communityDataSourceId);
+           // plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(communityDataSourceId);
             otherSymptoms = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(otherSymptomId);
 
             for (int i = 1; i <= pageTotal; i++) {
                 requestModel.setPageNo(i);
+                requestModel.setStartDate(startTimeDate);
                 getDataFromAccess(requestModel);
             }
         }
@@ -166,22 +171,22 @@ public class DataCollectionServiceImpl{
         }
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-      //  List<TroubleshootRecord> records=new ArrayList<>();
+        //  List<TroubleshootRecord> records=new ArrayList<>();
         for (Object obj : list) {
 
             Map objMap = JsonUtil.fromJson(toJson(obj), Map.class);
             Object recordId = objMap.get("id");
             Object personName = objMap.get("name");
             Object phone = objMap.get("phone");
-            Object sex=objMap.get("sex");
-            if ( personName == null || phone == null || sex==null || troubleshootRecordRepository.existsById(recordId.toString()) ) {
+            Object sex = objMap.get("sex");
+            if (personName == null || phone == null || sex == null || troubleshootRecordRepository.existsById(recordId.toString())) {
                 continue;
             }
-            if ( "".equals(personName)|| "".equals(phone )||"".equals(sex)){
+            if ("".equals(personName) || "".equals(phone) || "".equals(sex)) {
                 continue;
             }
 
-            TroubleshootRecord record=new TroubleshootRecord();
+            TroubleshootRecord record = new TroubleshootRecord();
 
             record.setId(recordId.toString());
             record.setBuilding(objMap.get("building") != null ? objMap.get("building").toString() : "其它");
@@ -194,13 +199,13 @@ public class DataCollectionServiceImpl{
             record.setUnitNumber(objMap.get("unit") != null ? objMap.get("unit").toString() : "其它");
 
             //record.setLeaveArea();
-           // record.setCreateDate();
+            // record.setCreateDate();
 
-            if(objMap.get("age") != null){
+            if (objMap.get("age") != null) {
                 record.setAge(Integer.parseInt(objMap.get("age").toString()));
             }
             if (objMap.get("medicalAdvice") != null) {
-             //   record.setConfirmed_diagnosis(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
+                //   record.setConfirmed_diagnosis(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
                 record.setMedicalOpinion(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
             }
             try {
@@ -219,14 +224,17 @@ public class DataCollectionServiceImpl{
                 //entity.setOtherSymptoms(converOtherSymptoms(objMap.get("symptom").toString()));
             }
 
-            if(objMap.get("communityCode")!=null && dSourceDataRepository.existsById(objMap.get("communityCode").toString())){
+            if (objMap.get("communityCode") != null && dSourceDataRepository.existsById(objMap.get("communityCode").toString())) {
                 record.setPlot(objMap.get("communityCode").toString());
-            }else{
+            } else {
                 Random random = new Random();  // 此处带改
+                String villageCode = objMap.get("currentVillage").toString();
+                DataSourceEntity village=dataSourceRepository.queryByDescription(villageCode);
+                List<DSourceDataEntity> plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(village.getId());
                 record.setPlot(plots.get(random.nextInt(plots.size())).getId());
             }
 
-            PersonBase personBase=new PersonBase();
+            PersonBase personBase = new PersonBase();
             personBase.setAddress(objMap.get("residence").toString());
             personBase.setName(personName.toString());
             personBase.setPhone(phone.toString());
@@ -238,12 +246,10 @@ public class DataCollectionServiceImpl{
             record.setPersonBase(personBase);
 
             troubleshootRecordService.add(record);
-          //  records.add(record);
+            //  records.add(record);
         }
         return true;
     }
-
-
 
 
     private String splitOtherSymptom(String symptoms) {

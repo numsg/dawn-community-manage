@@ -39,4 +39,6 @@ public interface DataSourceRepository  extends JpaRepository<DataSourceEntity,St
     @Query
     DataSourceEntity queryById(String dataSourceId);
 
+    @Query
+    DataSourceEntity queryByDescription(String districtCode);
 }

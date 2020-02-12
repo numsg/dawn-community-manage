@@ -94,7 +94,10 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             if (troubleshootHistoryRecordRepository.findCountByPersonBaseId(personBaseEntity.getId()).intValue() == saveCycle) {
                 List<String> ids = troubleshootHistoryRecordRepository.findIdByPersonBaseId(personBaseEntity.getId());
                 if (!CollectionUtils.isEmpty(ids)) {
-                    troubleshootHistoryRecordRepository.deleteById(ids.get(0));
+                    ids = ids.stream().skip(saveCycle).collect(Collectors.toList());
+                    ids.forEach(f -> {
+                        troubleshootHistoryRecordRepository.deleteById(f);
+                    });
                 }
             }
             TroubleshootHistoryRecordEntity troubleshootHistoryRecordEntity = new TroubleshootHistoryRecordEntity();

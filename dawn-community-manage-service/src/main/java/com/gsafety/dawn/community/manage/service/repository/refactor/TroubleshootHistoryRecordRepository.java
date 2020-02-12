@@ -13,7 +13,7 @@ public interface TroubleshootHistoryRecordRepository extends JpaRepository<Troub
     @Query("select count(1) from TroubleshootHistoryRecordEntity c where c.personBaseId  = :personBaseId")
     Long findCountByPersonBaseId(@Param("personBaseId") String personBaseId);
 
-    @Query("select c.id from TroubleshootHistoryRecordEntity c where c.personBaseId  = :personBaseId order by c.createDate asc ")
+    @Query("select c.id from TroubleshootHistoryRecordEntity c where c.personBaseId  = :personBaseId order by c.createDate desc")
     List<String> findIdByPersonBaseId(@Param("personBaseId") String personBaseId);
 
     @Query("select c.id from TroubleshootHistoryRecordEntity c where c.personBaseId  = :personBaseId and c.createDate = :createDate ")

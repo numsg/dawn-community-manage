@@ -74,13 +74,14 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             PersonBaseEntity personBaseEntity = personBaseRepository.findByNameAndPhone(troubleshootRecord.getPersonBase().getName(), troubleshootRecord.getPersonBase().getPhone());
             if (personBaseEntity == null) {
                 personBaseEntity = personBaseMapper.modelToEntity(troubleshootRecord.getPersonBase());
-                if (!troubleshootRecord.getIsByPhone()) {
-                    personBaseEntity.setId(UUID.randomUUID().toString());
-                }
+                personBaseEntity.setId(UUID.randomUUID().toString());
                 personBaseRepository.save(personBaseEntity);
             }
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
             TroubleshootRecordEntity troubleshootRecordEntity = troubleshootRecordRepository.findByPersonBaseId(personBaseEntity.getId());
+            if (!troubleshootRecordEntity.getId().equals(troubleshootRecord.getId())) {
+                return false;
+            }
             troubleshootRecord.setPersonBaseId(personBaseEntity.getId());
             if (troubleshootRecordEntity == null) {
                 troubleshootRecordEntity = troubleshootRecordMapper.modelToEntity(troubleshootRecord);

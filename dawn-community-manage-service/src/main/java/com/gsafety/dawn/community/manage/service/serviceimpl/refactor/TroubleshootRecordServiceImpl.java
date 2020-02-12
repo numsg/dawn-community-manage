@@ -126,7 +126,7 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             if (troubleshootRecordEntity == null) {
                 return false;
             } else {
-                troubleshootRecordEntity = commonUtil.mapper(troubleshootRecordMapper.modelToEntity(troubleshootRecord), troubleshootRecordEntity);
+                troubleshootRecordEntity = commonUtil.mapper(troubleshootRecord, troubleshootRecordEntity);
             }
             troubleshootRecordEntity.setCreateDate(format.parse(format.format(troubleshootRecord.getCreateTime())));
             troubleshootRecordRepository.save(troubleshootRecordEntity);

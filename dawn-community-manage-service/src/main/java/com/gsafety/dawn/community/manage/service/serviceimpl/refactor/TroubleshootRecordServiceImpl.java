@@ -14,6 +14,8 @@ import com.gsafety.dawn.community.manage.service.repository.refactor.Troubleshoo
 import com.gsafety.dawn.community.manage.service.repository.refactor.PersonBaseRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootRecordRepository;
 import org.mapstruct.Mapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class TroubleshootRecordServiceImpl implements TroubleshootRecordService {
+
+    Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private PersonBaseRepository personBaseRepository;
@@ -94,6 +98,7 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             personBaseRepository.save(personBaseEntity);
             return troubleshootRecordRepository.getOne(troubleshootRecord.getId()) != null;
         } catch (Exception e) {
+            logger.error("add error", e, e.getMessage(), e.getCause());
             return false;
         }
     }
@@ -121,20 +126,26 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             troubleshootHistoryRecordRepository.save(troubleshootHistoryRecordEntity);
             return troubleshootRecordRepository.getOne(troubleshootRecord.getId()).getCreateTime() == troubleshootRecord.getCreateTime();
         } catch (Exception e) {
+            logger.error("update error", e, e.getMessage(), e.getCause());
             return false;
         }
     }
 
     @Override
     public List<ReportingStaffStatistics> getReportingStaffStatistics(String multiTenancy) {
-        if (StringUtil.isEmpty(multiTenancy)) {
+        try {
+            if (StringUtil.isEmpty(multiTenancy)) {
+                return Collections.emptyList();
+            }
+            List<PlotReportingStaffEntity> plotReportingStaffEntities = personBaseRepository.findPlotReportingStaff(multiTenancy);
+            if (CollectionUtils.isEmpty(plotReportingStaffEntities)) {
+                return Collections.emptyList();
+            }
+            return reportingStaffMapper.entitiesToModels(plotReportingStaffEntities);
+        } catch (Exception e) {
+            logger.error("getReportingStaffStatistics error", e, e.getMessage(), e.getCause());
             return Collections.emptyList();
         }
-        List<PlotReportingStaffEntity> plotReportingStaffEntities = personBaseRepository.findPlotReportingStaff(multiTenancy);
-        if (CollectionUtils.isEmpty(plotReportingStaffEntities)) {
-            return Collections.emptyList();
-        }
-        return reportingStaffMapper.entitiesToModels(plotReportingStaffEntities);
     }
 
     @Override
@@ -168,6 +179,7 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             }
             return result;
         } catch (Exception e) {
+            logger.error("getBuildingUnitStatistics error", e, e.getMessage(), e.getCause());
             return Collections.emptyList();
         }
     }

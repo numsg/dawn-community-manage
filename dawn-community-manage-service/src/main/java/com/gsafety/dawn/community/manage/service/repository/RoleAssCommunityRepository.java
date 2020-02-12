@@ -15,16 +15,9 @@ import java.util.List;
 public interface RoleAssCommunityRepository extends JpaRepository<RoleAssCommunityEntity, String> {
 
     @Query()
-    List<RoleAssCommunityEntity> findAllByRolesInformation(String roleId);
-
-
-    @Query()
-    List<RoleAssCommunityEntity> findAllByRolesInformationAndAdministrativeCodes(String roleId , String code);
-
-    @Query()
     List<RoleAssCommunityEntity> findByRolesInformationIn(List<String> roleIds);
 
-    @Query
+    @Query()
     List<RoleAssCommunityEntity> findByAdministrativeCodesIn(List<String> codes);
 
 }

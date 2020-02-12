@@ -35,7 +35,7 @@ public class RoleAssCommunityController {
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
             @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<List<RoleAssCommunityModel>> add(@RequestBody @ApiParam(value = "角色行政区划", required = true) List<RoleAssCommunityModel> roleAssCommunityModels) {
+    public ResponseEntity<List<RoleAssCommunityModel>> add(@RequestBody @ApiParam(value = "新增角色行政区划关联", required = true) List<RoleAssCommunityModel> roleAssCommunityModels) {
         try {
             List<RoleAssCommunityModel>  result = roleAssCommunityService.addRoleAssCom(roleAssCommunityModels);
             return new ResponseEntity<>(result, HttpStatus.OK);
@@ -53,7 +53,7 @@ public class RoleAssCommunityController {
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
             @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<List<RoleAssCommunityModel>> update(@RequestBody @ApiParam(value = "角色行政区划", required = true) List<RoleAssCommunityModel> roleAssCommunityModels) {
+    public ResponseEntity<List<RoleAssCommunityModel>> update(@RequestBody @ApiParam(value = "修改角色行政区划关联", required = true) List<RoleAssCommunityModel> roleAssCommunityModels) {
         try {
             List<RoleAssCommunityModel> result = roleAssCommunityService.updateRoleAssCom(roleAssCommunityModels);
             return new ResponseEntity<>(result, HttpStatus.OK);
@@ -71,7 +71,7 @@ public class RoleAssCommunityController {
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
             @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<Boolean> delete(@RequestBody @ApiParam(value = "角色行政区划", required = true) List<String> roleAssCommunityIds) {
+    public ResponseEntity<Boolean> delete(@RequestBody @ApiParam(value = "删除角色行政区划的id集合", required = true) List<String> roleAssCommunityIds) {
         try {
             boolean result = roleAssCommunityService.deleteRoleAssCom(roleAssCommunityIds);
             return new ResponseEntity<>(result, HttpStatus.OK);
@@ -88,7 +88,7 @@ public class RoleAssCommunityController {
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
             @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<List<RoleAssCommunityModel>> queryRoleIds(@RequestBody @ApiParam(value = "角色行政区划", required = true) List<String> roleids) {
+    public ResponseEntity<List<RoleAssCommunityModel>> queryRoleIds(@RequestBody @ApiParam(value = "角色roleids", required = true) List<String> roleids) {
         try {
             List<RoleAssCommunityModel> result = roleAssCommunityService.queryByroleIds(roleids);
             return new ResponseEntity<>(result, HttpStatus.OK);
@@ -105,7 +105,7 @@ public class RoleAssCommunityController {
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
             @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<List<RoleAssCommunityModel>> queryCodes(@RequestBody @ApiParam(value = "角色行政区划", required = true) List<String> codes) {
+    public ResponseEntity<List<RoleAssCommunityModel>> queryCodes(@RequestBody @ApiParam(value = "行政区划codes", required = true) List<String> codes) {
         try {
             List<RoleAssCommunityModel> result = roleAssCommunityService.queryByRoleCodes(codes);
             return new ResponseEntity<>(result, HttpStatus.OK);

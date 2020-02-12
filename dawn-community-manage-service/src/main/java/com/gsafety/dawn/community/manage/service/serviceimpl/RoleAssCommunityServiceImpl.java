@@ -42,6 +42,7 @@ public class RoleAssCommunityServiceImpl implements RoleAssCommunityService {
             a.setCreateTime(TS);
             a.setUpdateTime(TS);
             a.setId(UUID.randomUUID().toString());
+            a.setCode(UUID.randomUUID().toString());
         });
         List<RoleAssCommunityEntity> roleAssCommunityEntitys = roleAssCommunityMapper.modelsToEntities(roleAssCommunityModels);
         List<RoleAssCommunityEntity> result = roleAssCommunityRepository.saveAll(roleAssCommunityEntitys);
@@ -66,14 +67,19 @@ public class RoleAssCommunityServiceImpl implements RoleAssCommunityService {
 
     @Override
     public boolean deleteRoleAssCom(List<String> roleAssCommunityIds) {
+        boolean flag = false;
         if(CollectionUtils.isEmpty(roleAssCommunityIds))
-            return false;
-        roleAssCommunityIds.forEach(a -> {
-            roleAssCommunityRepository.deleteById(a);
-        });
-        return true;
+            return flag;
+        for(int i = 0 ; i < roleAssCommunityIds.size() ; i ++){
+            String id = roleAssCommunityIds.get(i);
+            boolean exist = roleAssCommunityRepository.existsById(id);
+            if(exist){
+                roleAssCommunityRepository.deleteById(id);
+                flag = true;
+            }
+        }
+        return flag;
     }
-
 
     @Override
     public List<RoleAssCommunityModel> queryByroleIds(List<String> roleIds) {
@@ -89,7 +95,7 @@ public class RoleAssCommunityServiceImpl implements RoleAssCommunityService {
         if (CollectionUtils.isEmpty(codes)) {
             return Collections.emptyList();
         }
-        List<RoleAssCommunityEntity> entities = roleAssCommunityRepository.findByRolesInformationIn(codes);
+        List<RoleAssCommunityEntity> entities = roleAssCommunityRepository.findByAdministrativeCodesIn(codes);
         return roleAssCommunityMapper.entitiesToModels(entities);
     }
 }

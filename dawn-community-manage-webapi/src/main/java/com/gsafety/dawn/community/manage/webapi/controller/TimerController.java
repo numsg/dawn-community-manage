@@ -1,6 +1,8 @@
 package com.gsafety.dawn.community.manage.webapi.controller;
 
 import com.gsafety.dawn.community.manage.contract.model.SystemSetModel;
+import com.gsafety.dawn.community.manage.contract.model.changde.RequestParamModel;
+import com.gsafety.dawn.community.manage.contract.model.changde.TroubleshootRecordModel;
 import com.gsafety.dawn.community.manage.contract.service.TimerService;
 import com.gsafety.java.common.exception.HttpError;
 import com.gsafety.springboot.common.annotation.LimitIPRequestAnnotation;
@@ -10,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1", produces = "application/json")
@@ -30,4 +34,17 @@ public class TimerController {
         Boolean result = timerService.flushData(villageId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/timer/data", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "从移动端数据", notes = "getDataFromPhone(requestParamModel)")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = TroubleshootRecordModel.class,responseContainer = "List"),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+    public ResponseEntity<List<TroubleshootRecordModel>> getDataFromPhone(@RequestBody @ApiParam(value = "参数", required = true) RequestParamModel requestParamModel) {
+        List<TroubleshootRecordModel> result = timerService.getDataFromPhone(requestParamModel);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 }

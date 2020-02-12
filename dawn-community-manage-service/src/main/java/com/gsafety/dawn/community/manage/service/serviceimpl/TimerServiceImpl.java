@@ -1,5 +1,7 @@
 package com.gsafety.dawn.community.manage.service.serviceimpl;
 
+import com.gsafety.dawn.community.manage.contract.model.changde.RequestParamModel;
+import com.gsafety.dawn.community.manage.contract.model.changde.TroubleshootRecordModel;
 import com.gsafety.dawn.community.manage.contract.service.TimerService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -42,8 +44,12 @@ public class TimerServiceImpl extends DataCollectionServiceImpl implements Servl
         return true;
     }
 
-    class OneTask extends TimerTask {//继承TimerTask类
+    @Override
+    public List<TroubleshootRecordModel> getDataFromPhone(RequestParamModel requestParamModel) {
+        return null;
+    }
 
+    class OneTask extends TimerTask {//继承TimerTask类
         @Override
         public void run() {
             System.out.println("开始一次数据同步");

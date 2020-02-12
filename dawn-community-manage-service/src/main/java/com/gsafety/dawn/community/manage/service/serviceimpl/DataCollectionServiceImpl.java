@@ -4,10 +4,8 @@ import com.gsafety.dawn.community.common.util.DateUtil;
 import com.gsafety.dawn.community.manage.contract.model.RequestModel;
 import com.gsafety.dawn.community.manage.contract.model.refactor.PersonBase;
 import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
-import com.gsafety.dawn.community.manage.contract.service.TimerService;
 import com.gsafety.dawn.community.manage.contract.service.refactor.TroubleshootRecordService;
 import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
-import com.gsafety.dawn.community.manage.service.entity.DailyTroubleshootRecordEntity;
 import com.gsafety.dawn.community.manage.service.repository.DSourceDataRepository;
 import com.gsafety.dawn.community.manage.service.repository.DailyTroubleshootRecordRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootRecordRepository;
@@ -122,7 +120,8 @@ public class DataCollectionServiceImpl{
 
         System.out.println(formatter.format(startTimeDate));
         System.out.println(formatter.format(endTimeDate));
-        //System.out.println(villageId);
+
+
         RequestModel requestModel = new RequestModel();
         requestModel.setPageSize(pageSize);
         requestModel.setKeyWords("");
@@ -174,10 +173,11 @@ public class DataCollectionServiceImpl{
             Object personName = objMap.get("name");
             Object phone = objMap.get("phone");
             Object sex=objMap.get("sex");
-            if ( personName == null || phone == null || sex==null || troubleshootRecordRepository.existsById(recordId.toString()) ) {
+            Object districtCode = objMap.get("currentVillage");
+            if (districtCode==null || personName == null || phone == null || sex==null || troubleshootRecordRepository.existsById(recordId.toString()) ) {
                 continue;
             }
-            if ( "".equals(personName)|| "".equals(phone )||"".equals(sex)){
+            if ( "".equals(districtCode) || "".equals(personName)|| "".equals(phone )||"".equals(sex)){
                 continue;
             }
 

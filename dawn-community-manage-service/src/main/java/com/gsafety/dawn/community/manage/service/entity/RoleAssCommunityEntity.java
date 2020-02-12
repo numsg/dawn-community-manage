@@ -13,7 +13,7 @@ import java.util.Date;
  * @create 2020-02-12 11:08
  */
 @Entity
-@Table(name = "b_role_Ass_community")
+@Table(name = "b_role_ass_community")
 public class RoleAssCommunityEntity {
 
     @Id

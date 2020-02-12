@@ -116,7 +116,7 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             }
             PersonBaseEntity personBaseEntity = personBaseRepository.findByNameAndPhone(troubleshootRecord.getPersonBase().getName(), troubleshootRecord.getPersonBase().getPhone());
             if (personBaseEntity != null) {
-                personBaseEntity = personBaseMapper.modelToEntity(troubleshootRecord.getPersonBase());
+                personBaseEntity = commonUtil.mapper(troubleshootRecord.getPersonBase(), personBaseEntity);
                 personBaseRepository.save(personBaseEntity);
             } else {
                 return false;

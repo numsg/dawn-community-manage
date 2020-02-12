@@ -2,28 +2,26 @@ package com.gsafety.dawn.community.manage.service.serviceimpl.refactor;
 
 import com.gsafety.dawn.community.common.util.CommonUtil;
 import com.gsafety.dawn.community.common.util.StringUtil;
+import com.gsafety.dawn.community.manage.contract.model.refactor.BuildingUnitStatistics;
 import com.gsafety.dawn.community.manage.contract.model.refactor.ReportingStaffStatistics;
 import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
 import com.gsafety.dawn.community.manage.contract.service.refactor.TroubleshootRecordService;
 import com.gsafety.dawn.community.manage.service.datamappers.refactor.PersonBaseMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.refactor.ReportingStaffMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.refactor.TroubleshootRecordMapper;
-import com.gsafety.dawn.community.manage.service.entity.refactor.PlotReportingStaffEntity;
-import com.gsafety.dawn.community.manage.service.entity.refactor.TroubleshootRecordEntity;
-import com.gsafety.dawn.community.manage.service.entity.refactor.PersonBaseEntity;
-import com.gsafety.dawn.community.manage.service.entity.refactor.TroubleshootHistoryRecordEntity;
+import com.gsafety.dawn.community.manage.service.entity.refactor.*;
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootHistoryRecordRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.PersonBaseRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootRecordRepository;
+import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -137,5 +135,40 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             return Collections.emptyList();
         }
         return reportingStaffMapper.entitiesToModels(plotReportingStaffEntities);
+    }
+
+    @Override
+    public List<BuildingUnitStatistics> getBuildingUnitStatistics(String plotId) {
+        try {
+            if (StringUtil.isEmpty(plotId)) {
+                return Collections.emptyList();
+            }
+            List<BuildingUnitStaffEntity> buildingUnitStaffEntities = troubleshootRecordRepository.findBuildingUnitStaff(plotId);
+            if (CollectionUtils.isEmpty(buildingUnitStaffEntities)) {
+                return Collections.emptyList();
+            }
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+            Date date = format.parse(format.format(new Date()));
+            List<BuildingUnitStatistics> result = new ArrayList<>();
+            Map<String, List<BuildingUnitStaffEntity>> groupBuildingUnitNumbers = buildingUnitStaffEntities.stream().collect(Collectors.groupingBy(BuildingUnitStaffEntity::getBuildingUnitNumber));
+            for (Map.Entry<String, List<BuildingUnitStaffEntity>> entry :
+                    groupBuildingUnitNumbers.entrySet()) {
+
+                if (!CollectionUtils.isEmpty(entry.getValue())) {
+                    BuildingUnitStatistics buildingUnitStatistics = new BuildingUnitStatistics();
+                    buildingUnitStatistics.setBuilding(entry.getValue().get(0).getBuilding());
+                    buildingUnitStatistics.setPlotId(plotId);
+                    buildingUnitStatistics.setUnitNumber(entry.getValue().get(0).getUnitNumber());
+                    Long checkedCount = entry.getValue().stream().filter(f -> f.getCreateDate().getTime() == date.getTime()).mapToLong(m -> m.getCount()).sum();
+                    buildingUnitStatistics.setCheckedCount(checkedCount.intValue());
+                    Long unCheckedCount = entry.getValue().stream().filter(f -> f.getCreateDate().getTime() != date.getTime()).mapToLong(m -> m.getCount()).sum();
+                    buildingUnitStatistics.setUnCheckedCount(unCheckedCount.intValue());
+                    result.add(buildingUnitStatistics);
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 }

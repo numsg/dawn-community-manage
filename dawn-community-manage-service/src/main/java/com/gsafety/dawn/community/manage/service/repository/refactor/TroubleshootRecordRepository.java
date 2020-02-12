@@ -1,9 +1,12 @@
 package com.gsafety.dawn.community.manage.service.repository.refactor;
 
+import com.gsafety.dawn.community.manage.service.entity.refactor.BuildingUnitStaffEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.TroubleshootRecordEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface TroubleshootRecordRepository extends JpaRepository<TroubleshootRecordEntity, String> {
 
@@ -19,6 +22,8 @@ public interface TroubleshootRecordRepository extends JpaRepository<Troubleshoot
     @Query("select c from TroubleshootRecordEntity c where c.personBaseId  = :personBaseId")
     TroubleshootRecordEntity findByPersonBaseId(@Param("personBaseId") String personBaseId);
 
-//    List<TroubleshootRecordEntity> find
-
+    @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.BuildingUnitStaffEntity(count(c),c.building,c.unitNumber,c.createDate,c.plot) " +
+            "from TroubleshootRecordEntity c where c.plot  = :plotId " +
+            "group by c.building,c.unitNumber,c.createDate,c.plot")
+    List<BuildingUnitStaffEntity> findBuildingUnitStaff(@Param("plotId") String plotId);
 }

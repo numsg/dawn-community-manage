@@ -1,6 +1,7 @@
 package com.gsafety.dawn.community.manage.webapi.controller.refactor;
 
 import com.gsafety.dawn.community.manage.contract.model.AccessControlModel;
+import com.gsafety.dawn.community.manage.contract.model.refactor.BuildingUnitStatistics;
 import com.gsafety.dawn.community.manage.contract.model.refactor.ReportingStaffStatistics;
 import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
 import com.gsafety.dawn.community.manage.contract.service.refactor.TroubleshootRecordService;
@@ -77,7 +78,7 @@ public class TroubleshootRecordController {
 
 
     @GetMapping(value = "/plot-reporting-staff/{multiTenancy}/multiTenancy", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "获取社区填报统计", notes = "checkNameIsRepeat(name)")
+    @ApiOperation(value = "获取社区填报统计", notes = "getPlotReportingStaff(multiTenancy)")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = Boolean.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
@@ -89,6 +90,23 @@ public class TroubleshootRecordController {
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
             logger.error("getPlotReportingStaff error", e.getMessage(), e);
+            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(value = "/building-unit-staff/{plotId}/plotId", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "获取小区楼栋单元已排查未排查统计", notes = "checkNameIsRepeat(name)")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = Boolean.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+    public ResponseEntity<List<BuildingUnitStatistics>> getBuildingUnitStatistics(@PathVariable @ApiParam(value = "多租户", required = true) String plotId) {
+        try {
+            List<BuildingUnitStatistics> result = troubleshootRecordService.getBuildingUnitStatistics(plotId);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("getBuildingUnitStatistics error", e.getMessage(), e);
             return new ResponseEntity<>(Collections.emptyList(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

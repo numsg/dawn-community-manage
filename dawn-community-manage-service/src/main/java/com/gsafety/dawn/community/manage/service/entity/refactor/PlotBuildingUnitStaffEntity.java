@@ -5,19 +5,21 @@ import java.util.Date;
 public class PlotBuildingUnitStaffEntity {
 
     private long count;
+    private boolean isExceedTemp;
     private String building;
     private String unitNumber;
     private Date createDate;
     private String plotId;
     private String plotBuildingUnitNumber;
 
-    public PlotBuildingUnitStaffEntity(long count, String building, String unitNumber, Date createDate, String plotId) {
+    public PlotBuildingUnitStaffEntity(long count, String building, String unitNumber, Date createDate, String plotId, boolean isExceedTemp) {
         this.count = count;
         this.building = building;
         this.unitNumber = unitNumber;
         this.createDate = createDate;
         this.plotId = plotId;
         this.plotBuildingUnitNumber = this.building + "-" + this.unitNumber + "-" + this.plotId;
+        this.isExceedTemp = isExceedTemp;
     }
 
     public long getCount() {
@@ -66,5 +68,13 @@ public class PlotBuildingUnitStaffEntity {
 
     public void setPlotBuildingUnitNumber(String plotBuildingUnitNumber) {
         this.plotBuildingUnitNumber = plotBuildingUnitNumber;
+    }
+
+    public boolean getIsExceedTemp() {
+        return this.isExceedTemp;
+    }
+
+    public void setIsExceedTemp(boolean isExceedTemp) {
+        this.isExceedTemp = isExceedTemp;
     }
 }

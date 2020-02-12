@@ -105,6 +105,22 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             if (troubleshootRecord == null) {
                 return false;
             }
+            if (troubleshootRecord.getPersonBase() == null) {
+                return false;
+            }
+            if (StringUtil.isEmpty(troubleshootRecord.getPersonBase().getName())) {
+                return false;
+            }
+            if (StringUtil.isEmpty(troubleshootRecord.getPersonBase().getPhone())) {
+                return false;
+            }
+            PersonBaseEntity personBaseEntity = personBaseRepository.findByNameAndPhone(troubleshootRecord.getPersonBase().getName(), troubleshootRecord.getPersonBase().getPhone());
+            if (personBaseEntity != null) {
+                personBaseEntity = personBaseMapper.modelToEntity(troubleshootRecord.getPersonBase());
+                personBaseRepository.save(personBaseEntity);
+            } else {
+                return false;
+            }
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
             TroubleshootRecordEntity troubleshootRecordEntity = troubleshootRecordRepository.findByPersonBaseId(troubleshootRecord.getPersonBaseId());
             if (troubleshootRecordEntity == null) {
@@ -166,6 +182,8 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
                     plotBuildingUnitStatistics.setBuilding(entry.getValue().get(0).getBuilding());
                     plotBuildingUnitStatistics.setPlotId(entry.getValue().get(0).getPlotId());
                     plotBuildingUnitStatistics.setUnitNumber(entry.getValue().get(0).getUnitNumber());
+                    Long feverCount = entry.getValue().stream().filter(f -> f.getIsExceedTemp() == true).count();
+                    plotBuildingUnitStatistics.setFeverCount(feverCount.intValue());
                     Long checkedCount = entry.getValue().stream().filter(f -> f.getCreateDate().getTime() == date.getTime()).mapToLong(m -> m.getCount()).sum();
                     plotBuildingUnitStatistics.setCheckedCount(checkedCount.intValue());
                     Long unCheckedCount = entry.getValue().stream().filter(f -> f.getCreateDate().getTime() != date.getTime()).mapToLong(m -> m.getCount()).sum();

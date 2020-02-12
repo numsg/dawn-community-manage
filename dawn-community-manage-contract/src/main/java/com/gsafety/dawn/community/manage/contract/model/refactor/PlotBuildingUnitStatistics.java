@@ -8,6 +8,7 @@ public class PlotBuildingUnitStatistics {
     private String building;
     private String unitNumber;
     private String plotId;
+    private int feverCount;
     private int checkedCount;
     private int unCheckedCount;
 
@@ -49,5 +50,13 @@ public class PlotBuildingUnitStatistics {
 
     public void setUnCheckedCount(int unCheckedCount) {
         this.unCheckedCount = unCheckedCount;
+    }
+
+    public int getFeverCount() {
+        return feverCount;
+    }
+
+    public void setFeverCount(int feverCount) {
+        this.feverCount = feverCount;
     }
 }

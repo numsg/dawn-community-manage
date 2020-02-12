@@ -49,7 +49,7 @@ public class DistrictEntity {
     private String provinceCode ;
 
     @Column(name = "district_level")
-    private int districtLevel ;
+    private Integer districtLevel ;
 
     public String getId() {
         return id;
@@ -139,11 +139,11 @@ public class DistrictEntity {
         this.locationOrigin = locationOrigin;
     }
 
-    public int getDistrictLevel() {
+    public Integer getDistrictLevel() {
         return districtLevel;
     }
 
-    public void setDistrictLevel(int districtLevel) {
+    public void setDistrictLevel(Integer districtLevel) {
         this.districtLevel = districtLevel;
     }
 

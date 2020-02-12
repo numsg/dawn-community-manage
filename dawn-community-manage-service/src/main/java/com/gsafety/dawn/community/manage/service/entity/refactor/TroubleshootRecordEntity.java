@@ -46,8 +46,14 @@ public class TroubleshootRecordEntity {
     @Column(name = "create_time", length = 128)
     private Date createTime;
 
-    @Column(name = "person_base_id", length = 64, nullable = false)
+    @Column(name = "b_person_base_id", length = 64)
     private String personBaseId;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "b_person_base_id", nullable = false, insertable = false, updatable = false)
+    private PersonBaseEntity personBase;
+
     /**
      * 排查日期
      */
@@ -240,5 +246,13 @@ public class TroubleshootRecordEntity {
 
     public void setDistrictCode(String districtCode) {
         this.districtCode = districtCode;
+    }
+
+    public PersonBaseEntity getPersonBase() {
+        return personBase;
+    }
+
+    public void setPersonBase(PersonBaseEntity personBase) {
+        this.personBase = personBase;
     }
 }

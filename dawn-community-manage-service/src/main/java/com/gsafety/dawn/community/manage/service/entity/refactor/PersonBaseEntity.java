@@ -41,19 +41,6 @@ public class PersonBaseEntity {
     private String multiTenancy;
 
     /**
-     * 最新的排查记录id
-     */
-    @Column(name = "b_troubleshoot_record_id", length = 64)
-    private String troubleshootRecordId;
-
-    /**
-     * 最新的排查记录
-     */
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "b_troubleshoot_record_id", nullable = false, insertable = false, updatable = false)
-    private TroubleshootRecordEntity troubleshootRecord;
-
-    /**
      * 数据是否通过移动端
      */
     @Column(name = "is_by_phone")
@@ -135,22 +122,6 @@ public class PersonBaseEntity {
 
     public void setMultiTenancy(String multiTenancy) {
         this.multiTenancy = multiTenancy;
-    }
-
-    public String getTroubleshootRecordId() {
-        return troubleshootRecordId;
-    }
-
-    public void setTroubleshootRecordId(String troubleshootRecordId) {
-        this.troubleshootRecordId = troubleshootRecordId;
-    }
-
-    public TroubleshootRecordEntity getTroubleshootRecord() {
-        return troubleshootRecord;
-    }
-
-    public void setTroubleshootRecord(TroubleshootRecordEntity troubleshootRecord) {
-        this.troubleshootRecord = troubleshootRecord;
     }
 
     public boolean getIsByPhone() {

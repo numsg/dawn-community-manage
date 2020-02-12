@@ -22,7 +22,7 @@ spring:
     properties:
       enabled: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties.hibernate.temp.use_jdbc_metadata_defaults: false   # 禁用Postgresql的特性检查（如CLOB），因为postgresql的驱动暂没有实现此特性
     database-platform: org.hibernate.dialect.PostgreSQL95Dialect

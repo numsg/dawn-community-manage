@@ -73,8 +73,6 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
                 if (!troubleshootRecord.getIsByPhone()) {
                     personBaseEntity.setId(UUID.randomUUID().toString());
                 }
-                personBaseEntity.setTroubleshootRecord(null);
-                personBaseEntity.setTroubleshootRecordId(null);
                 personBaseRepository.save(personBaseEntity);
             }
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
@@ -86,6 +84,8 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
                 troubleshootRecordEntity = commonUtil.mapper(troubleshootRecordMapper.modelToEntity(troubleshootRecord), troubleshootRecordEntity);
             }
             troubleshootRecordEntity.setCreateDate(format.parse(format.format(troubleshootRecord.getCreateTime())));
+            troubleshootRecordEntity.setPersonBase(null);
+            troubleshootRecordEntity.setPersonBaseId(personBaseEntity.getId());
             troubleshootRecordRepository.save(troubleshootRecordEntity);
             TroubleshootHistoryRecordEntity troubleshootHistoryRecordEntity = new TroubleshootHistoryRecordEntity();
             troubleshootHistoryRecordEntity = commonUtil.mapper(troubleshootRecordEntity, troubleshootHistoryRecordEntity);
@@ -93,9 +93,6 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             troubleshootHistoryRecordEntity.setPersonBase(null);
             troubleshootHistoryRecordEntity.setPersonBaseId(personBaseEntity.getId());
             troubleshootHistoryRecordRepository.save(troubleshootHistoryRecordEntity);
-            personBaseEntity = personBaseRepository.getOne(personBaseEntity.getId());
-            personBaseEntity.setTroubleshootRecordId(troubleshootRecordEntity.getId());
-            personBaseRepository.save(personBaseEntity);
             return troubleshootRecordRepository.getOne(troubleshootRecord.getId()) != null;
         } catch (Exception e) {
             logger.error("add error", e, e.getMessage(), e.getCause());
@@ -137,7 +134,7 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             if (StringUtil.isEmpty(multiTenancy)) {
                 return Collections.emptyList();
             }
-            List<PlotReportingStaffEntity> plotReportingStaffEntities = personBaseRepository.findPlotReportingStaff(multiTenancy);
+            List<PlotReportingStaffEntity> plotReportingStaffEntities = troubleshootRecordRepository.findPlotReportingStaff(multiTenancy);
             if (CollectionUtils.isEmpty(plotReportingStaffEntities)) {
                 return Collections.emptyList();
             }

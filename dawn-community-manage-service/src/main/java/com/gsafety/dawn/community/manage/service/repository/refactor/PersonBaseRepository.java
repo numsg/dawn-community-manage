@@ -20,7 +20,4 @@ public interface PersonBaseRepository extends JpaRepository<PersonBaseEntity, St
     @Query("select c from PersonBaseEntity c where c.name  = :name and c.phone = :phone")
     PersonBaseEntity findByNameAndPhone(@Param("name") String name, @Param("phone") String phone);
 
-    @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.PlotReportingStaffEntity(count(c),c.troubleshootRecord.plot) from PersonBaseEntity c where c.multiTenancy  = :multiTenancy group by c.troubleshootRecord.plot")
-    List<PlotReportingStaffEntity> findPlotReportingStaff(@Param("multiTenancy") String multiTenancy);
-
 }

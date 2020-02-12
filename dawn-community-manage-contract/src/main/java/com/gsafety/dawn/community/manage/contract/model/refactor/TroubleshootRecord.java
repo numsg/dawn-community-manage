@@ -26,7 +26,7 @@ public class TroubleshootRecord {
     private int age;
 
     // 过去14天是否离开过本地区
-    private Boolean isLeaveArea;
+    private boolean isLeaveArea;
 
     // 确诊情况
     private String confirmed_diagnosis;
@@ -91,12 +91,12 @@ public class TroubleshootRecord {
         this.personBase = personBase;
     }
 
-    public Boolean getLeaveArea() {
-        return isLeaveArea;
+    public boolean getIsLeaveArea() {
+        return this.isLeaveArea;
     }
 
-    public void setLeaveArea(Boolean leaveArea) {
-        isLeaveArea = leaveArea;
+    public void setIsLeaveArea(boolean isLeaveArea) {
+        this.isLeaveArea = isLeaveArea;
     }
 
     public String getConfirmed_diagnosis() {
@@ -123,20 +123,20 @@ public class TroubleshootRecord {
         this.multiTenancy = multiTenancy;
     }
 
-    public boolean isExceedTemp() {
-        return isExceedTemp;
+    public boolean setIsExceedTemp() {
+        return this.isExceedTemp;
     }
 
-    public void setExceedTemp(boolean exceedTemp) {
-        isExceedTemp = exceedTemp;
+    public void setIsExceedTemp(boolean isExceedTemp) {
+        this.isExceedTemp = isExceedTemp;
     }
 
-    public boolean isContact() {
-        return isContact;
+    public boolean getIsContact() {
+        return this.isContact;
     }
 
-    public void setContact(boolean contact) {
-        isContact = contact;
+    public void setIsContact(boolean isContact) {
+        this.isContact = isContact;
     }
 
     public String getOtherSymptoms() {

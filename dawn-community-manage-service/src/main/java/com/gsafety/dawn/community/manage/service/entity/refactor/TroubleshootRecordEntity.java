@@ -98,12 +98,12 @@ public class TroubleshootRecordEntity {
         this.id = id;
     }
 
-    public Boolean getLeaveArea() {
-        return isLeaveArea;
+    public Boolean getIsLeaveArea() {
+        return this.isLeaveArea;
     }
 
-    public void setLeaveArea(Boolean leaveArea) {
-        isLeaveArea = leaveArea;
+    public void setIsLeaveArea(Boolean isLeaveArea) {
+        this.isLeaveArea = isLeaveArea;
     }
 
     public String getConfirmed_diagnosis() {
@@ -138,20 +138,20 @@ public class TroubleshootRecordEntity {
         this.multiTenancy = multiTenancy;
     }
 
-    public boolean isExceedTemp() {
-        return isExceedTemp;
+    public boolean getIsExceedTemp() {
+        return this.isExceedTemp;
     }
 
-    public void setExceedTemp(boolean exceedTemp) {
-        isExceedTemp = exceedTemp;
+    public void setIsExceedTemp(boolean isExceedTemp) {
+        this.isExceedTemp = isExceedTemp;
     }
 
-    public boolean isContact() {
-        return isContact;
+    public boolean getIsContact() {
+        return this.isContact;
     }
 
-    public void setContact(boolean contact) {
-        isContact = contact;
+    public void setIsContact(boolean isContact) {
+        this.isContact = isContact;
     }
 
     public String getOtherSymptoms() {

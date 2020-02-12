@@ -1,6 +1,6 @@
 package com.gsafety.dawn.community.manage.service.repository.refactor;
 
-import com.gsafety.dawn.community.manage.service.entity.refactor.BuildingUnitStaffEntity;
+import com.gsafety.dawn.community.manage.service.entity.refactor.PlotBuildingUnitStaffEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.PlotReportingStaffEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.TroubleshootRecordEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,10 +23,10 @@ public interface TroubleshootRecordRepository extends JpaRepository<Troubleshoot
     @Query("select c from TroubleshootRecordEntity c where c.personBaseId  = :personBaseId")
     TroubleshootRecordEntity findByPersonBaseId(@Param("personBaseId") String personBaseId);
 
-    @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.BuildingUnitStaffEntity(count(c),c.building,c.unitNumber,c.createDate,c.plot) " +
-            "from TroubleshootRecordEntity c where c.plot  = :plotId " +
+    @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.PlotBuildingUnitStaffEntity(count(c),c.building,c.unitNumber,c.createDate,c.plot) " +
+            "from TroubleshootRecordEntity c where c.multiTenancy  = :multiTenancy " +
             "group by c.building,c.unitNumber,c.createDate,c.plot")
-    List<BuildingUnitStaffEntity> findBuildingUnitStaff(@Param("plotId") String plotId);
+    List<PlotBuildingUnitStaffEntity> findPlotBuildingUnitStaff(@Param("multiTenancy") String multiTenancy);
 
     @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.PlotReportingStaffEntity(count(c),c.plot) " +
             "from TroubleshootRecordEntity c where c.multiTenancy  = :multiTenancy group by c.plot")

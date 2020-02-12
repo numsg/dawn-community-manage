@@ -3,7 +3,7 @@ package com.gsafety.dawn.community.manage.contract.model.refactor;
 /**
  * 楼栋单元分组统计信息
  */
-public class BuildingUnitStatistics {
+public class PlotBuildingUnitStatistics {
 
     private String building;
     private String unitNumber;

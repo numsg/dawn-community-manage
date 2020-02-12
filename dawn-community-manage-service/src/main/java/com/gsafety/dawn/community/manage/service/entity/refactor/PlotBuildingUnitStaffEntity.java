@@ -2,22 +2,22 @@ package com.gsafety.dawn.community.manage.service.entity.refactor;
 
 import java.util.Date;
 
-public class BuildingUnitStaffEntity {
+public class PlotBuildingUnitStaffEntity {
 
     private long count;
     private String building;
     private String unitNumber;
     private Date createDate;
     private String plotId;
-    private String buildingUnitNumber;
+    private String plotBuildingUnitNumber;
 
-    public BuildingUnitStaffEntity(long count, String building, String unitNumber, Date createDate, String plotId) {
+    public PlotBuildingUnitStaffEntity(long count, String building, String unitNumber, Date createDate, String plotId) {
         this.count = count;
         this.building = building;
         this.unitNumber = unitNumber;
         this.createDate = createDate;
         this.plotId = plotId;
-        this.buildingUnitNumber = this.building + "-" + this.unitNumber;
+        this.plotBuildingUnitNumber = this.building + "-" + this.unitNumber + "-" + this.plotId;
     }
 
     public long getCount() {
@@ -60,11 +60,11 @@ public class BuildingUnitStaffEntity {
         this.plotId = plotId;
     }
 
-    public String getBuildingUnitNumber() {
-        return buildingUnitNumber;
+    public String getPlotBuildingUnitNumber() {
+        return plotBuildingUnitNumber;
     }
 
-    public void setBuildingUnitNumber(String buildingUnitNumber) {
-        this.buildingUnitNumber = buildingUnitNumber;
+    public void setPlotBuildingUnitNumber(String plotBuildingUnitNumber) {
+        this.plotBuildingUnitNumber = plotBuildingUnitNumber;
     }
 }

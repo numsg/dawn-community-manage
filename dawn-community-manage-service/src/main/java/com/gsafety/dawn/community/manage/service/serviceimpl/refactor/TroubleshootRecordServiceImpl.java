@@ -2,7 +2,7 @@ package com.gsafety.dawn.community.manage.service.serviceimpl.refactor;
 
 import com.gsafety.dawn.community.common.util.CommonUtil;
 import com.gsafety.dawn.community.common.util.StringUtil;
-import com.gsafety.dawn.community.manage.contract.model.refactor.BuildingUnitStatistics;
+import com.gsafety.dawn.community.manage.contract.model.refactor.PlotBuildingUnitStatistics;
 import com.gsafety.dawn.community.manage.contract.model.refactor.ReportingStaffStatistics;
 import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
 import com.gsafety.dawn.community.manage.contract.service.refactor.TroubleshootRecordService;
@@ -13,7 +13,6 @@ import com.gsafety.dawn.community.manage.service.entity.refactor.*;
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootHistoryRecordRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.PersonBaseRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootRecordRepository;
-import org.mapstruct.Mapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,32 +145,32 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
     }
 
     @Override
-    public List<BuildingUnitStatistics> getBuildingUnitStatistics(String plotId) {
+    public List<PlotBuildingUnitStatistics> getPlotBuildingUnitStatistics(String multiTenancy) {
         try {
-            if (StringUtil.isEmpty(plotId)) {
+            if (StringUtil.isEmpty(multiTenancy)) {
                 return Collections.emptyList();
             }
-            List<BuildingUnitStaffEntity> buildingUnitStaffEntities = troubleshootRecordRepository.findBuildingUnitStaff(plotId);
-            if (CollectionUtils.isEmpty(buildingUnitStaffEntities)) {
+            List<PlotBuildingUnitStaffEntity> plotBuildingUnitStaffEntities = troubleshootRecordRepository.findPlotBuildingUnitStaff(multiTenancy);
+            if (CollectionUtils.isEmpty(plotBuildingUnitStaffEntities)) {
                 return Collections.emptyList();
             }
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
             Date date = format.parse(format.format(new Date()));
-            List<BuildingUnitStatistics> result = new ArrayList<>();
-            Map<String, List<BuildingUnitStaffEntity>> groupBuildingUnitNumbers = buildingUnitStaffEntities.stream().collect(Collectors.groupingBy(BuildingUnitStaffEntity::getBuildingUnitNumber));
-            for (Map.Entry<String, List<BuildingUnitStaffEntity>> entry :
-                    groupBuildingUnitNumbers.entrySet()) {
+            List<PlotBuildingUnitStatistics> result = new ArrayList<>();
+            Map<String, List<PlotBuildingUnitStaffEntity>> groupPlotBuildingUnitNumbers = plotBuildingUnitStaffEntities.stream().collect(Collectors.groupingBy(PlotBuildingUnitStaffEntity::getPlotBuildingUnitNumber));
+            for (Map.Entry<String, List<PlotBuildingUnitStaffEntity>> entry :
+                    groupPlotBuildingUnitNumbers.entrySet()) {
 
                 if (!CollectionUtils.isEmpty(entry.getValue())) {
-                    BuildingUnitStatistics buildingUnitStatistics = new BuildingUnitStatistics();
-                    buildingUnitStatistics.setBuilding(entry.getValue().get(0).getBuilding());
-                    buildingUnitStatistics.setPlotId(plotId);
-                    buildingUnitStatistics.setUnitNumber(entry.getValue().get(0).getUnitNumber());
+                    PlotBuildingUnitStatistics plotBuildingUnitStatistics = new PlotBuildingUnitStatistics();
+                    plotBuildingUnitStatistics.setBuilding(entry.getValue().get(0).getBuilding());
+                    plotBuildingUnitStatistics.setPlotId(entry.getValue().get(0).getPlotId());
+                    plotBuildingUnitStatistics.setUnitNumber(entry.getValue().get(0).getUnitNumber());
                     Long checkedCount = entry.getValue().stream().filter(f -> f.getCreateDate().getTime() == date.getTime()).mapToLong(m -> m.getCount()).sum();
-                    buildingUnitStatistics.setCheckedCount(checkedCount.intValue());
+                    plotBuildingUnitStatistics.setCheckedCount(checkedCount.intValue());
                     Long unCheckedCount = entry.getValue().stream().filter(f -> f.getCreateDate().getTime() != date.getTime()).mapToLong(m -> m.getCount()).sum();
-                    buildingUnitStatistics.setUnCheckedCount(unCheckedCount.intValue());
-                    result.add(buildingUnitStatistics);
+                    plotBuildingUnitStatistics.setUnCheckedCount(unCheckedCount.intValue());
+                    result.add(plotBuildingUnitStatistics);
                 }
             }
             return result;

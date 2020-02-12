@@ -75,7 +75,7 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             if (personBaseEntity == null) {
                 personBaseEntity = personBaseMapper.modelToEntity(troubleshootRecord.getPersonBase());
                 personBaseEntity.setId(UUID.randomUUID().toString());
-                personBaseRepository.save(personBaseEntity);
+
             }
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
             TroubleshootRecordEntity troubleshootRecordEntity = troubleshootRecordRepository.findByPersonBaseId(personBaseEntity.getId());
@@ -88,6 +88,7 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
                 }
                 troubleshootRecordEntity = commonUtil.mapper(troubleshootRecordMapper.modelToEntity(troubleshootRecord), troubleshootRecordEntity);
             }
+            personBaseRepository.save(personBaseEntity);
             troubleshootRecordEntity.setCreateDate(format.parse(format.format(troubleshootRecord.getCreateTime())));
             troubleshootRecordEntity.setPersonBase(null);
             troubleshootRecordEntity.setPersonBaseId(personBaseEntity.getId());
@@ -132,7 +133,6 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             PersonBaseEntity personBaseEntity = personBaseRepository.findByNameAndPhone(troubleshootRecord.getPersonBase().getName(), troubleshootRecord.getPersonBase().getPhone());
             if (personBaseEntity != null) {
                 personBaseEntity = commonUtil.mapper(troubleshootRecord.getPersonBase(), personBaseEntity);
-                personBaseRepository.save(personBaseEntity);
             } else {
                 return false;
             }
@@ -143,6 +143,7 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             } else {
                 troubleshootRecordEntity = commonUtil.mapper(troubleshootRecord, troubleshootRecordEntity);
             }
+            personBaseRepository.save(personBaseEntity);
             troubleshootRecordEntity.setCreateDate(format.parse(format.format(troubleshootRecord.getCreateTime())));
             troubleshootRecordRepository.save(troubleshootRecordEntity);
             TroubleshootHistoryRecordEntity troubleshootHistoryRecordEntity = new TroubleshootHistoryRecordEntity();

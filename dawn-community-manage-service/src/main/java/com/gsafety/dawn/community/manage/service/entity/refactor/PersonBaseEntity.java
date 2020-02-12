@@ -10,7 +10,7 @@ public class PersonBaseEntity {
     @Column(name = "id", length = 64, nullable = false)
     private String id;
 
-    @Column(name = "code", length = 64, nullable = false)
+    @Column(name = "code", length = 64)
     private String code;
 
     // name

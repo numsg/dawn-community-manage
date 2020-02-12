@@ -46,7 +46,7 @@ public class TimerServiceImpl extends DataCollectionServiceImpl implements Servl
 
     @Override
     public List<TroubleshootRecordModel> getDataFromPhone(RequestParamModel requestParamModel) {
-        return null;
+        return getDataFromMobileTerminal(requestParamModel);
     }
 
     class OneTask extends TimerTask {//继承TimerTask类

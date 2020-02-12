@@ -35,8 +35,8 @@ public class TimerController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/timer/data", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "从移动端数据", notes = "getDataFromPhone(requestParamModel)")
+    @PostMapping(value = "/timer/data", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "查询移动端数据", notes = "getDataFromPhone(requestParamModel)")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = TroubleshootRecordModel.class,responseContainer = "List"),
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),

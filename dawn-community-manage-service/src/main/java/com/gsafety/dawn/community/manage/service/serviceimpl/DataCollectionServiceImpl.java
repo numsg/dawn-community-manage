@@ -2,12 +2,16 @@ package com.gsafety.dawn.community.manage.service.serviceimpl;
 
 import com.gsafety.dawn.community.common.util.DateUtil;
 import com.gsafety.dawn.community.manage.contract.model.RequestModel;
+import com.gsafety.dawn.community.manage.contract.model.changde.RequestParamModel;
+import com.gsafety.dawn.community.manage.contract.model.changde.TroubleshootRecordModel;
 import com.gsafety.dawn.community.manage.contract.model.refactor.PersonBase;
 import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
 import com.gsafety.dawn.community.manage.contract.service.refactor.TroubleshootRecordService;
 import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
+import com.gsafety.dawn.community.manage.service.entity.DataSourceEntity;
 import com.gsafety.dawn.community.manage.service.repository.DSourceDataRepository;
 import com.gsafety.dawn.community.manage.service.repository.DailyTroubleshootRecordRepository;
+import com.gsafety.dawn.community.manage.service.repository.DataSourceRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootRecordRepository;
 import com.gsafety.java.common.utils.HttpClientUtil;
 import com.gsafety.java.common.utils.JsonUtil;
@@ -24,12 +28,12 @@ import static com.gsafety.java.common.utils.JsonUtil.toJson;
 
 @Service
 @Transactional
-public class DataCollectionServiceImpl{
+public class DataCollectionServiceImpl {
     @Value("${access.data-collection}")
     private String dataCollectionUrl;
 
-    @Value("${app.villageId}")
-    private String villageId;
+   // @Value("${app.villageId}")
+   // private String villageId;
 
     @Value("${app.pageSize}")
     private Integer pageSize;
@@ -45,7 +49,7 @@ public class DataCollectionServiceImpl{
     //1:乏力
     private static final String feebleId = "5e647e8b-6396-4e56-854b-ed1be1c60ae3";
     //2:干咳
-    private static final  String hooseId = "e081de69-a984-4abb-a2a1-ed9996a63917";
+    private static final String hooseId = "e081de69-a984-4abb-a2a1-ed9996a63917";
     //3:肌痛
     private static final String musclePainId = "0e2adfab-bb9d-4ef9-a4db-6a5baa2d7788";
     //4:寒战
@@ -75,7 +79,7 @@ public class DataCollectionServiceImpl{
     //1:疑似患者，6293737c-5775-426d-9845-f919eafba1be
     private static final String suspectedPatientId = "6293737c-5775-426d-9845-f919eafba1be";
     //3:一版发热患者，c0bb07b2-db54-4fd1-89d3-20b0672a2779
-    private static final  String feverPatientId = "c0bb07b2-db54-4fd1-89d3-20b0672a2779";
+    private static final String feverPatientId = "c0bb07b2-db54-4fd1-89d3-20b0672a2779";
 
     //2:CT诊断肺炎患者 c9eedfbc-ae5a-40b7-8a62-c049c5678deb
     private static final String CTPatientId = "c9eedfbc-ae5a-40b7-8a62-c049c5678deb";
@@ -83,7 +87,7 @@ public class DataCollectionServiceImpl{
     private static final String contractPatientId = "6293737c-5775-426d-9845-f919eafba1be";
 
 
-    private String url = "/search/v2";
+    private String url = "/changde/search";
 
     // 杨桥湖社区id
     private static final String communityDataSourceId = "a2e01f0e-6c86-4a41-bcf3-c07c1ffa2f82";
@@ -104,10 +108,15 @@ public class DataCollectionServiceImpl{
     @Autowired
     private TroubleshootRecordService troubleshootRecordService;
 
+    @Autowired
+    private DataSourceRepository dataSourceRepository;
 
     private Date startTimeDate = DateUtil.getDayStartDate();
+
+    private Date endTimeDate = null;
+
     // 小区
-    private List<DSourceDataEntity> plots = new ArrayList<>();
+   // private  List<DSourceDataEntity> plots = new ArrayList<>();
     // 其他诊断状况
     private List<DSourceDataEntity> otherSymptoms = new ArrayList<>();
 
@@ -133,26 +142,25 @@ public class DataCollectionServiceImpl{
             Map data = JsonUtil.fromJson(toJson(map.get("data")), Map.class);
             Integer total = Integer.parseInt(JsonUtil.fromJson(toJson(data.get("total")), String.class));
 
-            int pageTotal=1;
-            if (total>pageSize){
-                if (total%pageSize==0){
-                    pageTotal=total/pageSize;
-                }else{
-                    pageTotal=total/pageSize+1;
+            int pageTotal = 1;
+            if (total > pageSize) {
+                if (total % pageSize == 0) {
+                    pageTotal = total / pageSize;
+                } else {
+                    pageTotal = total / pageSize + 1;
                 }
             }
-
-            plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(communityDataSourceId);
+           // plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(communityDataSourceId);
             otherSymptoms = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(otherSymptomId);
-
             for (int i = 1; i <= pageTotal; i++) {
                 requestModel.setPageNo(i);
-                getDataFromAccess(requestModel);
+                requestModel.setStartDate(startTimeDate);
+                TraversalAndInsertData(requestModel);
             }
         }
     }
 
-    public Boolean getDataFromAccess(RequestModel requestModel) {
+    public Boolean TraversalAndInsertData(RequestModel requestModel) {
         Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
         if (map.get("data") == null || map.get("success").equals(false)) {
             return false;
@@ -165,23 +173,23 @@ public class DataCollectionServiceImpl{
         }
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-      //  List<TroubleshootRecord> records=new ArrayList<>();
+        //  List<TroubleshootRecord> records=new ArrayList<>();
         for (Object obj : list) {
 
             Map objMap = JsonUtil.fromJson(toJson(obj), Map.class);
             Object recordId = objMap.get("id");
             Object personName = objMap.get("name");
             Object phone = objMap.get("phone");
-            Object sex=objMap.get("sex");
+            Object sex = objMap.get("sex");
             Object districtCode = objMap.get("currentVillage");
-            if (districtCode==null || personName == null || phone == null || sex==null || troubleshootRecordRepository.existsById(recordId.toString()) ) {
+            if (districtCode == null || personName == null || phone == null || sex == null || troubleshootRecordRepository.existsById(recordId.toString())) {
                 continue;
             }
-            if ( "".equals(districtCode) || "".equals(personName)|| "".equals(phone )||"".equals(sex)){
+            if ("".equals(districtCode) || "".equals(personName) || "".equals(phone) || "".equals(sex)) {
                 continue;
             }
 
-            TroubleshootRecord record=new TroubleshootRecord();
+            TroubleshootRecord record = new TroubleshootRecord();
 
             record.setId(recordId.toString());
             record.setBuilding(objMap.get("building") != null ? objMap.get("building").toString() : "其它");
@@ -194,13 +202,13 @@ public class DataCollectionServiceImpl{
             record.setUnitNumber(objMap.get("unit") != null ? objMap.get("unit").toString() : "其它");
 
             //record.setLeaveArea();
-           // record.setCreateDate();
+            // record.setCreateDate();
 
-            if(objMap.get("age") != null){
+            if (objMap.get("age") != null) {
                 record.setAge(Integer.parseInt(objMap.get("age").toString()));
             }
             if (objMap.get("medicalAdvice") != null) {
-             //   record.setConfirmed_diagnosis(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
+                //   record.setConfirmed_diagnosis(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
                 record.setMedicalOpinion(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
             }
             try {
@@ -219,31 +227,140 @@ public class DataCollectionServiceImpl{
                 //entity.setOtherSymptoms(converOtherSymptoms(objMap.get("symptom").toString()));
             }
 
-            if(objMap.get("communityCode")!=null && dSourceDataRepository.existsById(objMap.get("communityCode").toString())){
+            if (objMap.get("communityCode") != null && dSourceDataRepository.existsById(objMap.get("communityCode").toString())) {
                 record.setPlot(objMap.get("communityCode").toString());
-            }else{
-                Random random = new Random();  // 此处带改
+            } else {
+                String villageCode = objMap.get("currentVillage").toString();
+                DataSourceEntity village=dataSourceRepository.queryByDescription(villageCode);
+                List<DSourceDataEntity>plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(village.getId());
+                Random random = new Random();
                 record.setPlot(plots.get(random.nextInt(plots.size())).getId());
             }
 
-            PersonBase personBase=new PersonBase();
+            PersonBase personBase = new PersonBase();
             personBase.setAddress(objMap.get("residence").toString());
             personBase.setName(personName.toString());
             personBase.setPhone(phone.toString());
             personBase.setSex(objMap.get("sex").toString().equals("0") ? maleId : femaleId);
             personBase.setIdentificationNumber(objMap.get("idNumber") != null ? objMap.get("idNumber").toString() : "");
-            record.setMultiTenancy(objMap.get("currentVillage").toString());
+          //  record.setMultiTenancy(objMap.get("currentVillage").toString());
 
             startTimeDate = record.getCreateTime();
             record.setPersonBase(personBase);
 
             troubleshootRecordService.add(record);
-          //  records.add(record);
+            //  records.add(record);
         }
         return true;
     }
 
 
+    public List<TroubleshootRecordModel> getDataFromMobileTerminal(RequestParamModel requestParamModel) {
+        List<TroubleshootRecordModel> result = new ArrayList<>();
+        endTimeDate=requestParamModel.getEndDate();
+        RequestModel requestModel = new RequestModel();
+        requestModel.setPageSize(pageSize);
+        requestModel.setCurrentVillage(requestParamModel.getCurrentVillageId()); // 改为查询所有社区
+        requestModel.setStartDate(requestParamModel.getStartDate());
+        requestModel.setEndDate(endTimeDate);
+        Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
+        if (map.get("data") != null && map.get("success").equals(true)) {
+            int pageTotal = 1;
+            Map data = JsonUtil.fromJson(toJson(map.get("data")), Map.class);
+            Integer total = Integer.parseInt(JsonUtil.fromJson(toJson(data.get("total")), String.class));
+
+            if (total > pageSize) {
+                if (total % pageSize == 0) {
+                    pageTotal = total / pageSize;
+                } else {
+                    pageTotal = total / pageSize + 1;
+                }
+            }
+            for (int i = 1; i <= pageTotal; i++) {
+                requestModel.setPageNo(i);
+                requestModel.setEndDate(endTimeDate);
+                result.addAll(TraversalAndAddData(requestModel));
+            }
+        }
+        return result;
+    }
+
+    private List<TroubleshootRecordModel> TraversalAndAddData(RequestModel requestModel) {
+        List<TroubleshootRecordModel> result = new ArrayList<>();
+        Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
+        if (map.get("data") == null || map.get("success").equals(false)) {
+            return result;
+        }
+        // 数据转换
+        Map data = JsonUtil.fromJson(toJson(map.get("data")), Map.class);
+        List list = JsonUtil.fromJson(toJson(data.get("list")), List.class);
+        if (list.isEmpty()) {
+            return result;
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        List<TroubleshootRecordModel> records = new ArrayList<>();
+        for (Object obj : list) {
+            Map objMap = JsonUtil.fromJson(toJson(obj), Map.class);
+            TroubleshootRecordModel recordModel = new TroubleshootRecordModel();
+            recordModel.setId(objMap.get("id") != null ? objMap.get("id").toString() : "");
+            recordModel.setName(objMap.get("name") != null ? objMap.get("name").toString() : "");
+            recordModel.setIdNumber(objMap.get("idNumber") != null ? objMap.get("idNumber").toString() : "");
+            recordModel.setSex(objMap.get("sex") != null ? objMap.get("sex").toString() : "");
+            recordModel.setAge(objMap.get("age") != null ? objMap.get("age").toString() : "");
+            recordModel.setResidence(objMap.get("residence") != null ? objMap.get("residence").toString() : "");
+            recordModel.setCommunity(objMap.get("community") != null ? objMap.get("community").toString() : "");
+            recordModel.setBuilding(objMap.get("building") != null ? objMap.get("building").toString() : "");
+            recordModel.setUnit(objMap.get("unit") != null ? objMap.get("unit").toString() : "");
+            recordModel.setRoomNumber(objMap.get("roomNumber") != null ? objMap.get("roomNumber").toString() : "");
+            recordModel.setPhone(objMap.get("phone") != null ? objMap.get("phone").toString() : "");
+            recordModel.setFever(objMap.get("fever") != null ? objMap.get("fever").toString() : "");
+            recordModel.setSymptom(objMap.get("symptom") != null ? objMap.get("symptom").toString() : "");
+            recordModel.setTravelLivingHubei(objMap.get("travelLivingHubei") != null ? objMap.get("travelLivingHubei").toString() : "");
+            recordModel.setTrip(objMap.get("trip") != null ? objMap.get("trip").toString() : "");
+            recordModel.setTouchPersonIsolation(objMap.get("touchPersonIsolation") != null ? objMap.get("touchPersonIsolation").toString() : "");
+            recordModel.setTouchHubei(objMap.get("touchHubei") != null ? objMap.get("touchHubei").toString() : "");
+            recordModel.setTemperature(objMap.get("temperature") != null ? objMap.get("temperature").toString() : "");
+            recordModel.setDiscomfort(objMap.get("discomfort") != null ? objMap.get("discomfort").toString() : "");
+            recordModel.setWuhanAddress(objMap.get("wuhanAddress") != null ? objMap.get("wuhanAddress").toString() : "");
+
+            recordModel.setVehicle(objMap.get("vehicle") != null ? objMap.get("vehicle").toString() : "");
+            recordModel.setVehicleNo(objMap.get("vehicleNo") != null ? objMap.get("vehicleNo").toString() : "");
+            recordModel.setStayPlace(objMap.get("stayPlace") != null ? objMap.get("stayPlace").toString() : "");
+            recordModel.setFourteenDays(objMap.get("fourteenDays") != null ? objMap.get("fourteenDays").toString() : "");
+            recordModel.setOtherToWuling(objMap.get("otherToWuling") != null ? objMap.get("otherToWuling").toString() : "");
+            recordModel.setWhereToWuling(objMap.get("whereToWuling") != null ? objMap.get("whereToWuling").toString() : "");
+            recordModel.setHowToWuling(objMap.get("howToWuling") != null ? objMap.get("howToWuling").toString() : "");
+            recordModel.setVehicleNoWuling(objMap.get("vehicleNoWuling") != null ? objMap.get("vehicleNoWuling").toString() : "");
+            recordModel.setTogetherPersonWuling(objMap.get("togetherPersonWuling") != null ? objMap.get("togetherPersonWuling").toString() : "");
+            recordModel.setWorkUnitWuling(objMap.get("workUnitWuling") != null ? objMap.get("workUnitWuling").toString() : "");
+            recordModel.setPermanentWuling(objMap.get("permanentWuling") != null ? objMap.get("permanentWuling").toString() : "");
+            recordModel.setProveWuling(objMap.get("proveWuling") != null ? objMap.get("proveWuling").toString() : "");
+            recordModel.setRemark(objMap.get("remark") != null ? objMap.get("remark").toString() : "");
+
+          //  recordModel.setLeaveHubeiDate(objMap.get("leaveHubeiDate") != null ? objMap.get("leaveHubeiDate").toString() : "");
+           // recordModel.setCreateTime(objMap.get("createTime") != null ? objMap.get("createTime").toString() : "");
+           // recordModel.setBackDate(objMap.get("backDate") != null ? objMap.get("backDate").toString() : "");
+
+            try {
+                if (objMap.get("leaveHubeiDate") != null){
+                    recordModel.setLeaveHubeiDate(formatter.parse(objMap.get("leaveHubeiDate").toString()).toString());
+                }
+                if (objMap.get("backDate") != null){
+                    recordModel.setBackDate(formatter.parse(objMap.get("backDate").toString()).toString());
+                }
+                recordModel.setCreateTime(formatter.parse(objMap.get("createTime").toString()).toString());
+                endTimeDate=formatter.parse(objMap.get("createTime").toString());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+//            if (records.contains(recordModel)){
+//
+//            }
+            records.add(recordModel);
+        }
+        return records;
+    }
 
 
     private String splitOtherSymptom(String symptoms) {

@@ -79,13 +79,13 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             }
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
             TroubleshootRecordEntity troubleshootRecordEntity = troubleshootRecordRepository.findByPersonBaseId(personBaseEntity.getId());
-            if (!troubleshootRecordEntity.getId().equals(troubleshootRecord.getId())) {
-                return false;
-            }
             troubleshootRecord.setPersonBaseId(personBaseEntity.getId());
             if (troubleshootRecordEntity == null) {
                 troubleshootRecordEntity = troubleshootRecordMapper.modelToEntity(troubleshootRecord);
             } else {
+                if (!troubleshootRecordEntity.getId().equals(troubleshootRecord.getId())) {
+                    return false;
+                }
                 troubleshootRecordEntity = commonUtil.mapper(troubleshootRecordMapper.modelToEntity(troubleshootRecord), troubleshootRecordEntity);
             }
             troubleshootRecordEntity.setCreateDate(format.parse(format.format(troubleshootRecord.getCreateTime())));

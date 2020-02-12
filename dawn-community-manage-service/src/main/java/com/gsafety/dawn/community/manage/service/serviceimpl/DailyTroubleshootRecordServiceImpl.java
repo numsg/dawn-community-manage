@@ -132,8 +132,8 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     public DailyTroubleshootRecordModel addDailyRecord(DailyTroubleshootRecordModel dailyTroubleshootRecordModel) {
 
         // 今日记录
-//        List<DailyTroubleshootRecordEntity> todayRecords = recordRepository.todayRecord(STARTTIME, ENDTIME);
-//        List<DailyTroubleshootRecordEntity> collect = todayRecords.stream()
+//        List<TroubleshootHistoryRecordEntity> todayRecords = recordRepository.todayRecord(STARTTIME, ENDTIME);
+//        List<TroubleshootHistoryRecordEntity> collect = todayRecords.stream()
 //                .filter(a ->
 //                        a.getName().equals(dailyTroubleshootRecordModel.getName()) &&
 //                        a.getPhone().equals(dailyTroubleshootRecordModel.getPhone()))
@@ -142,7 +142,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 //            return null;
 
         // 可以重复
-//        List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByNameAndPhone(dailyTroubleshootRecordModel.getName(), dailyTroubleshootRecordModel.getPhone());
+//        List<TroubleshootHistoryRecordEntity> recordEntities = recordRepository.queryAllByNameAndPhone(dailyTroubleshootRecordModel.getName(), dailyTroubleshootRecordModel.getPhone());
 //        if(!recordEntities.isEmpty())
 //            return null;
 
@@ -434,12 +434,12 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 //            DSourceDataEntity dataSourceEntity = allByDataSource.get(i);
 //
 //            // 根据小区查所有楼栋
-//            List<DailyTroubleshootRecordEntity> recordEntityList = recordRepository.queryAllByPlot(dataSourceEntity.getId());
+//            List<TroubleshootHistoryRecordEntity> recordEntityList = recordRepository.queryAllByPlot(dataSourceEntity.getId());
 //            for (int j = 0; j < recordEntityList.size(); j++) {
-//                DailyTroubleshootRecordEntity recordEntity = recordEntityList.get(j);
-//                List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByPlotAndbAndBuilding(dataSourceEntity.getId(), recordEntity.getBuilding());
+//                TroubleshootHistoryRecordEntity recordEntity = recordEntityList.get(j);
+//                List<TroubleshootHistoryRecordEntity> recordEntities = recordRepository.queryAllByPlotAndbAndBuilding(dataSourceEntity.getId(), recordEntity.getBuilding());
 //                for (int k = 0; k < recordEntities.size(); k++) {
-//                    DailyTroubleshootRecordEntity unit = recordEntities.get(k);
+//                    TroubleshootHistoryRecordEntity unit = recordEntities.get(k);
 //                    DailyStatisticModel dailyStatisticModel = new DailyStatisticModel();
 //                    dailyStatisticModel.setPlotId(dataSourceEntity.getId());
 //                    dailyStatisticModel.setPlotName(dataSourceEntity.getName());
@@ -472,10 +472,10 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 //            dailyStatisticModel.setChecked(integer);
 //
 //            // 统计未排查的人数 统计有误
-//            List<DailyTroubleshootRecordEntity> allPersons = recordRepository.queryUnchecked(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber());
-//            List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryAllByPlotAndBuildingAndUnitNumber(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber(), STARTTIME, ENDTIME);
+//            List<TroubleshootHistoryRecordEntity> allPersons = recordRepository.queryUnchecked(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber());
+//            List<TroubleshootHistoryRecordEntity> recordEntities = recordRepository.queryAllByPlotAndBuildingAndUnitNumber(dailyStatisticModel.getPlotId(), dailyStatisticModel.getBuilding(), dailyStatisticModel.getUnitNumber(), STARTTIME, ENDTIME);
 //
-//            List<DailyTroubleshootRecordEntity> temp = allPersons.stream()
+//            List<TroubleshootHistoryRecordEntity> temp = allPersons.stream()
 //                    .filter(item -> !recordEntities.stream()
 //                            .map(e -> e.getName() + e.getPhone())
 //                            .collect(toList())

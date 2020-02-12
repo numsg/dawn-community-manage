@@ -1,0 +1,229 @@
+package com.gsafety.dawn.community.manage.contract.model.refactor;
+
+import java.util.Date;
+
+public class TroubleshootRecord {
+
+    private String id;
+
+    private String personBaseId;
+
+    private PersonBase personBase;
+
+    // 小区
+    private String plot;
+
+    // 楼栋
+    private String building;
+
+    // 单元号
+    private String unitNumber;
+
+    // 房号
+    private String roomNo;
+
+    // 年龄
+    private int age;
+
+    // 过去14天是否离开过本地区
+    private Boolean isLeaveArea;
+
+    // 确诊情况
+    private String confirmed_diagnosis;
+
+    // 填报时间
+    private Date createTime;
+
+    /**
+     * 排查日期
+     */
+    private Date createDate;
+
+    // 多租户
+    private String multiTenancy;
+
+    // 体温是否大于37.3
+    private boolean isExceedTemp;
+
+    // 是否有接触史
+    private boolean isContact;
+
+    // 其它症状
+    private String otherSymptoms;
+
+    // 医疗意见
+    private String medicalOpinion;
+
+    // 备注
+    private String note;
+
+    /**
+     * 数据是否通过移动端
+     */
+    private boolean isByPhone;
+
+    /**
+     * 行政区划code
+     */
+    private String districtCode;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getPersonBaseId() {
+        return personBaseId;
+    }
+
+    public void setPersonBaseId(String personBaseId) {
+        this.personBaseId = personBaseId;
+    }
+
+    public PersonBase getPersonBase() {
+        return personBase;
+    }
+
+    public void setPersonBase(PersonBase personBase) {
+        this.personBase = personBase;
+    }
+
+    public Boolean getLeaveArea() {
+        return isLeaveArea;
+    }
+
+    public void setLeaveArea(Boolean leaveArea) {
+        isLeaveArea = leaveArea;
+    }
+
+    public String getConfirmed_diagnosis() {
+        return confirmed_diagnosis;
+    }
+
+    public void setConfirmed_diagnosis(String confirmed_diagnosis) {
+        this.confirmed_diagnosis = confirmed_diagnosis;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getMultiTenancy() {
+        return multiTenancy;
+    }
+
+    public void setMultiTenancy(String multiTenancy) {
+        this.multiTenancy = multiTenancy;
+    }
+
+    public boolean isExceedTemp() {
+        return isExceedTemp;
+    }
+
+    public void setExceedTemp(boolean exceedTemp) {
+        isExceedTemp = exceedTemp;
+    }
+
+    public boolean isContact() {
+        return isContact;
+    }
+
+    public void setContact(boolean contact) {
+        isContact = contact;
+    }
+
+    public String getOtherSymptoms() {
+        return otherSymptoms;
+    }
+
+    public void setOtherSymptoms(String otherSymptoms) {
+        this.otherSymptoms = otherSymptoms;
+    }
+
+    public String getMedicalOpinion() {
+        return medicalOpinion;
+    }
+
+    public void setMedicalOpinion(String medicalOpinion) {
+        this.medicalOpinion = medicalOpinion;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public String getPlot() {
+        return plot;
+    }
+
+    public void setPlot(String plot) {
+        this.plot = plot;
+    }
+
+    public String getBuilding() {
+        return building;
+    }
+
+    public void setBuilding(String building) {
+        this.building = building;
+    }
+
+    public String getUnitNumber() {
+        return unitNumber;
+    }
+
+    public void setUnitNumber(String unitNumber) {
+        this.unitNumber = unitNumber;
+    }
+
+    public String getRoomNo() {
+        return roomNo;
+    }
+
+    public void setRoomNo(String roomNo) {
+        this.roomNo = roomNo;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public boolean getIsByPhone() {
+        return this.isByPhone;
+    }
+
+    public void setIsByPhone(boolean isByPhone) {
+        this.isByPhone = isByPhone;
+    }
+
+    public String getDistrictCode() {
+        return districtCode;
+    }
+
+    public void setDistrictCode(String districtCode) {
+        this.districtCode = districtCode;
+    }
+}

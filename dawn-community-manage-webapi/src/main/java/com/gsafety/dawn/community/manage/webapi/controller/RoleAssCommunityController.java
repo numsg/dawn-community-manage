@@ -99,7 +99,7 @@ public class RoleAssCommunityController {
     }
 
     @PostMapping(value = "/role-ass-community/query-codes", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "根据codes查询", notes = "delete(roleAssCommunityModels)")
+    @ApiOperation(value = "根据行政codes查询", notes = "delete(roleAssCommunityModels)")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = List.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),

@@ -23,6 +23,9 @@ public class RoleAssCommunityEntity {
     @Column(name = "code",length = 64,nullable = false)
     private String code;
 
+    @Column(name = "name",length = 64,nullable = false)
+    private String name;
+
     // 存储行政区划code集合
     @Column(name = "administrative_codes",columnDefinition = "text",nullable = false)
     private String administrativeCodes;
@@ -114,5 +117,21 @@ public class RoleAssCommunityEntity {
 
     public void setMultiTenancy(String multiTenancy) {
         this.multiTenancy = multiTenancy;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

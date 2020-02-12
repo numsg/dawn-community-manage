@@ -2,11 +2,15 @@ package com.gsafety.dawn.community.manage.service.serviceimpl;
 
 import com.gsafety.dawn.community.common.util.DateUtil;
 import com.gsafety.dawn.community.manage.contract.model.RequestModel;
+import com.gsafety.dawn.community.manage.contract.model.refactor.PersonBase;
+import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
 import com.gsafety.dawn.community.manage.contract.service.TimerService;
+import com.gsafety.dawn.community.manage.contract.service.refactor.TroubleshootRecordService;
 import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
 import com.gsafety.dawn.community.manage.service.entity.DailyTroubleshootRecordEntity;
 import com.gsafety.dawn.community.manage.service.repository.DSourceDataRepository;
 import com.gsafety.dawn.community.manage.service.repository.DailyTroubleshootRecordRepository;
+import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootRecordRepository;
 import com.gsafety.java.common.utils.HttpClientUtil;
 import com.gsafety.java.common.utils.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,11 +51,11 @@ public class DataCollectionServiceImpl{
     //3:肌痛
     private static final String musclePainId = "0e2adfab-bb9d-4ef9-a4db-6a5baa2d7788";
     //4:寒战
-    private static final String aguedId = "be64af80-00ee-4ea5-94ba-3246d7d16230";
+    private static final String arguedId = "be64af80-00ee-4ea5-94ba-3246d7d16230";
     //5:呼吸困难
     private static final String breathId = "b01b1538-31f3-428b-9e33-531af1f40f83";
     //6:咽痛
-    private static final String pharyngalgiaId = "3dbbfced-ca40-437b-91d5-70f0c12b32ea";
+    private static final String soreThroatId = "3dbbfced-ca40-437b-91d5-70f0c12b32ea";
     //7:头疼
     private static final String headacheId = "ee377b8b-220f-4e8b-a6ce-fe47082e227b";
     //8:眩晕
@@ -69,16 +73,16 @@ public class DataCollectionServiceImpl{
 
     //分类诊疗医疗意见：
     // 0:确诊患者，
-    private String confirmedPatientId = "c9eedfbc-ae5a-40b7-8a62-c049c5678deb";
+    private static final String confirmedPatientId = "c9eedfbc-ae5a-40b7-8a62-c049c5678deb";
     //1:疑似患者，6293737c-5775-426d-9845-f919eafba1be
-    private String suspectedPatientId = "6293737c-5775-426d-9845-f919eafba1be";
+    private static final String suspectedPatientId = "6293737c-5775-426d-9845-f919eafba1be";
     //3:一版发热患者，c0bb07b2-db54-4fd1-89d3-20b0672a2779
-    private String feverPatientId = "c0bb07b2-db54-4fd1-89d3-20b0672a2779";
+    private static final  String feverPatientId = "c0bb07b2-db54-4fd1-89d3-20b0672a2779";
 
     //2:CT诊断肺炎患者 c9eedfbc-ae5a-40b7-8a62-c049c5678deb
-    private String CTPatientId = "c9eedfbc-ae5a-40b7-8a62-c049c5678deb";
+    private static final String CTPatientId = "c9eedfbc-ae5a-40b7-8a62-c049c5678deb";
     //4:密切接触者  6293737c-5775-426d-9845-f919eafba1be
-    private String contractPatientId = "6293737c-5775-426d-9845-f919eafba1be";
+    private static final String contractPatientId = "6293737c-5775-426d-9845-f919eafba1be";
 
 
     private String url = "/search/v2";
@@ -96,6 +100,13 @@ public class DataCollectionServiceImpl{
     @Autowired
     private DSourceDataRepository dSourceDataRepository;
 
+    @Autowired
+    private TroubleshootRecordRepository troubleshootRecordRepository;
+
+    @Autowired
+    private TroubleshootRecordService troubleshootRecordService;
+
+
     private Date startTimeDate = DateUtil.getDayStartDate();
     // 小区
     private List<DSourceDataEntity> plots = new ArrayList<>();
@@ -111,11 +122,11 @@ public class DataCollectionServiceImpl{
 
         System.out.println(formatter.format(startTimeDate));
         System.out.println(formatter.format(endTimeDate));
-        System.out.println(villageId);
+        //System.out.println(villageId);
         RequestModel requestModel = new RequestModel();
         requestModel.setPageSize(pageSize);
         requestModel.setKeyWords("");
-        requestModel.setCurrentVillage(villageId);
+        //requestModel.setCurrentVillage(villageId); // 改为查询所有社区
         requestModel.setStartDate(startTimeDate);
         requestModel.setEndDate(DateUtil.getDayEndDate());
         Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
@@ -143,7 +154,6 @@ public class DataCollectionServiceImpl{
     }
 
     public Boolean getDataFromAccess(RequestModel requestModel) {
-        Boolean result=false;
         Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
         if (map.get("data") == null || map.get("success").equals(false)) {
             return false;
@@ -156,73 +166,85 @@ public class DataCollectionServiceImpl{
         }
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+      //  List<TroubleshootRecord> records=new ArrayList<>();
         for (Object obj : list) {
+
             Map objMap = JsonUtil.fromJson(toJson(obj), Map.class);
-            DailyTroubleshootRecordEntity entity = new DailyTroubleshootRecordEntity();
-            if (objMap.get("name") == null || objMap.get("phone") == null || objMap.get("residence") == null || objMap.get("sex") == null) {
+            Object recordId = objMap.get("id");
+            Object personName = objMap.get("name");
+            Object phone = objMap.get("phone");
+            Object sex=objMap.get("sex");
+            if ( personName == null || phone == null || sex==null || troubleshootRecordRepository.existsById(recordId.toString()) ) {
+                continue;
+            }
+            if ( "".equals(personName)|| "".equals(phone )||"".equals(sex)){
                 continue;
             }
 
-            entity.setId(objMap.get("id").toString());
-            entity.setName(objMap.get("name").toString());
-            entity.setPhone(objMap.get("phone").toString());
-            entity.setAddress(objMap.get("residence").toString());
+            TroubleshootRecord record=new TroubleshootRecord();
 
-            entity.setAge(objMap.get("age") != null ? Integer.parseInt(objMap.get("age").toString()) : 0);
-            entity.setBuilding(objMap.get("building") != null ? objMap.get("building").toString() : "");
+            record.setId(recordId.toString());
+            record.setBuilding(objMap.get("building") != null ? objMap.get("building").toString() : "其它");
+            record.setIsByPhone(true);
+            //社区id
+            record.setDistrictCode(objMap.get("currentVillage").toString());
+            record.setMultiTenancy(objMap.get("currentVillage").toString());
+            record.setNote(objMap.get("remark") != null ? objMap.get("remark").toString() : "");
+            record.setRoomNo(objMap.get("roomNumber") != null ? objMap.get("roomNumber").toString() : "");
+            record.setUnitNumber(objMap.get("unit") != null ? objMap.get("unit").toString() : "其它");
+
+            //record.setLeaveArea();
+           // record.setCreateDate();
+
+            if(objMap.get("age") != null){
+                record.setAge(Integer.parseInt(objMap.get("age").toString()));
+            }
+            if (objMap.get("medicalAdvice") != null) {
+             //   record.setConfirmed_diagnosis(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
+                record.setMedicalOpinion(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
+            }
             try {
-                entity.setCreateTime(formatter.parse(objMap.get("createTime").toString()));  //字符串转换
+                record.setCreateTime(formatter.parse(objMap.get("createTime").toString()));  //字符串转换
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            entity.setIdentificationNumber(objMap.get("idNumber") != null ? objMap.get("idNumber").toString() : "");
-            entity.setRoomNo(objMap.get("roomNumber") != null ? objMap.get("roomNumber").toString() : "");
-            entity.setUnitNumber(objMap.get("unit") != null ? objMap.get("unit").toString() : "");
-            entity.setNote(objMap.get("remark") != null ? objMap.get("remark").toString() : "");
-
-            entity.setCode(UUID.randomUUID().toString());
-
-            if (objMap.get("sex") != null) {
-                entity.setSex(objMap.get("sex").toString().equals("0") ? maleId : femaleId);
+            if (objMap.get("touchPersonIsolation") != null) {
+                record.setIsContact(objMap.get("touchPersonIsolation").toString().equals("1"));
             }
             if (objMap.get("fever") != null) {
-                entity.setExceedTemp(objMap.get("fever").toString().equals("1"));
-            }
-            if (objMap.get("touchPersonIsolation") != null) {
-                entity.setContact(objMap.get("touchPersonIsolation").toString().equals("1"));
+                record.setIsExceedTemp(objMap.get("fever").toString().equals("1"));
             }
             if (objMap.get("symptom") != null) {
-                entity.setOtherSymptoms(splitOtherSymptom(objMap.get("symptom").toString()));
+                record.setOtherSymptoms(splitOtherSymptom(objMap.get("symptom").toString()));
                 //entity.setOtherSymptoms(converOtherSymptoms(objMap.get("symptom").toString()));
             }
-            if (objMap.get("medicalAdvice") != null) {
-                entity.setConfirmed_diagnosis(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
-                entity.setMedicalOpinion(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
-            }
-            entity.setMultiTenancy(villageId);
-           // entity.setMultiTenancy(objMap.get("currentVillage").toString());
-            //entity.setLeaveArea();
-            //entity.setPlot(objMap.get("communityCode").toString());
+
             if(objMap.get("communityCode")!=null && dSourceDataRepository.existsById(objMap.get("communityCode").toString())){
-                    entity.setPlot(objMap.get("communityCode").toString());
+                record.setPlot(objMap.get("communityCode").toString());
             }else{
-                Random random = new Random();
-                entity.setPlot(plots.get(random.nextInt(plots.size())).getId());
+                Random random = new Random();  // 此处带改
+                record.setPlot(plots.get(random.nextInt(plots.size())).getId());
             }
 
-//            System.out.println("++++++++++=");
-//            System.out.println(entity.getId() + entity.getName());
-//            System.out.println("++++++++++=");
+            PersonBase personBase=new PersonBase();
+            personBase.setAddress(objMap.get("residence").toString());
+            personBase.setName(personName.toString());
+            personBase.setPhone(phone.toString());
+            personBase.setSex(objMap.get("sex").toString().equals("0") ? maleId : femaleId);
+            personBase.setIdentificationNumber(objMap.get("idNumber") != null ? objMap.get("idNumber").toString() : "");
+            record.setMultiTenancy(objMap.get("currentVillage").toString());
 
-            startTimeDate = entity.getCreateTime();
+            startTimeDate = record.getCreateTime();
+            record.setPersonBase(personBase);
 
-            if (!recordRepository.existsById(entity.getId())) {
-                result=true;
-                recordRepository.save(entity);
-            }
+            troubleshootRecordService.add(record);
+          //  records.add(record);
         }
-        return result;
+        return true;
     }
+
+
+
 
     private String splitOtherSymptom(String symptoms) {
         StringBuffer symptomIds = new StringBuffer();
@@ -270,11 +292,11 @@ public class DataCollectionServiceImpl{
         } else if (number.equals("3")) {
             result = musclePainId;
         } else if (number.equals("4")) {
-            result = aguedId;
+            result = arguedId;
         } else if (number.equals("5")) {
             result = breathId;
         } else if (number.equals("6")) {
-            result = pharyngalgiaId;
+            result = soreThroatId;
         } else if (number.equals("7")) {
             result = headacheId;
         } else if (number.equals("8")) {

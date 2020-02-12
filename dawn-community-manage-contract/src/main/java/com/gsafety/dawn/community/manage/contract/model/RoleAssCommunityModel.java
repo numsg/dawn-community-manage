@@ -18,6 +18,9 @@ public class RoleAssCommunityModel {
     // 存储行政区划code集合
     private String administrativeCodes;
 
+    // 社区名称
+    private String name;
+
     // 存储角色信息集合
     private String rolesInformation;
 
@@ -108,4 +111,13 @@ public class RoleAssCommunityModel {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

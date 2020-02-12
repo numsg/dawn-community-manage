@@ -64,7 +64,7 @@ public class RoleAssCommunityController {
     }
 
 
-    @DeleteMapping(value = "/role-ass-community/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/role-ass-community/delete", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "删除角色行政区划关联", notes = "delete(roleAssCommunityModels)")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = Boolean.class),

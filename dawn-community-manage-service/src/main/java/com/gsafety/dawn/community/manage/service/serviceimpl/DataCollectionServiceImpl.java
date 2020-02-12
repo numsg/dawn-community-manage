@@ -90,7 +90,7 @@ public class DataCollectionServiceImpl {
     private String url = "/changde/search";
 
     // 杨桥湖社区id
-    private static final String communityDataSourceId = "a2e01f0e-6c86-4a41-bcf3-c07c1ffa2f82";
+    // private static final String communityDataSourceId = "a2e01f0e-6c86-4a41-bcf3-c07c1ffa2f82";
     // 其他状况id
     private static final String otherSymptomId = "582daff0-56a5-45a4-9ca7-dc098c688753";
     @Autowired
@@ -130,11 +130,11 @@ public class DataCollectionServiceImpl {
         System.out.println(formatter.format(startTimeDate));
         System.out.println(formatter.format(endTimeDate));
 
-
         RequestModel requestModel = new RequestModel();
         requestModel.setPageSize(pageSize);
         requestModel.setKeyWords("");
-        //requestModel.setCurrentVillage(villageId); // 改为查询所有社区
+        // 改为查询所有社区
+
         requestModel.setStartDate(startTimeDate);
         requestModel.setEndDate(DateUtil.getDayEndDate());
         Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
@@ -284,6 +284,7 @@ public class DataCollectionServiceImpl {
         }
         return result;
     }
+
 
     private List<TroubleshootRecordModel> TraversalAndAddData(RequestModel requestModel) {
         List<TroubleshootRecordModel> result = new ArrayList<>();

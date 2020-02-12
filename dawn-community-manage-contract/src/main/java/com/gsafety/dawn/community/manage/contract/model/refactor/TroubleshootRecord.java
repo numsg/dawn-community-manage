@@ -123,7 +123,7 @@ public class TroubleshootRecord {
         this.multiTenancy = multiTenancy;
     }
 
-    public boolean setIsExceedTemp() {
+    public boolean getIsExceedTemp() {
         return this.isExceedTemp;
     }
 

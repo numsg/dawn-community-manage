@@ -22,7 +22,7 @@ spring:
     properties:
       enabled: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties.hibernate.temp.use_jdbc_metadata_defaults: false   # 禁用Postgresql的特性检查（如CLOB），因为postgresql的驱动暂没有实现此特性
     database-platform: org.hibernate.dialect.PostgreSQL95Dialect
@@ -42,7 +42,7 @@ app:
   commId: a2e01f0e-6c86-4a41-bcf3-c07c1ffa2f82
   otherSymptomId: 582daff0-56a5-45a4-9ca7-dc098c688753
   medicalAdvice: fdd092c0-3227-495b-a83a-0bdc68e67708
-  waitTime: 7200000
+  waitTime: 60000
   villageId: 420802001013
   pageSize: 10
   saveCycle: 14

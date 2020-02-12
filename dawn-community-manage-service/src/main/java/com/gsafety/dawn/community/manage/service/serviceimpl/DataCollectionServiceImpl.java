@@ -203,9 +203,13 @@ public class DataCollectionServiceImpl{
            // entity.setMultiTenancy(objMap.get("currentVillage").toString());
             //entity.setLeaveArea();
             //entity.setPlot(objMap.get("communityCode").toString());
+            if(objMap.get("communityCode")!=null && dSourceDataRepository.existsById(objMap.get("communityCode").toString())){
+                    entity.setPlot(objMap.get("communityCode").toString());
+            }else{
+                Random random = new Random();
+                entity.setPlot(plots.get(random.nextInt(plots.size())).getId());
+            }
 
-            Random random = new Random();
-            entity.setPlot(plots.get(random.nextInt(plots.size())).getId());
 //            System.out.println("++++++++++=");
 //            System.out.println(entity.getId() + entity.getName());
 //            System.out.println("++++++++++=");

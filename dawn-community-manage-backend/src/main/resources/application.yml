@@ -45,6 +45,7 @@ app:
   waitTime: 7200000
   villageId: 420802001013
   pageSize: 10
+  saveCycle: 14
 
 
 

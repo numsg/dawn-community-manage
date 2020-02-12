@@ -16,6 +16,7 @@ import com.gsafety.dawn.community.manage.service.repository.refactor.Troubleshoo
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -50,6 +51,10 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
 
     @Autowired
     private CommonUtil commonUtil;
+
+    // 排查记录历史表保留周期
+    @Value("${app.saveCycle}")
+    private int saveCycle;
 
     @Override
     public boolean add(TroubleshootRecord troubleshootRecord) {
@@ -86,6 +91,12 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             troubleshootRecordEntity.setPersonBase(null);
             troubleshootRecordEntity.setPersonBaseId(personBaseEntity.getId());
             troubleshootRecordRepository.save(troubleshootRecordEntity);
+            if (troubleshootHistoryRecordRepository.findCountByPersonBaseId(personBaseEntity.getId()).intValue() == saveCycle) {
+                List<String> ids = troubleshootHistoryRecordRepository.findIdByPersonBaseId(personBaseEntity.getId());
+                if (!CollectionUtils.isEmpty(ids)) {
+                    troubleshootHistoryRecordRepository.deleteById(ids.get(0));
+                }
+            }
             TroubleshootHistoryRecordEntity troubleshootHistoryRecordEntity = new TroubleshootHistoryRecordEntity();
             troubleshootHistoryRecordEntity = commonUtil.mapper(troubleshootRecordEntity, troubleshootHistoryRecordEntity);
             troubleshootHistoryRecordEntity.setId(UUID.randomUUID().toString());
@@ -131,8 +142,14 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             troubleshootRecordEntity.setCreateDate(format.parse(format.format(troubleshootRecord.getCreateTime())));
             troubleshootRecordRepository.save(troubleshootRecordEntity);
             TroubleshootHistoryRecordEntity troubleshootHistoryRecordEntity = new TroubleshootHistoryRecordEntity();
-            troubleshootHistoryRecordEntity = commonUtil.mapper(troubleshootRecordEntity, troubleshootHistoryRecordEntity);
-            troubleshootHistoryRecordEntity.setId(UUID.randomUUID().toString());
+            List<String> existsHistoryId = troubleshootHistoryRecordRepository.findIdByCreateDateAndPersonBaseId(personBaseEntity.getId(), troubleshootRecordEntity.getCreateDate());
+            if (!CollectionUtils.isEmpty(existsHistoryId)) {
+                troubleshootHistoryRecordEntity = troubleshootHistoryRecordRepository.getOne(existsHistoryId.get(0));
+                troubleshootHistoryRecordEntity = commonUtil.mapper(troubleshootRecordEntity, troubleshootHistoryRecordEntity);
+            } else {
+                troubleshootHistoryRecordEntity = commonUtil.mapper(troubleshootRecordEntity, troubleshootHistoryRecordEntity);
+                troubleshootHistoryRecordEntity.setId(UUID.randomUUID().toString());
+            }
             troubleshootHistoryRecordEntity.setPersonBase(null);
             troubleshootHistoryRecordEntity.setPersonBaseId(troubleshootRecordEntity.getPersonBaseId());
             troubleshootHistoryRecordRepository.save(troubleshootHistoryRecordEntity);

@@ -112,10 +112,8 @@ public class DataCollectionServiceImpl {
 
     private Date startTimeDate = DateUtil.getDayStartDate();
 
-    private Date endTimeDate = null;
-
     // 小区
-   // private  List<DSourceDataEntity> plots = new ArrayList<>();
+    // private  List<DSourceDataEntity> plots = new ArrayList<>();
     // 其他诊断状况
     private List<DSourceDataEntity> otherSymptoms = new ArrayList<>();
 
@@ -149,13 +147,13 @@ public class DataCollectionServiceImpl {
                     pageTotal = total / pageSize + 1;
                 }
             }
-           // plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(communityDataSourceId);
+            // plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(communityDataSourceId);
             otherSymptoms = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(otherSymptomId);
             for (int i = 1; i <= pageTotal; i++) {
                 requestModel.setPageNo(i);
                 //分页查询时时间段是一致的
                 //requestModel.setStartDate(startTimeDate);
-                getDataFromAccess(requestModel);
+                TraversalAndInsertData(requestModel);
             }
         }
     }
@@ -206,7 +204,7 @@ public class DataCollectionServiceImpl {
                 //   record.setConfirmed_diagnosis(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
                 record.setMedicalOpinion(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
             }
-                record.setCreateTime(DateUtil.stringFormat(objMap.get("createTime").toString()));  //字符串转换
+            record.setCreateTime(DateUtil.stringFormat(objMap.get("createTime").toString()));  //字符串转换
             if (objMap.get("touchPersonIsolation") != null) {
                 record.setIsContact(objMap.get("touchPersonIsolation").toString().equals("1"));
             }
@@ -220,31 +218,30 @@ public class DataCollectionServiceImpl {
             if (objMap.get("communityCode") != null && dSourceDataRepository.existsById(objMap.get("communityCode").toString())) {
                 record.setPlot(objMap.get("communityCode").toString());
             } else {
-
-                DataSourceEntity village=dataSourceRepository.queryByDescription(districtCode.toString());
-                if(village==null){
+                DataSourceEntity village = dataSourceRepository.queryByDescription(districtCode.toString());
+                if (village == null) {
                     continue;
                 }
                 List<DSourceDataEntity> plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(village.getId());
-
                 Random random = new Random();
                 record.setPlot(plots.get(random.nextInt(plots.size())).getId());
             }
             PersonBase personBase = new PersonBase();
-            if(objMap.get("residence")!=null){
+            if (objMap.get("wuhanAddress") != null) {
+                personBase.setAddress(objMap.get("wuhanAddress").toString());
+            }
+            if (objMap.get("residence") != null) {
                 personBase.setAddress(objMap.get("residence").toString());
             }
-            if(sex==null){
+            if (sex == null) {
                 personBase.setSex(noSexId);
-            }else{
+            } else {
                 personBase.setSex(objMap.get("sex").toString().equals("0") ? maleId : femaleId);
             }
             personBase.setName(personName.toString());
             personBase.setPhone(phone.toString());
-
             personBase.setIdentificationNumber(objMap.get("idNumber") != null ? objMap.get("idNumber").toString() : "");
             personBase.setMultiTenancy(districtCode.toString());
-
             startTimeDate = record.getCreateTime();
             record.setPersonBase(personBase);
             troubleshootRecordService.add(record);
@@ -255,12 +252,11 @@ public class DataCollectionServiceImpl {
 
     public List<TroubleshootRecordModel> getDataFromMobileTerminal(RequestParamModel requestParamModel) {
         List<TroubleshootRecordModel> result = new ArrayList<>();
-        endTimeDate=DateUtil.dateFormat(requestParamModel.getEndDate());
         RequestModel requestModel = new RequestModel();
         requestModel.setPageSize(pageSize);
         requestModel.setCurrentVillage(requestParamModel.getCurrentVillageId()); // 改为查询所有社区
         requestModel.setStartDate(DateUtil.dateFormat(requestParamModel.getStartDate()));
-        requestModel.setEndDate(endTimeDate);
+        requestModel.setEndDate(DateUtil.dateFormat(requestParamModel.getEndDate()));
         Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
         if (map.get("data") != null && map.get("success").equals(true)) {
             int pageTotal = 1;
@@ -276,7 +272,6 @@ public class DataCollectionServiceImpl {
             }
             for (int i = 1; i <= pageTotal; i++) {
                 requestModel.setPageNo(i);
-                requestModel.setEndDate(endTimeDate);
                 result.addAll(TraversalAndAddData(requestModel));
             }
         }
@@ -337,25 +332,18 @@ public class DataCollectionServiceImpl {
             recordModel.setProveWuling(objMap.get("proveWuling") != null ? objMap.get("proveWuling").toString() : "");
             recordModel.setRemark(objMap.get("remark") != null ? objMap.get("remark").toString() : "");
 
-           recordModel.setLeaveHubeiDate(objMap.get("leaveHubeiDate") != null ? objMap.get("leaveHubeiDate").toString() : "");
-           // recordModel.setCreateTime(objMap.get("createTime") != null ? objMap.get("createTime").toString() : "");
-            recordModel.setBackDate(objMap.get("backDate") != null ? objMap.get("backDate").toString() : "");
+            //recordModel.setLeaveHubeiDate(objMap.get("leaveHubeiDate") != null ? objMap.get("leaveHubeiDate").toString() : "");
+            // recordModel.setCreateTime(objMap.get("createTime") != null ? objMap.get("createTime").toString() : "");
+            // recordModel.setBackDate(objMap.get("backDate") != null ? objMap.get("backDate").toString() : "");
 
-            try {
-//                if (objMap.get("leaveHubeiDate") != null){
-//                    recordModel.setLeaveHubeiDate(formatter.parse(objMap.get("leaveHubeiDate").toString()).toString());
-//                }
-//                if (objMap.get("backDate") != null){
-//                    recordModel.setBackDate(formatter.parse(objMap.get("backDate").toString()).toString());
-//                }
-                recordModel.setCreateTime(formatter.parse(objMap.get("createTime").toString()).toString());
-                endTimeDate=formatter.parse(objMap.get("createTime").toString());
-            } catch (ParseException e) {
-                e.printStackTrace();
+
+            if (objMap.get("leaveHubeiDate") != null) {
+                recordModel.setLeaveHubeiDate(formatter.format(DateUtil.stringFormat(objMap.get("leaveHubeiDate").toString())));
             }
-//            if (records.contains(recordModel)){
-//
-//            }
+            if (objMap.get("backDate") != null) {
+                recordModel.setBackDate(formatter.format(DateUtil.stringFormat(objMap.get("backDate").toString())));
+            }
+            recordModel.setCreateTime(formatter.format(DateUtil.stringFormat(objMap.get("backDate").toString())));
             records.add(recordModel);
         }
         return records;

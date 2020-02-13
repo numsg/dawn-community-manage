@@ -49,7 +49,7 @@ public class PersonBaseEntity {
     /**
      * 行政区划code
      */
-    @Column(name = "district_code", length = 36)
+    @Column(name = "district_code", length = 128)
     private String districtCode;
 
     public String getId() {

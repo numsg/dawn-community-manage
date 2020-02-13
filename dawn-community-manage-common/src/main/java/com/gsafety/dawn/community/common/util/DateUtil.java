@@ -12,6 +12,7 @@ import java.util.Date;
  */
 public class DateUtil {
     static {}
+    private  static  final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
      * 获取当前格式化时间字符串yyyy-MM-dd HH:mm:ss
@@ -93,8 +94,7 @@ public class DateUtil {
     public static Date stringFormat(String date){
         Date result=null;
         try {
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            result = df.parse(date);  //字符串转换
+            result = df.parse(date); 
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -103,8 +103,7 @@ public class DateUtil {
     public static Date dateFormat(Date date){
         Date result=null;
         try {
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            result = df.parse(df.format(date));  //字符串转换
+            result = df.parse(df.format(date));  
         } catch (ParseException e) {
             e.printStackTrace();
         }

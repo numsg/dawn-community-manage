@@ -32,9 +32,6 @@ public class DataCollectionServiceImpl {
     @Value("${access.data-collection}")
     private String dataCollectionUrl;
 
-   // @Value("${app.villageId}")
-   // private String villageId;
-
     @Value("${app.pageSize}")
     private Integer pageSize;
 
@@ -156,8 +153,9 @@ public class DataCollectionServiceImpl {
             otherSymptoms = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(otherSymptomId);
             for (int i = 1; i <= pageTotal; i++) {
                 requestModel.setPageNo(i);
-                requestModel.setStartDate(startTimeDate);
-                TraversalAndInsertData(requestModel);
+                //分页查询时时间段是一致的
+                //requestModel.setStartDate(startTimeDate);
+                getDataFromAccess(requestModel);
             }
         }
     }
@@ -173,9 +171,8 @@ public class DataCollectionServiceImpl {
         if (list.isEmpty()) {
             return false;
         }
-        
-        for (Object obj : list) {
 
+        for (Object obj : list) {
             Map objMap = JsonUtil.fromJson(toJson(obj), Map.class);
             Object recordId = objMap.get("id");
             Object personName = objMap.get("name");
@@ -189,7 +186,6 @@ public class DataCollectionServiceImpl {
                 continue;
             }
             TroubleshootRecord record = new TroubleshootRecord();
-
             record.setId(recordId.toString());
             record.setBuilding(objMap.get("building") != null ? objMap.get("building").toString() : "其它");
             record.setIsByPhone(true);
@@ -224,9 +220,13 @@ public class DataCollectionServiceImpl {
             if (objMap.get("communityCode") != null && dSourceDataRepository.existsById(objMap.get("communityCode").toString())) {
                 record.setPlot(objMap.get("communityCode").toString());
             } else {
-                String villageCode = objMap.get("currentVillage").toString();
-                DataSourceEntity village=dataSourceRepository.queryByDescription(villageCode);
-                List<DSourceDataEntity>plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(village.getId());
+
+                DataSourceEntity village=dataSourceRepository.queryByDescription(districtCode.toString());
+                if(village==null){
+                    continue;
+                }
+                List<DSourceDataEntity> plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(village.getId());
+
                 Random random = new Random();
                 record.setPlot(plots.get(random.nextInt(plots.size())).getId());
             }
@@ -241,8 +241,10 @@ public class DataCollectionServiceImpl {
             }
             personBase.setName(personName.toString());
             personBase.setPhone(phone.toString());
+
             personBase.setIdentificationNumber(objMap.get("idNumber") != null ? objMap.get("idNumber").toString() : "");
             personBase.setMultiTenancy(districtCode.toString());
+
             startTimeDate = record.getCreateTime();
             record.setPersonBase(personBase);
             troubleshootRecordService.add(record);

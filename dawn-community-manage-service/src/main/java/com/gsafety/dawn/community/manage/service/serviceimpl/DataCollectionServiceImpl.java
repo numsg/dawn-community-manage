@@ -332,18 +332,11 @@ public class DataCollectionServiceImpl {
             recordModel.setProveWuling(objMap.get("proveWuling") != null ? objMap.get("proveWuling").toString() : "");
             recordModel.setRemark(objMap.get("remark") != null ? objMap.get("remark").toString() : "");
 
-            //recordModel.setLeaveHubeiDate(objMap.get("leaveHubeiDate") != null ? objMap.get("leaveHubeiDate").toString() : "");
+            recordModel.setLeaveHubeiDate(objMap.get("leaveHubeiDate") != null ? objMap.get("leaveHubeiDate").toString() : "");
             // recordModel.setCreateTime(objMap.get("createTime") != null ? objMap.get("createTime").toString() : "");
-            // recordModel.setBackDate(objMap.get("backDate") != null ? objMap.get("backDate").toString() : "");
+             recordModel.setBackDate(objMap.get("backDate") != null ? objMap.get("backDate").toString() : "");
 
-
-            if (objMap.get("leaveHubeiDate") != null) {
-                recordModel.setLeaveHubeiDate(formatter.format(DateUtil.stringFormat(objMap.get("leaveHubeiDate").toString())));
-            }
-            if (objMap.get("backDate") != null) {
-                recordModel.setBackDate(formatter.format(DateUtil.stringFormat(objMap.get("backDate").toString())));
-            }
-            recordModel.setCreateTime(formatter.format(DateUtil.stringFormat(objMap.get("backDate").toString())));
+            recordModel.setCreateTime(formatter.format(DateUtil.stringFormat(objMap.get("createTime").toString())));
             records.add(recordModel);
         }
         return records;

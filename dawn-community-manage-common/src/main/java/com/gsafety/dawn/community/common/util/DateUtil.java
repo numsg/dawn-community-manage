@@ -11,6 +11,7 @@ import java.util.Date;
  */
 public class DateUtil {
     static {}
+    private  static  final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
      * 获取当前格式化时间字符串yyyy-MM-dd HH:mm:ss
@@ -87,5 +88,24 @@ public class DateUtil {
         calendar1.set(calendar2.get(Calendar.YEAR), calendar2.get(Calendar.MONTH), calendar2.get(Calendar.DAY_OF_MONTH),
                 23, 59, 59);
         return calendar1.getTime();
+    }
+
+    public static Date stringFormat(String date){
+        Date result=null;
+        try {
+            result = df.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    public static Date dateFormat(Date date){
+        Date result=null;
+        try {
+            result = df.parse(df.format(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }

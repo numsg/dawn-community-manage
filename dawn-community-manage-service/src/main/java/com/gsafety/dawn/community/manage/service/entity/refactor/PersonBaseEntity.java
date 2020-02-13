@@ -26,7 +26,7 @@ public class PersonBaseEntity {
     private String sex;
 
     // 住址
-    @Column(name = "address", length = 256, nullable = false)
+    @Column(name = "address", length = 256)
     private String address;
 
     // 身份证号码

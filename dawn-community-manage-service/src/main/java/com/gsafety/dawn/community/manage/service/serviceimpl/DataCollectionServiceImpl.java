@@ -42,6 +42,8 @@ public class DataCollectionServiceImpl {
     private static final String maleId = "3f265ff3-75b8-49f1-9669-4506535a500c";
     //女
     private static final String femaleId = "2ae58f9e-65f2-4f2a-8244-ac01d668b7b5";
+    //未知
+    private static final String noSexId = "13a5633b-57fa-4850-9c36-61356bd99c50";
 
     // 其他症状
     //0:无
@@ -171,9 +173,7 @@ public class DataCollectionServiceImpl {
         if (list.isEmpty()) {
             return false;
         }
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        //  List<TroubleshootRecord> records=new ArrayList<>();
+        
         for (Object obj : list) {
 
             Map objMap = JsonUtil.fromJson(toJson(obj), Map.class);
@@ -182,21 +182,20 @@ public class DataCollectionServiceImpl {
             Object phone = objMap.get("phone");
             Object sex = objMap.get("sex");
             Object districtCode = objMap.get("currentVillage");
-            if (districtCode == null || personName == null || phone == null || sex == null || troubleshootRecordRepository.existsById(recordId.toString())) {
+            if (districtCode == null || personName == null || phone == null || troubleshootRecordRepository.existsById(recordId.toString())) {
                 continue;
             }
-            if ("".equals(districtCode) || "".equals(personName) || "".equals(phone) || "".equals(sex)) {
+            if ("".equals(districtCode) || "".equals(personName) || "".equals(phone)) {
                 continue;
             }
-
             TroubleshootRecord record = new TroubleshootRecord();
 
             record.setId(recordId.toString());
             record.setBuilding(objMap.get("building") != null ? objMap.get("building").toString() : "其它");
             record.setIsByPhone(true);
             //社区id
-            record.setDistrictCode(objMap.get("currentVillage").toString());
-            record.setMultiTenancy(objMap.get("currentVillage").toString());
+            record.setDistrictCode(districtCode.toString());
+            record.setMultiTenancy(districtCode.toString());
             record.setNote(objMap.get("remark") != null ? objMap.get("remark").toString() : "");
             record.setRoomNo(objMap.get("roomNumber") != null ? objMap.get("roomNumber").toString() : "");
             record.setUnitNumber(objMap.get("unit") != null ? objMap.get("unit").toString() : "其它");
@@ -211,11 +210,7 @@ public class DataCollectionServiceImpl {
                 //   record.setConfirmed_diagnosis(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
                 record.setMedicalOpinion(convertMedicalOpinion(objMap.get("medicalAdvice").toString()));
             }
-            try {
-                record.setCreateTime(formatter.parse(objMap.get("createTime").toString()));  //字符串转换
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+                record.setCreateTime(DateUtil.stringFormat(objMap.get("createTime").toString()));  //字符串转换
             if (objMap.get("touchPersonIsolation") != null) {
                 record.setIsContact(objMap.get("touchPersonIsolation").toString().equals("1"));
             }
@@ -226,7 +221,6 @@ public class DataCollectionServiceImpl {
                 record.setOtherSymptoms(splitOtherSymptom(objMap.get("symptom").toString()));
                 //entity.setOtherSymptoms(converOtherSymptoms(objMap.get("symptom").toString()));
             }
-
             if (objMap.get("communityCode") != null && dSourceDataRepository.existsById(objMap.get("communityCode").toString())) {
                 record.setPlot(objMap.get("communityCode").toString());
             } else {
@@ -236,20 +230,22 @@ public class DataCollectionServiceImpl {
                 Random random = new Random();
                 record.setPlot(plots.get(random.nextInt(plots.size())).getId());
             }
-
             PersonBase personBase = new PersonBase();
-            personBase.setAddress(objMap.get("residence").toString());
+            if(objMap.get("residence")!=null){
+                personBase.setAddress(objMap.get("residence").toString());
+            }
+            if(sex==null){
+                personBase.setSex(noSexId);
+            }else{
+                personBase.setSex(objMap.get("sex").toString().equals("0") ? maleId : femaleId);
+            }
             personBase.setName(personName.toString());
             personBase.setPhone(phone.toString());
-            personBase.setSex(objMap.get("sex").toString().equals("0") ? maleId : femaleId);
             personBase.setIdentificationNumber(objMap.get("idNumber") != null ? objMap.get("idNumber").toString() : "");
-          //  record.setMultiTenancy(objMap.get("currentVillage").toString());
-
+            personBase.setMultiTenancy(districtCode.toString());
             startTimeDate = record.getCreateTime();
             record.setPersonBase(personBase);
-
             troubleshootRecordService.add(record);
-            //  records.add(record);
         }
         return true;
     }
@@ -257,11 +253,11 @@ public class DataCollectionServiceImpl {
 
     public List<TroubleshootRecordModel> getDataFromMobileTerminal(RequestParamModel requestParamModel) {
         List<TroubleshootRecordModel> result = new ArrayList<>();
-        endTimeDate=requestParamModel.getEndDate();
+        endTimeDate=DateUtil.dateFormat(requestParamModel.getEndDate());
         RequestModel requestModel = new RequestModel();
         requestModel.setPageSize(pageSize);
         requestModel.setCurrentVillage(requestParamModel.getCurrentVillageId()); // 改为查询所有社区
-        requestModel.setStartDate(requestParamModel.getStartDate());
+        requestModel.setStartDate(DateUtil.dateFormat(requestParamModel.getStartDate()));
         requestModel.setEndDate(endTimeDate);
         Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
         if (map.get("data") != null && map.get("success").equals(true)) {
@@ -339,17 +335,17 @@ public class DataCollectionServiceImpl {
             recordModel.setProveWuling(objMap.get("proveWuling") != null ? objMap.get("proveWuling").toString() : "");
             recordModel.setRemark(objMap.get("remark") != null ? objMap.get("remark").toString() : "");
 
-          //  recordModel.setLeaveHubeiDate(objMap.get("leaveHubeiDate") != null ? objMap.get("leaveHubeiDate").toString() : "");
+           recordModel.setLeaveHubeiDate(objMap.get("leaveHubeiDate") != null ? objMap.get("leaveHubeiDate").toString() : "");
            // recordModel.setCreateTime(objMap.get("createTime") != null ? objMap.get("createTime").toString() : "");
-           // recordModel.setBackDate(objMap.get("backDate") != null ? objMap.get("backDate").toString() : "");
+            recordModel.setBackDate(objMap.get("backDate") != null ? objMap.get("backDate").toString() : "");
 
             try {
-                if (objMap.get("leaveHubeiDate") != null){
-                    recordModel.setLeaveHubeiDate(formatter.parse(objMap.get("leaveHubeiDate").toString()).toString());
-                }
-                if (objMap.get("backDate") != null){
-                    recordModel.setBackDate(formatter.parse(objMap.get("backDate").toString()).toString());
-                }
+//                if (objMap.get("leaveHubeiDate") != null){
+//                    recordModel.setLeaveHubeiDate(formatter.parse(objMap.get("leaveHubeiDate").toString()).toString());
+//                }
+//                if (objMap.get("backDate") != null){
+//                    recordModel.setBackDate(formatter.parse(objMap.get("backDate").toString()).toString());
+//                }
                 recordModel.setCreateTime(formatter.parse(objMap.get("createTime").toString()).toString());
                 endTimeDate=formatter.parse(objMap.get("createTime").toString());
             } catch (ParseException e) {

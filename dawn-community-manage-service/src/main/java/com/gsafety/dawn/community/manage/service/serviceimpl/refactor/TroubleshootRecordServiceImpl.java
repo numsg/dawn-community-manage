@@ -207,8 +207,8 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
                     plotBuildingUnitStatistics.setBuilding(entry.getValue().get(0).getBuilding());
                     plotBuildingUnitStatistics.setPlotId(entry.getValue().get(0).getPlotId());
                     plotBuildingUnitStatistics.setUnitNumber(entry.getValue().get(0).getUnitNumber());
-                    Long feverCount = entry.getValue().stream().filter(f -> f.getIsExceedTemp() == true).count();
-                    plotBuildingUnitStatistics.setFeverCount(feverCount.intValue());
+                    Long exceedTempCount = entry.getValue().stream().mapToLong(m -> m.getExceedTempCount()).sum();
+                    plotBuildingUnitStatistics.setFeverCount(exceedTempCount.intValue());
                     Long checkedCount = entry.getValue().stream().filter(f -> f.getCreateDate().getTime() == date.getTime()).mapToLong(m -> m.getCount()).sum();
                     plotBuildingUnitStatistics.setCheckedCount(checkedCount.intValue());
                     Long unCheckedCount = entry.getValue().stream().filter(f -> f.getCreateDate().getTime() != date.getTime()).mapToLong(m -> m.getCount()).sum();

@@ -219,9 +219,12 @@ public class DataCollectionServiceImpl {
             if (objMap.get("communityCode") != null && dSourceDataRepository.existsById(objMap.get("communityCode").toString())) {
                 record.setPlot(objMap.get("communityCode").toString());
             } else {
-                Random random = new Random();
                 DataSourceEntity village=dataSourceRepository.queryByDescription(districtCode.toString());
+                if(village==null){
+                    continue;
+                }
                 List<DSourceDataEntity> plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(village.getId());
+                Random random = new Random();
                 record.setPlot(plots.get(random.nextInt(plots.size())).getId());
             }
 
@@ -233,7 +236,7 @@ public class DataCollectionServiceImpl {
                 personBase.setSex(noSexId);
             }else{
                 personBase.setSex(objMap.get("sex").toString().equals("0") ? maleId : femaleId);
-            } 
+            }
             personBase.setIdentificationNumber(objMap.get("idNumber") != null ? objMap.get("idNumber").toString() : "");
             personBase.setMultiTenancy(districtCode.toString());
 

@@ -2,23 +2,30 @@ package com.gsafety.dawn.community.manage.service.serviceimpl;
 
 import com.gsafety.dawn.community.common.util.DateUtil;
 import com.gsafety.dawn.community.common.util.ExcelUtil;
+import com.gsafety.dawn.community.common.util.IDCardUtil;
+import com.gsafety.dawn.community.common.util.StringUtil;
 import com.gsafety.dawn.community.manage.contract.model.BasicInformationModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyStatisticModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleFilterModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
+import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
 import com.gsafety.dawn.community.manage.contract.model.total.DailyStatisticPageModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.model.total.PendingInvestigatModel;
 import com.gsafety.dawn.community.manage.contract.model.total.PlotLinkageModel;
 import com.gsafety.dawn.community.manage.contract.service.BasicInformationService;
 import com.gsafety.dawn.community.manage.contract.service.DailyTroubleshootRecordService;
+import com.gsafety.dawn.community.manage.contract.service.refactor.TroubleshootRecordService;
 import com.gsafety.dawn.community.manage.service.datamappers.BasciInformationMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.DSourceDataMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.DailyTroubleshootRecordMapper;
+import com.gsafety.dawn.community.manage.service.datamappers.refactor.TroubleshootRecordMapper;
 import com.gsafety.dawn.community.manage.service.entity.BasicInformationEntity;
 import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
 import com.gsafety.dawn.community.manage.service.entity.DailyTroubleshootRecordEntity;
 import com.gsafety.dawn.community.manage.service.entity.EpidemicPersonEntity;
+import com.gsafety.dawn.community.manage.service.entity.refactor.PersonBaseEntity;
+import com.gsafety.dawn.community.manage.service.entity.refactor.TroubleshootRecordEntity;
 import com.gsafety.dawn.community.manage.service.repository.BasicInformationRepository;
 import com.gsafety.dawn.community.manage.service.repository.DSourceDataRepository;
 import com.gsafety.dawn.community.manage.service.repository.DailyTroubleshootRecordRepository;
@@ -38,6 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -62,6 +70,11 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     // 体温
     @Value("${app.bodyTemperature}")
     private String bodyTemperature;
+
+    @Autowired
+    private TroubleshootRecordService troubleshootRecordService;
+    @Autowired
+    private TroubleshootRecordMapper troubleshootRecordMapper;
 
     /**
      * The Record mapper.
@@ -93,6 +106,8 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     @Value("${app.medicalAdvice}")
     private String medicalAdvice;
 
+    // 随机身份证号码
+    private static final IDCardUtil ID_CARD_UTIL = new IDCardUtil();
 
     @Autowired
     private DSourceDataRepository dSourceDataRepository;
@@ -127,6 +142,25 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     private static final String femaleId = "2ae58f9e-65f2-4f2a-8244-ac01d668b7b5";
     // 性别未知
     private static final String noSexId = "13a5633b-57fa-4850-9c36-61356bd99c50";
+    private static final String[] sex = {"3f265ff3-75b8-49f1-9669-4506535a500c", "2ae58f9e-65f2-4f2a-8244-ac01d668b7b5", "13a5633b-57fa-4850-9c36-61356bd99c50", "13a5633b-57fa-4850-9c36-61356bd99c50"};
+
+    private SecureRandom random = new SecureRandom();
+
+    private String[] notes = {"", "齐心协力抗疫情，愿一切都向好的方向转变！", "", "", "", "", "", "大家都众志成城抗疫情吧，做好自己本分的事，别瞎地图炮。", "隔离病毒，但不隔离爱，因为爱是桥梁。"};
+
+    private String[] diagonsis = {"" ,"" ,"身体健康","身体健康","身体健康","普通感冒","发烧","流感"};
+
+    // 其它症状
+    private String[] otherSymptoms = {"26d8ca3b-8b7b-4109-a992-8052f9defb9d" ,
+            "26d8ca3b-8b7b-4109-a992-8052f9defb9d" ,"26d8ca3b-8b7b-4109-a992-8052f9defb9d",
+            "26d8ca3b-8b7b-4109-a992-8052f9defb9d","5e647e8b-6396-4e56-854b-ed1be1c60ae3",
+            "f0671f8a-233f-44a5-a785-9e9ab0c18fe8","2fdd7934-7823-4227-8712-7488ebc7704e",
+            "1720a8db-a0b4-43d2-8f52-3a4df8e3fca5","5f98d8f5-40e9-427d-90c0-e1849a87ae19",
+            "ce0902a6-e3ee-4055-b1c3-d41a365a5522","e081de69-a984-4abb-a2a1-ed9996a63917","be64af80-00ee-4ea5-94ba-3246d7d16230"};
+    // 分类诊疗意见
+    private String[] medicalOpinions = {"8470e8e9-90ba-484b-8f33-148a1f5028fc" ,"8470e8e9-90ba-484b-8f33-148a1f5028fc" ,
+            "2e8cad5c-5462-43ce-bdd2-b40d9c7b9b76" ,"5e959c1b-584a-42d5-a28c-78ad5e57c1fb","893880b7-1ef8-4fed-b890-188b03f83f51",
+            "903db428-4f4b-4f67-a5ab-3631a77b633d","2e8cad5c-5462-43ce-bdd2-b40d9c7b9b76"};
 
     @Override
     public DailyTroubleshootRecordModel addDailyRecord(DailyTroubleshootRecordModel dailyTroubleshootRecordModel) {
@@ -235,6 +269,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             return Collections.emptyList();
         }
         List<DailyTroubleshootRecordEntity> recordEntities = new ArrayList<>();
+        List<TroubleshootRecordEntity> troubleshootRecordEntities = new ArrayList<>();
         int endRow = sheet.getPhysicalNumberOfRows();
         int firstSheetNumber = sheet.getFirstRowNum();
         for (int rowNum = firstSheetNumber + 1; rowNum < endRow; rowNum++) {
@@ -248,8 +283,54 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
                 continue;
             plot = dataList.get(0).getId();
 
+            TroubleshootRecordEntity troubleshootRecordEntity = new TroubleshootRecordEntity();
+            PersonBaseEntity personBaseEntity = new PersonBaseEntity();
+
+            // ID
+            troubleshootRecordEntity.setId(StringUtil.genUUID());
+            // 时间
+            troubleshootRecordEntity.setCreateDate(TS);
+            // 备注
+            int iNote = random.nextInt(notes.length-1);
+            troubleshootRecordEntity.setNote(notes[iNote]);
+            // plot
+            troubleshootRecordEntity.setPlot(plot);
+
+
+            String address = ExcelUtil.convertCellValueToString(row.getCell(5));
+            String name = ExcelUtil.convertCellValueToString(row.getCell(0));
+
+            // personBaseEntity
+            // id
+            personBaseEntity.setId(StringUtil.genUUID());
+            // code
+            personBaseEntity.setCode(StringUtil.genUUID());
+            // 身份证
+            personBaseEntity.setIdentificationNumber(ID_CARD_UTIL.getRandomID());
+            // 手机号码
+            String phone = ExcelUtil.convertCellValueToString(row.getCell(4));
+            personBaseEntity.setPhone(phone);
+            // 地址
+            personBaseEntity.setAddress(address);
+            // 性别
+            int iSex = random.nextInt(notes.length-1);
+            System.out.println("iSex:" + iSex);
+            personBaseEntity.setSex(sex[iSex]);
+            // 其它
+            personBaseEntity.setOther(notes[iNote]);
+            // isByphone
+            personBaseEntity.setIsByPhone(false);
+            // name
+            personBaseEntity.setName(name);
+            // multiTenancy and district code
+            personBaseEntity.setDistrictCode("420115001012");
+            // 江夏
+            personBaseEntity.setMultiTenancy("420115001012");
+            personBaseEntity.setDistrictCode("420000/420100/420115/420115001/420115001012");
+
+
             // 其它症状
-            String other = ExcelUtil.convertCellValueToString(row.getCell(12));
+//            String other = ExcelUtil.convertCellValueToString(row.getCell(12));
 //            String dataIds = getDataIds(other);
 //            if(dataIds != null){
 //                other = dataIds.substring(0 , dataIds.length() - 1);
@@ -257,71 +338,116 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 
 
             // 分类诊疗意见
-            String opinion = ExcelUtil.convertCellValueToString(row.getCell(13));
+//            String opinion = ExcelUtil.convertCellValueToString(row.getCell(13));
 //            String dataIdO = getDataIds(opinion);
 //            if(dataIdO != null){
 //                opinion = dataIdO.substring(0 , dataIdO.length() - 1 );
 //            }
 
-            String name = ExcelUtil.convertCellValueToString(row.getCell(0));
-            String idCard = ExcelUtil.convertCellValueToString(row.getCell(1));
-            String sex = ExcelUtil.convertCellValueToString(row.getCell(2));
-            String age = ExcelUtil.convertCellValueToString(row.getCell(3));
-            String phone = ExcelUtil.convertCellValueToString(row.getCell(4));
-            String address = ExcelUtil.convertCellValueToString(row.getCell(5));
 
+//            String idCard = ExcelUtil.convertCellValueToString(row.getCell(1));
+//            String sex = ExcelUtil.convertCellValueToString(row.getCell(2));
+            String age = ExcelUtil.convertCellValueToString(row.getCell(3));
+
+
+//
             String build = ExcelUtil.convertCellValueToString(row.getCell(7));
             String unit = ExcelUtil.convertCellValueToString(row.getCell(8));
             String roomNo = ExcelUtil.convertCellValueToString(row.getCell(9));
-            String tempture = ExcelUtil.convertCellValueToString(row.getCell(10));
-            String contact = ExcelUtil.convertCellValueToString(row.getCell(11));
+//            String tempture = ExcelUtil.convertCellValueToString(row.getCell(10));
+//            String contact = ExcelUtil.convertCellValueToString(row.getCell(11));
 
 
-            String note = ExcelUtil.convertCellValueToString(row.getCell(14));
-            if ("".equals(name)|| "".equals(phone) || "".equals(build) || "".equals(unit))
-                continue;
-           if(name==null || phone==null || build ==null || unit ==null)
-               continue;
-            DailyTroubleshootRecordEntity recordEntity = new DailyTroubleshootRecordEntity();
-            recordEntity.setId(UUID.randomUUID().toString());
-            recordEntity.setCreateTime(TS);
-            recordEntity.setMultiTenancy(multiTenancy);
-            recordEntity.setAddress(address);
+//            String note = ExcelUtil.convertCellValueToString(row.getCell(14));
+//            if ("".equals(name)|| "".equals(phone) || "".equals(build) || "".equals(unit))
+//                continue;
+//           if(name==null || phone==null || build ==null || unit ==null)
+//               continue;
 
-            recordEntity.setOtherSymptoms(other);
-            recordEntity.setMedicalOpinion(opinion);
-            recordEntity.setNote(note);
 
-            if (!"".equals(age) && age != null) {
-                recordEntity.setAge(Integer.valueOf(age));
-            }
+//            DailyTroubleshootRecordEntity recordEntity = new DailyTroubleshootRecordEntity();
 
-            if (sex == null || "".equals(sex)) {
-                recordEntity.setSex(noSexId);
-            } else {
-                recordEntity.setSex(sex.equals("男") ? maleId : femaleId);
-            }
-            if(contact.equals("t")){
-                recordEntity.setContact(true);
-            }else{
-                recordEntity.setContact(false);
-            }
-            if(tempture.equals("t")){
-                recordEntity.setExceedTemp(true);
-            }else{
-                recordEntity.setExceedTemp(false);
-            }
+            // building
+            troubleshootRecordEntity.setBuilding(build);
+            // unitnumber
+            troubleshootRecordEntity.setUnitNumber(unit);
+            // roomNo
+            troubleshootRecordEntity.setRoomNo(roomNo);
+            // is phone
+            troubleshootRecordEntity.setIsByPhone(false);
+            // istempture
+            troubleshootRecordEntity.setIsExceedTemp(random.nextBoolean());
+            // isLeaveArea
+            troubleshootRecordEntity.setIsLeaveArea(random.nextBoolean());
+            // isContact
+            boolean isContact = true;
+            if (iNote > 1)
+                isContact = false;
+            troubleshootRecordEntity.setIsContact(isContact);
+            // personBaseId personBaseEntity
+            troubleshootRecordEntity.setPersonBaseId(personBaseEntity.getId());
+            troubleshootRecordEntity.setPersonBase(personBaseEntity);
+            // age
+            troubleshootRecordEntity.setAge(Integer.valueOf(age));
+            // 确诊情况
+            int iDiagonsis = random.nextInt(diagonsis.length - 1);
+            System.out.println("iSex:" + iDiagonsis);
+            troubleshootRecordEntity.setConfirmed_diagnosis(diagonsis[iDiagonsis]);
+            // 其它症状
+            int iSymoptos = random.nextInt(otherSymptoms.length-1);
+            System.out.println("iSex:" + iSymoptos);
+            troubleshootRecordEntity.setOtherSymptoms(otherSymptoms[iSymoptos]);
+            // 分类诊疗意见
+            int iMedicalOpinions = random.nextInt(medicalOpinions.length-1);
+            System.out.println("iSex:" + iSex);
+            troubleshootRecordEntity.setMedicalOpinion(medicalOpinions[iMedicalOpinions]);
+            // 多租户 和 district_code
+            // 江夏
+            troubleshootRecordEntity.setDistrictCode("420115001012");
+            troubleshootRecordEntity.setMultiTenancy("420115001012");
 
-            recordEntity.setBuilding(build);
-            recordEntity.setPlot(plot);
-            recordEntity.setCode(UUID.randomUUID().toString());
-            recordEntity.setIdentificationNumber(idCard);
-            recordEntity.setUnitNumber(unit);
-            recordEntity.setRoomNo(roomNo);
-            recordEntity.setName(name);
-            recordEntity.setPhone(phone);
-            // 体温大于37.5 以及 已有相同数据不添加 未过滤
-            recordEntities.add(recordEntity);
+
+//            recordEntity.setId(UUID.randomUUID().toString());
+//            recordEntity.setCreateTime(TS);
+//            recordEntity.setMultiTenancy(multiTenancy);
+//            recordEntity.setAddress(address);
+//
+//            recordEntity.setOtherSymptoms(other);
+//            recordEntity.setMedicalOpinion(opinion);
+//            recordEntity.setNote(note);
+//
+//            if (!"".equals(age) && age != null) {
+////                recordEntity.setAge(Integer.valueOf(age));
+//                recordEntity.setAge(Integer.valueOf(age));
+//            }
+//
+//            if (sex == null || "".equals(sex)) {
+//                recordEntity.setSex(noSexId);
+//            } else {
+//                recordEntity.setSex(sex.equals("男") ? maleId : femaleId);
+//            }
+//            if (contact.equals("t")) {
+//                recordEntity.setContact(true);
+//            } else {
+//                recordEntity.setContact(false);
+//            }
+//            if (tempture.equals("t")) {
+//                recordEntity.setExceedTemp(true);
+//            } else {
+//                recordEntity.setExceedTemp(false);
+//            }
+//
+//            recordEntity.setBuilding(build);
+//            recordEntity.setPlot(plot);
+//            recordEntity.setCode(UUID.randomUUID().toString());
+//            recordEntity.setIdentificationNumber(idCard);
+//            recordEntity.setUnitNumber(unit);
+//            recordEntity.setRoomNo(roomNo);
+//            recordEntity.setName(name);
+//            recordEntity.setPhone(phone);
+//            // 体温大于37.5 以及 已有相同数据不添加 未过滤
+//            recordEntities.add(recordEntity);
+            troubleshootRecordService.add(troubleshootRecordMapper.entityToModel(troubleshootRecordEntity));
         }
         return recordEntities;
     }
@@ -501,7 +627,6 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 //    }
 
 
-
     // 重写 分组查询统计
 
 
@@ -510,7 +635,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
         List<DailyStatisticModel> dailyStatisticModels = new ArrayList<>();
         // 根据plot、build、unit去重
         List<DailyTroubleshootRecordEntity> recordEntities = recordRepository.queryDistPlotBuildUnit();
-        for (int i = 0 ; i < recordEntities.size() ; i++){
+        for (int i = 0; i < recordEntities.size(); i++) {
             DailyStatisticModel dailyStatisticModel = new DailyStatisticModel();
             DailyTroubleshootRecordEntity recordEntity = recordEntities.get(i);
             String plot = recordEntity.getPlot();
@@ -520,16 +645,16 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             dailyStatisticModel.setBuilding(building);
             dailyStatisticModel.setUnitNumber(unit);
             // 小区名称
-            if(!"".equals(plot) && plot != null){
+            if (!"".equals(plot) && plot != null) {
                 DSourceDataEntity dSourceDataEntity = dSourceDataRepository.getOne(plot);
-                if(dSourceDataEntity != null && dSourceDataEntity.getName() != null)
+                if (dSourceDataEntity != null && dSourceDataEntity.getName() != null)
                     dailyStatisticModel.setPlotName(dSourceDataEntity.getName());
             }
             // 今日已排查
             List<DailyTroubleshootRecordEntity> alreadyChecked = recordRepository.queryTodayChecked(plot, building, unit, STARTTIME, ENDTIME);
             int checked = alreadyChecked.size();
             dailyStatisticModel.setChecked(checked);
-            int fever = (int) alreadyChecked.stream().filter(DailyTroubleshootRecordEntity::isExceedTemp).count() ;
+            int fever = (int) alreadyChecked.stream().filter(DailyTroubleshootRecordEntity::isExceedTemp).count();
             dailyStatisticModel.setFeverCount(fever);
             // 小区人数总和
             List<DailyTroubleshootRecordEntity> allPerson = recordRepository.queryPersonGroup(plot, building, unit);
@@ -537,7 +662,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             dailyStatisticModel.setUnchecked(allPerson.size() - checked);
             dailyStatisticModels.add(dailyStatisticModel);
         }
-        return  dailyStatisticModels;
+        return dailyStatisticModels;
 
     }
 

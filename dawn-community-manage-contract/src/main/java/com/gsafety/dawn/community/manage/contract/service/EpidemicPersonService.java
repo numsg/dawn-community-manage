@@ -17,7 +17,7 @@ public interface EpidemicPersonService {
     Boolean deleteOneEpidemicPerson(String id);
 
     // 统计
-    List<DiagnosisCountModel> diagnosisCount();
+    List<DiagnosisCountModel> diagnosisCount(String districtCode);
 
     List<SpecialCountModel> diagnosisCountWithConfirmedAndSuspected(String communityId);
 

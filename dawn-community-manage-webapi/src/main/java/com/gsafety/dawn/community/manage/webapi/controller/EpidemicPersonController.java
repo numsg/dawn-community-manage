@@ -65,15 +65,15 @@ public class EpidemicPersonController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/epidemic-person/total/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "统计诊断每种的数量", notes = "diagnosisCount()")
+    @GetMapping(value = "/epidemic-person/total/all/{districtCode}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "统计诊断每种情况的数量", notes = "diagnosisCount()")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = DiagnosisCountModel.class,responseContainer = "List" ),
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
             @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<List<DiagnosisCountModel>> diagnosisCount() {
-        List<DiagnosisCountModel> result = epidemicPersonService.diagnosisCount();
+    public ResponseEntity<List<DiagnosisCountModel>> diagnosisCount(@PathVariable @ApiParam(value = "社区code") String districtCode) {
+        List<DiagnosisCountModel> result = epidemicPersonService.diagnosisCount(districtCode);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

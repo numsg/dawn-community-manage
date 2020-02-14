@@ -44,7 +44,6 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
 
     @Override
     public EpidemicPersonModel addOneEpidemicPerson(EpidemicPersonModel epidemicPersonModel) {
-        epidemicPersonModel.setMultiTenancy("123456");
         EpidemicPersonEntity epidemicPersonEntity = epidemicPersonMapper.modelToEntity(epidemicPersonModel);
         return epidemicPersonMapper.entityToModel(epidemicPersonRepository.save(epidemicPersonEntity));
     }
@@ -77,13 +76,13 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
     }
 
     @Override
-    public List<DiagnosisCountModel> diagnosisCount() {
+    public List<DiagnosisCountModel> diagnosisCount(String districtCode) {
         List<DiagnosisCountModel> result = new ArrayList<>();
         List<DSourceDataEntity> dSourceDataEntities = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(diagnosisId);
         dSourceDataEntities.forEach(dSourceDataEntity -> {
             DiagnosisCountModel diagnosisCountModel = new DiagnosisCountModel();
             diagnosisCountModel.setdSourceDataModel(dSourceDataMapper.entityToModel(dSourceDataEntity));
-            diagnosisCountModel.setCount(epidemicPersonRepository.queryCountByDiagnosisSituation(dSourceDataEntity.getId()));
+            diagnosisCountModel.setCount(epidemicPersonRepository.queryCountByDiagnosisSituationAndMultiTenancy(dSourceDataEntity.getId(),districtCode));
             result.add(diagnosisCountModel);
         });
         return result;

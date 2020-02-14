@@ -9,4 +9,6 @@ public interface TroubleshootRecordMapper {
 
     TroubleshootRecordEntity modelToEntity(TroubleshootRecord model);
 
+    TroubleshootRecord entityToModel(TroubleshootRecordEntity model);
+
 }

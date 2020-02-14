@@ -21,10 +21,14 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
                                  String diagnosisSituation, String medicalCondition, String specialSituation, Date submitTime,
                                  Date diseaseTime, Date updateTime, String note, String multiTenancy, String expendProperty,String mobileNumber);
 
-    @Query(nativeQuery = true, value = "select count(*) from b_epidemic_person  WHERE diagnosis_situation = ?1 ;")
-    Integer queryCountByDiagnosisSituation(String diagnosisSituation);
+
+
+    @Query(nativeQuery = true, value = "select count(*) from b_epidemic_person  WHERE diagnosis_situation = ?1 and multi_tenancy=?2 ;")
+    Integer queryCountByDiagnosisSituationAndMultiTenancy(String diagnosisSituation,String districtCode);
+
 
     List<EpidemicPersonEntity> queryAllByDiagnosisSituationAndMultiTenancyOrderByUpdateTimeAsc(String diagnosisId,String communityId);
+
 
     @Query(nativeQuery = true, value = "select to_char(update_time,'YYYY-MM-DD') as update_time  from b_epidemic_person GROUP BY to_char(update_time,'YYYY-MM-DD')  ;")
     List<EpidemicPersonEntity> queryDate();

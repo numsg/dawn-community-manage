@@ -227,12 +227,13 @@ public class DataCollectionServiceImpl {
                 record.setPlot(plots.get(random.nextInt(plots.size())).getId());
             }
             PersonBase personBase = new PersonBase();
+//            if (objMap.get("residence") != null) {
+//                personBase.setAddress(objMap.get("residence").toString());
+//            }
             if (objMap.get("wuhanAddress") != null) {
                 personBase.setAddress(objMap.get("wuhanAddress").toString());
             }
-            if (objMap.get("residence") != null) {
-                personBase.setAddress(objMap.get("residence").toString());
-            }
+
             if (sex == null) {
                 personBase.setSex(noSexId);
             } else {
@@ -331,6 +332,9 @@ public class DataCollectionServiceImpl {
             recordModel.setPermanentWuling(objMap.get("permanentWuling") != null ? objMap.get("permanentWuling").toString() : "");
             recordModel.setProveWuling(objMap.get("proveWuling") != null ? objMap.get("proveWuling").toString() : "");
             recordModel.setRemark(objMap.get("remark") != null ? objMap.get("remark").toString() : "");
+            recordModel.setReporterName(objMap.get("reporterName") != null ? objMap.get("reporterName").toString() : "");
+            recordModel.setReporterPhone(objMap.get("reporterPhone") != null ? objMap.get("reporterPhone").toString() : "");
+
 
             recordModel.setLeaveHubeiDate(objMap.get("leaveHubeiDate") != null ? objMap.get("leaveHubeiDate").toString() : "");
             // recordModel.setCreateTime(objMap.get("createTime") != null ? objMap.get("createTime").toString() : "");

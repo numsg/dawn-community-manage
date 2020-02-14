@@ -52,12 +52,13 @@ public class TroubleshootRecordModel {
     private String proveWuling;  //是否有相关证明(1是0否)
     private String remark; //备注
     private String createTime;
-
+    private String  reporterName;
+    private String  reporterPhone;
 
     public TroubleshootRecordModel() {
     }
 
-    public TroubleshootRecordModel(String id, String name, String idNumber, String sex, String age, String residence, String community, String building, String unit, String roomNumber, String phone, String fever, String symptom, String travelLivingHubei, String trip, String touchPersonIsolation, String touchHubei, String temperature, String discomfort, String wuhanAddress, String leaveHubeiDate, String vehicle, String vehicleNo, String stayPlace, String backDate, String fourteenDays, String otherToWuling, String whereToWuling, String howToWuling, String vehicleNoWuling, String togetherPersonWuling, String workUnitWuling, String permanentWuling, String proveWuling, String remark, String createTime) {
+    public TroubleshootRecordModel(String id, String name, String idNumber, String sex, String age, String residence, String community, String building, String unit, String roomNumber, String phone, String fever, String symptom, String travelLivingHubei, String trip, String touchPersonIsolation, String touchHubei, String temperature, String discomfort, String wuhanAddress, String leaveHubeiDate, String vehicle, String vehicleNo, String stayPlace, String backDate, String fourteenDays, String otherToWuling, String whereToWuling, String howToWuling, String vehicleNoWuling, String togetherPersonWuling, String workUnitWuling, String permanentWuling, String proveWuling, String remark, String createTime, String reporterName, String reporterPhone) {
         this.id = id;
         this.name = name;
         this.idNumber = idNumber;
@@ -94,6 +95,24 @@ public class TroubleshootRecordModel {
         this.proveWuling = proveWuling;
         this.remark = remark;
         this.createTime = createTime;
+        this.reporterName = reporterName;
+        this.reporterPhone = reporterPhone;
+    }
+
+    public String getReporterName() {
+        return reporterName;
+    }
+
+    public void setReporterName(String reporterName) {
+        this.reporterName = reporterName;
+    }
+
+    public String getReporterPhone() {
+        return reporterPhone;
+    }
+
+    public void setReporterPhone(String reporterPhone) {
+        this.reporterPhone = reporterPhone;
     }
 
     public String getId() {

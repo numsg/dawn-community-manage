@@ -64,9 +64,9 @@ public class TroubleshootRecordEntity {
     @Column(name = "multi_tenancy")
     private String multiTenancy;
 
-    // 体温是否大于37.3
-    @Column(name = "is_exceed_temp")
-    private boolean isExceedTemp;
+    // 体温
+    @Column(name = "is_exceed_temp",length = 1024)
+    private String isExceedTemp;
 
     // 是否有接触史
     @Column(name = "is_contact")
@@ -144,13 +144,7 @@ public class TroubleshootRecordEntity {
         this.multiTenancy = multiTenancy;
     }
 
-    public boolean getIsExceedTemp() {
-        return this.isExceedTemp;
-    }
 
-    public void setIsExceedTemp(boolean isExceedTemp) {
-        this.isExceedTemp = isExceedTemp;
-    }
 
     public boolean getIsContact() {
         return this.isContact;
@@ -158,6 +152,14 @@ public class TroubleshootRecordEntity {
 
     public void setIsContact(boolean isContact) {
         this.isContact = isContact;
+    }
+
+    public String getIsExceedTemp() {
+        return isExceedTemp;
+    }
+
+    public void setIsExceedTemp(String isExceedTemp) {
+        this.isExceedTemp = isExceedTemp;
     }
 
     public String getOtherSymptoms() {

@@ -209,7 +209,7 @@ public class DataCollectionServiceImpl {
                 record.setIsContact(objMap.get("touchPersonIsolation").toString().equals("1"));
             }
             if (objMap.get("fever") != null) {
-                record.setIsExceedTemp(objMap.get("fever").toString().equals("1"));
+                record.setIsExceedTemp(objMap.get("fever").toString());
             }
             if (objMap.get("symptom") != null) {
                 record.setOtherSymptoms(splitOtherSymptom(objMap.get("symptom").toString()));

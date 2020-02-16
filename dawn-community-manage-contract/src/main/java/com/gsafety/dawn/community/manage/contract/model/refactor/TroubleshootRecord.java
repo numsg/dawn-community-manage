@@ -42,8 +42,8 @@ public class TroubleshootRecord {
     // 多租户
     private String multiTenancy;
 
-    // 体温是否大于37.3
-    private boolean isExceedTemp;
+    // 体温
+    private String isExceedTemp;
 
     // 是否有接触史
     private boolean isContact;
@@ -123,11 +123,11 @@ public class TroubleshootRecord {
         this.multiTenancy = multiTenancy;
     }
 
-    public boolean getIsExceedTemp() {
-        return this.isExceedTemp;
+    public String getIsExceedTemp() {
+        return isExceedTemp;
     }
 
-    public void setIsExceedTemp(boolean isExceedTemp) {
+    public void setIsExceedTemp(String isExceedTemp) {
         this.isExceedTemp = isExceedTemp;
     }
 

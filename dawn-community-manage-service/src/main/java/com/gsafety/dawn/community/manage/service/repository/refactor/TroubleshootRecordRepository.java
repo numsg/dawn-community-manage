@@ -24,7 +24,7 @@ public interface TroubleshootRecordRepository extends JpaRepository<Troubleshoot
     TroubleshootRecordEntity findByPersonBaseId(@Param("personBaseId") String personBaseId);
 
     @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.PlotBuildingUnitStaffEntity(count(c),c.building,c.unitNumber,c.createDate,c.plot," +
-            "SUM(CASE WHEN isExceedTemp IS TRUE THEN 1 ELSE 0 END)) " +
+             "SUM(CASE WHEN isExceedTemp not in ('a:小于36℃', 'b:36-36.5℃', 'c:36.5-37℃') THEN 1 ELSE 0 END)) " +
             "from TroubleshootRecordEntity c where c.multiTenancy  = :multiTenancy " +
             "group by c.building,c.unitNumber,c.createDate,c.plot")
     List<PlotBuildingUnitStaffEntity> findPlotBuildingUnitStaff(@Param("multiTenancy") String multiTenancy);

@@ -376,7 +376,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
             // is phone
             troubleshootRecordEntity.setIsByPhone(false);
             // istempture
-            troubleshootRecordEntity.setIsExceedTemp(random.nextBoolean());
+            troubleshootRecordEntity.setIsExceedTemp(null);
             // isLeaveArea
             troubleshootRecordEntity.setIsLeaveArea(random.nextBoolean());
             // isContact

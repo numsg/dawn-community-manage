@@ -64,8 +64,14 @@ public class TroubleshootRecordEntity {
     @Column(name = "multi_tenancy")
     private String multiTenancy;
 
-    // 体温
-    @Column(name = "is_exceed_temp",length = 1024)
+    /** 体温记录情况
+     * a:小于36℃
+     * b:36-36.5℃
+     * c:36.5-37℃
+     * d:37-37.3℃
+     * e:>37.3℃
+     */
+    @Column(name = "is_exceed_temp",length = 128)
     private String isExceedTemp;
 
     // 是否有接触史

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -120,7 +121,7 @@ public class DataCollectionServiceImpl {
     /**
      * 定时从外部服务查询数据。
      */
-    public void timeQuery() {
+    public void timeQuery() throws Exception {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date endTimeDate = DateUtil.getDayEndDate();
 
@@ -171,6 +172,19 @@ public class DataCollectionServiceImpl {
         }
 
         for (Object obj : list) {
+         //   Class cls=obj.getClass();
+         //   Field[] fields = cls.getDeclaredFields();
+          //  for(int i=0; i<fields.length; i++){
+          //      Field f = fields[i];
+          //      f.setAccessible(true);
+                //System.out.println("属性名:" + f.getName() + " 0:" + f.get(obj));
+                // 判断字段是否在keyNames数组（在表中有对应的字段）中，不在的放到拓展字段中。
+          //  }
+            String keyNames[]= { "id","name","phone","sex","currentVillage","building","remark",
+            "roomNumber","unit","age","medicalAdvice","createTime","touchPersonIsolation","fever",
+            "symptom","communityCode","residence"};
+
+
             Map objMap = JsonUtil.fromJson(toJson(obj), Map.class);
             Object recordId = objMap.get("id");
             Object personName = objMap.get("name");
@@ -213,7 +227,7 @@ public class DataCollectionServiceImpl {
             }
             if (objMap.get("symptom") != null) {
                 record.setOtherSymptoms(splitOtherSymptom(objMap.get("symptom").toString()));
-                //entity.setOtherSymptoms(converOtherSymptoms(objMap.get("symptom").toString()));
+                //entity.setOtherSymptoms(convertOtherSymptoms(objMap.get("symptom").toString()));
             }
             if (objMap.get("communityCode") != null && dSourceDataRepository.existsById(objMap.get("communityCode").toString())) {
                 record.setPlot(objMap.get("communityCode").toString());

@@ -102,6 +102,17 @@ public class TroubleshootRecordEntity {
     @Column(name = "district_code", length = 128)
     private String districtCode;
 
+
+    //责任人名称
+    @Column(name = "reporter_name", length = 128)
+    private String reporterName;
+    //责任人电话
+    @Column(name = "reporter_phone", length = 15)
+    private String reporterPhone;
+    // 拓展字段
+    @Column(name = "expend_property",length = 10240)
+    private String expendProperty;
+
     public String getId() {
         return id;
     }
@@ -262,5 +273,29 @@ public class TroubleshootRecordEntity {
 
     public void setPersonBase(PersonBaseEntity personBase) {
         this.personBase = personBase;
+    }
+
+    public String getReporterName() {
+        return reporterName;
+    }
+
+    public void setReporterName(String reporterName) {
+        this.reporterName = reporterName;
+    }
+
+    public String getReporterPhone() {
+        return reporterPhone;
+    }
+
+    public void setReporterPhone(String reporterPhone) {
+        this.reporterPhone = reporterPhone;
+    }
+
+    public String getExpendProperty() {
+        return expendProperty;
+    }
+
+    public void setExpendProperty(String expendProperty) {
+        this.expendProperty = expendProperty;
     }
 }

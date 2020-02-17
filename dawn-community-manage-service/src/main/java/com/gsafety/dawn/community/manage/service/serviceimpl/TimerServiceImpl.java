@@ -3,6 +3,8 @@ package com.gsafety.dawn.community.manage.service.serviceimpl;
 import com.gsafety.dawn.community.manage.contract.model.changde.RequestParamModel;
 import com.gsafety.dawn.community.manage.contract.model.changde.TroubleshootRecordModel;
 import com.gsafety.dawn.community.manage.contract.service.TimerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.util.*;
 @Service
 public class TimerServiceImpl extends DataCollectionServiceImpl implements ServletContextListener, TimerService {
 
+    Logger logger = LoggerFactory.getLogger(this.getClass());
     private Timer timer = null;
 
     @Value("${app.waitTime}")
@@ -37,7 +40,11 @@ public class TimerServiceImpl extends DataCollectionServiceImpl implements Servl
     @Override
     public Boolean flushData(String villageId) {
         timer.cancel();
-        timeQuery();
+        try {
+            timeQuery();
+        } catch (Exception e) {
+            logger.error("flushData() error", e.getMessage(), e);
+        }
         //执行完之后再次
         timer = new Timer(true);
         timer.schedule(new OneTask(), 10000, waitTime);//延迟60秒，定时1小时
@@ -53,7 +60,11 @@ public class TimerServiceImpl extends DataCollectionServiceImpl implements Servl
         @Override
         public void run() {
             System.out.println("开始一次数据同步");
-            timeQuery();
+            try {
+                timeQuery();
+            } catch (Exception e) {
+                logger.error("timer run() error", e.getMessage(), e);
             }
         }
+    }
 }

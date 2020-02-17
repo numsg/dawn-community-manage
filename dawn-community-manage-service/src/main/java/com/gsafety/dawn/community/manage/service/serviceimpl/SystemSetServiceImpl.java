@@ -39,7 +39,7 @@ public class SystemSetServiceImpl implements SystemSetService {
         Calendar calendar = Calendar.getInstance();
         String dateNow = df.format(calendar.getTime());
         Timestamp ts = Timestamp.valueOf(dateNow);
-        return  systemSetRepository.updateRuleType(systemSetEntity.getId(),systemSetEntity.getSystemName(),
-                systemSetEntity.getSystemLogo(),systemSetEntity.getUpdateUser() ,ts );
+        return systemSetRepository.updateRuleType(systemSetEntity.getId(), systemSetEntity.getSystemName(),
+                systemSetEntity.getSystemLogo(), systemSetEntity.getUpdateUser(), ts);
     }
 }

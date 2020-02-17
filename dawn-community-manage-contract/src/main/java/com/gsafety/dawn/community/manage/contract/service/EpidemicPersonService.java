@@ -22,9 +22,6 @@ public interface EpidemicPersonService {
     // 统计
     List<DiagnosisCountModel> diagnosisCount(String districtCode);
 
-    List<SpecialCountModel> diagnosisCountWithConfirmedAndSuspected(String communityId);
-
-    List<SpecialCountModel> diagnosisCountWithHealthAndDeath(String communityId);
 
     // 更新医疗情况信息
     boolean modifyMedicalTreatment(ModifyMedicalTreatmentModel medicalTreatmentModel);

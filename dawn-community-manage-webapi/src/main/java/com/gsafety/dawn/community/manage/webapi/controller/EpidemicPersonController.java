@@ -79,32 +79,7 @@ public class EpidemicPersonController {
         List<DiagnosisCountModel> result = epidemicPersonService.diagnosisCount(districtCode);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
-
-    @GetMapping(value = "/epidemic-person/total/confirmed-suspected/{communityId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "累计确诊/疑似数量统计", notes = "diagnosisCountWithConfirmedAndSuspected()")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = DiagnosisCountModel.class,responseContainer = "List" ),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
-            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
-    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<List<SpecialCountModel>> diagnosisCountWithConfirmedAndSuspected(@PathVariable @ApiParam(value = "社区id") String communityId) {
-        List<SpecialCountModel> result = epidemicPersonService.diagnosisCountWithConfirmedAndSuspected(communityId);;
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/epidemic-person/total/health-death/{communityId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "累计治愈/死亡数量统计", notes = "diagnosisCountWithHealthAndDeath()")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = DiagnosisCountModel.class,responseContainer = "List" ),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
-            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
-    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<List<SpecialCountModel>> diagnosisCountWithHealthAndDeath(@PathVariable @ApiParam(value = "社区id") String communityId) {
-        List<SpecialCountModel> result = epidemicPersonService.diagnosisCountWithHealthAndDeath(communityId);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-
+    
     // 更新就医情况信息
     @PutMapping(value = "/epidemic-person/medical-treatment", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "更新就医情况信息", notes = "modifyMedicalTreatment()")

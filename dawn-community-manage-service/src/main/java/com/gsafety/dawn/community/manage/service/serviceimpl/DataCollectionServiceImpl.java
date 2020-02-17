@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -79,7 +78,6 @@ public class DataCollectionServiceImpl {
     private static final String suspectedPatientId = "6293737c-5775-426d-9845-f919eafba1be";
     //3:一版发热患者，c0bb07b2-db54-4fd1-89d3-20b0672a2779
     private static final String feverPatientId = "c0bb07b2-db54-4fd1-89d3-20b0672a2779";
-
     //2:CT诊断肺炎患者 c9eedfbc-ae5a-40b7-8a62-c049c5678deb
     private static final String CTPatientId = "c9eedfbc-ae5a-40b7-8a62-c049c5678deb";
     //4:密切接触者  6293737c-5775-426d-9845-f919eafba1be
@@ -88,9 +86,11 @@ public class DataCollectionServiceImpl {
 
     private String url = "/search/v2";
 
-    // 杨桥湖社区id
-    // private static final String communityDataSourceId = "a2e01f0e-6c86-4a41-bcf3-c07c1ffa2f82";
-    // 其他状况id
+    private static  String [] keyNames= { "id","name","phone","sex","currentVillage","building","remark",
+            "roomNumber","unit","age","medicalAdvice","createTime","touchPersonIsolation","fever",
+            "symptom","communityCode","residence","reporterName","reporterPhone","idNumber"};
+
+     // 其他状况id
     private static final String otherSymptomId = "582daff0-56a5-45a4-9ca7-dc098c688753";
     @Autowired
     private HttpClientUtil httpClientUtil;
@@ -144,8 +144,6 @@ public class DataCollectionServiceImpl {
                     pageTotal = total / pageSize + 1;
                 }
             }
-
-           // plots = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(communityDataSourceId);
             otherSymptoms = dSourceDataRepository.queryByDataSourceIdOrderBySortAsc(otherSymptomId);
 
             for (int i = 1; i <= pageTotal; i++) {
@@ -168,6 +166,8 @@ public class DataCollectionServiceImpl {
         if (list.isEmpty()) {
             return false;
         }
+        List<String> keyList=new ArrayList<>();
+        Collections.addAll(keyList,keyNames);
         for (Object obj : list) {
             Map objMap = JsonUtil.fromJson(toJson(obj), Map.class);
             Object recordId = objMap.get("id");
@@ -228,10 +228,29 @@ public class DataCollectionServiceImpl {
                 record.setPlot(plots.get(random.nextInt(plots.size())).getId());
             }
 
+            if (objMap.get("reporterName")!=null){
+                record.setReporterName(objMap.get("reporterName").toString());
+            }
+            if (objMap.get("reporterPhone")!=null){
+                record.setReporterPhone(objMap.get("reporterPhone").toString());
+            }
+            // 将其他字段放到拓展属性里
+            Map<String,Object> temp =JsonUtil.fromJson(toJson(obj), Map.class);
+            Map<String,Object> expendPropertyMap=new HashMap<>();
+
+            for(Map.Entry<String,Object> entry : temp.entrySet()) {
+                if (!keyList.contains(entry.getKey())){
+                    expendPropertyMap.put(entry.getKey(),entry.getValue());
+                }
+            }
+            record.setExpendProperty(JsonUtil.toJson(expendPropertyMap));
+
             PersonBase personBase = new PersonBase();
-            personBase.setAddress(objMap.get("residence").toString());
             personBase.setName(personName.toString());
             personBase.setPhone(phone.toString());
+            if (objMap.get("residence")!=null){
+                personBase.setAddress(objMap.get("residence").toString());
+            }
             if(sex==null){
                 personBase.setSex(noSexId);
             }else{

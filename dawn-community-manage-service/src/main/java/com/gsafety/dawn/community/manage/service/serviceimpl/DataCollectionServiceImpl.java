@@ -20,8 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.lang.reflect.Field;
-import java.text.ParseException;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -89,12 +88,10 @@ public class DataCollectionServiceImpl {
 
     private String url = "/changde/search";
 
-    private static final String keyNames[]= { "id","name","phone","sex","currentVillage","building","remark",
+    private static  String [] keyNames= { "id","name","phone","sex","currentVillage","building","remark",
             "roomNumber","unit","age","medicalAdvice","createTime","touchPersonIsolation","fever",
             "symptom","communityCode","wuhanAddress","reporterName","reporterPhone","idNumber"};
 
-    // 杨桥湖社区id
-    // private static final String communityDataSourceId = "a2e01f0e-6c86-4a41-bcf3-c07c1ffa2f82";
     // 其他状况id
     private static final String otherSymptomId = "582daff0-56a5-45a4-9ca7-dc098c688753";
     @Autowired
@@ -125,7 +122,7 @@ public class DataCollectionServiceImpl {
     /**
      * 定时从外部服务查询数据。
      */
-    public void timeQuery() throws Exception {
+    public void timeQuery()  {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date endTimeDate = DateUtil.getDayEndDate();
 
@@ -163,7 +160,7 @@ public class DataCollectionServiceImpl {
         }
     }
 
-    public Boolean TraversalAndInsertData(RequestModel requestModel) throws IllegalAccessException {
+    public Boolean TraversalAndInsertData(RequestModel requestModel)  {
         Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
         if (map.get("data") == null || map.get("success").equals(false)) {
             return false;
@@ -220,8 +217,7 @@ public class DataCollectionServiceImpl {
             }
             if (objMap.get("symptom") != null) {
                 record.setOtherSymptoms(splitOtherSymptom(objMap.get("symptom").toString()));
-                //entity.setOtherSymptoms(convertOtherSymptoms(objMap.get("symptom").toString()));
-            }
+               }
             if (objMap.get("communityCode") != null && dSourceDataRepository.existsById(objMap.get("communityCode").toString())) {
                 record.setPlot(objMap.get("communityCode").toString());
             } else {

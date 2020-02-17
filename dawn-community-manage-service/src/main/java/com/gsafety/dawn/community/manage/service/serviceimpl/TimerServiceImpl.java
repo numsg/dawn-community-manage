@@ -40,11 +40,7 @@ public class TimerServiceImpl extends DataCollectionServiceImpl implements Servl
     @Override
     public Boolean flushData(String villageId) {
         timer.cancel();
-        try {
-            timeQuery();
-        } catch (Exception e) {
-            logger.error("flushData() error", e.getMessage(), e);
-        }
+        timeQuery();
         //执行完之后再次
         timer = new Timer(true);
         timer.schedule(new OneTask(), 10000, waitTime);//延迟60秒，定时1小时
@@ -60,11 +56,7 @@ public class TimerServiceImpl extends DataCollectionServiceImpl implements Servl
         @Override
         public void run() {
             System.out.println("开始一次数据同步");
-            try {
-                timeQuery();
-            } catch (Exception e) {
-                logger.error("timer run() error", e.getMessage(), e);
-            }
+            timeQuery();
         }
     }
 }

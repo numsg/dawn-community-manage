@@ -43,4 +43,7 @@ public interface DataSourceRepository  extends JpaRepository<DataSourceEntity,St
     @Query
     DataSourceEntity queryByDescription(String districtCode);
 
+    // 根据districtCode和tag查询数据源
+    @Query()
+    List<DataSourceEntity> queryAllByDescription(String districtCode);
 }

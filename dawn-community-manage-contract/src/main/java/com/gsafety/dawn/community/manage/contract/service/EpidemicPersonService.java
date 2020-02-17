@@ -1,7 +1,10 @@
 package com.gsafety.dawn.community.manage.contract.service;
 
+import com.gsafety.dawn.community.manage.contract.model.ModifyMedicalTreatmentModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.model.EpidemicPersonModel;
+import com.gsafety.dawn.community.manage.contract.model.total.DistrictDiagnosisCountModel;
+import com.gsafety.dawn.community.manage.contract.model.total.EpidemicTotalStatisticModel;
 import com.gsafety.dawn.community.manage.contract.model.total.SpecialCountModel;
 
 import java.util.List;
@@ -22,4 +25,19 @@ public interface EpidemicPersonService {
     List<SpecialCountModel> diagnosisCountWithConfirmedAndSuspected(String communityId);
 
     List<SpecialCountModel> diagnosisCountWithHealthAndDeath(String communityId);
+
+    // 更新医疗情况信息
+    boolean modifyMedicalTreatment(ModifyMedicalTreatmentModel medicalTreatmentModel);
+
+    // 统计-总体-分类诊疗意见
+    EpidemicTotalStatisticModel overallClassification(String districtCode , String dataSourceId);
+
+    // 统计-总体-医疗情况
+    EpidemicTotalStatisticModel overallMedical(String districtCode , String dataSourceId);
+
+    // 统计-小区-分类诊疗意见
+    List<EpidemicTotalStatisticModel> plotClassification(String districtCode , String dataSourceId);
+
+    // 统计-小区-医疗情况
+    List<EpidemicTotalStatisticModel> plotMedical(String districtCode , String dataSourceId);
 }

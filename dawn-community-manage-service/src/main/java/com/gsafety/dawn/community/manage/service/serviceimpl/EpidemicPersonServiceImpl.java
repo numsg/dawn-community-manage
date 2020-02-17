@@ -170,6 +170,8 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
             // DiagnosisCountModel diagnosisCountModel = new DiagnosisCountModel();
             EpidemicTotalNodeModel epidemicTotalNodeModel = new EpidemicTotalNodeModel();
             epidemicTotalNodeModel.setTypeName(a.getName());
+            epidemicTotalNodeModel.setColor(a.getImgColor());
+            epidemicTotalNodeModel.setId(a.getId());
             // diagnosisCountModel.setdSourceDataModel(dSourceDataMapper.entityToModel(a));
             Integer integer = 0;
             if (classOrMedical) {
@@ -198,6 +200,8 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
         List<EpidemicTotalNodeModel> epidemicTotalNodeModels = new ArrayList<>();
         dSourceDataEntities.forEach(a -> {
             EpidemicTotalNodeModel epidemicTotalNodeModel = new EpidemicTotalNodeModel();
+            epidemicTotalNodeModel.setColor(a.getImgColor());
+            epidemicTotalNodeModel.setId(a.getId());
             epidemicTotalNodeModel.setTypeName(a.getName());
             // DiagnosisCountModel diagnosisCountModel = new DiagnosisCountModel();
             // diagnosisCountModel.setdSourceDataModel(dSourceDataMapper.entityToModel(a));

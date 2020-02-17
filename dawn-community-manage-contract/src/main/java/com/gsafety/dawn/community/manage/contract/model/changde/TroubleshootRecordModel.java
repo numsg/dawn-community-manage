@@ -15,6 +15,13 @@ public class TroubleshootRecordModel {
     private String unit; //单元（详细地址）
     private String roomNumber;//房号（详细地址）
     private String phone;  // 联系电话
+    /** 体温记录情况
+     * a:小于36℃
+     * b:36-36.5℃
+     * c:36.5-37℃
+     * d:37-37.3℃
+     * e:>37.3℃
+     */
     private String fever; //体温记录
     /**
      * 其他症状（0:无，1:乏力，2:干咳，3:肌痛，4:寒战，

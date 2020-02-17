@@ -15,7 +15,7 @@ public class TroubleshootRecordModel {
     private String unit; //单元（详细地址）
     private String roomNumber;//房号（详细地址）
     private String phone;  // 联系电话
-    private String fever; //是否发热（体温大于37.3度）（0:否，1:是）
+    private String fever; //体温记录
     /**
      * 其他症状（0:无，1:乏力，2:干咳，3:肌痛，4:寒战，
      * 5:呼吸困难，6:咽痛，7:头疼，8:眩晕，9:腹痛，

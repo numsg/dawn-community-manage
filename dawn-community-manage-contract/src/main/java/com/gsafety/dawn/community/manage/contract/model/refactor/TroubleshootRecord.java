@@ -1,5 +1,6 @@
 package com.gsafety.dawn.community.manage.contract.model.refactor;
 
+import javax.persistence.Column;
 import java.util.Date;
 
 public class TroubleshootRecord {
@@ -66,6 +67,41 @@ public class TroubleshootRecord {
      * 行政区划code
      */
     private String districtCode;
+
+
+    //责任人名称
+    @Column(name = "reporter_name", length = 128)
+    private String reporterName;
+    //责任人电话
+    @Column(name = "reporter_phone", length = 15)
+    private String reporterPhone;
+    // 拓展字段
+    @Column(name = "expend_property",length = 10240)
+    private String expendProperty;
+
+    public String getReporterName() {
+        return reporterName;
+    }
+
+    public void setReporterName(String reporterName) {
+        this.reporterName = reporterName;
+    }
+
+    public String getReporterPhone() {
+        return reporterPhone;
+    }
+
+    public void setReporterPhone(String reporterPhone) {
+        this.reporterPhone = reporterPhone;
+    }
+
+    public String getExpendProperty() {
+        return expendProperty;
+    }
+
+    public void setExpendProperty(String expendProperty) {
+        this.expendProperty = expendProperty;
+    }
 
     public String getId() {
         return id;

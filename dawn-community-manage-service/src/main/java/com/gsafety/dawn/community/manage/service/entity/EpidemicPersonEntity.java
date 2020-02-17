@@ -285,4 +285,6 @@ public class EpidemicPersonEntity {
     public void setRoomNumber(String roomNumber) {
         this.roomNumber = roomNumber;
     }
+
+
 }

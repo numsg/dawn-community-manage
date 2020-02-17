@@ -12,7 +12,7 @@ public class CompareConfirmed implements Comparator<EpidemicTotalStatisticModel>
     @Override
     public int compare(EpidemicTotalStatisticModel o1, EpidemicTotalStatisticModel o2) {
         if (CollectionUtils.isEmpty(o1.getNodeModels()) || CollectionUtils.isEmpty(o1.getNodeModels()))
-            return 1;
+            return -1;
         return o1.getNodeModels().get(0).getCount() - o2.getNodeModels().get(0).getCount();
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -174,7 +175,7 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
             if (classOrMedical) {
                 integer = epidemicPersonRepository.countAllByMultiTenancyAndConfirmedDiagnosis(districtCode, a.getId());
             } else {
-                integer = epidemicPersonRepository.countAllByMultiTenancyAndMedicalCondition(districtCode, dataSourceId);
+                integer = epidemicPersonRepository.countAllByMultiTenancyAndMedicalCondition(districtCode, a.getId());
             }
             epidemicTotalNodeModel.setCount(integer);
             epidemicTotalNodeModels.add(epidemicTotalNodeModel);
@@ -204,7 +205,7 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
             if (classOrMedical) {
                 integer = epidemicPersonRepository.countAllByMultiTenancyAndVillageIdAndConfirmedDiagnosis(districtCode, plotId, a.getId());
             } else {
-                integer = epidemicPersonRepository.countAllByMultiTenancyAndVillageIdAndMedicalCondition(districtCode, plotId, dataSourceId);
+                integer = epidemicPersonRepository.countAllByMultiTenancyAndVillageIdAndMedicalCondition(districtCode, plotId, a.getId());
             }
             epidemicTotalNodeModel.setCount(integer);
             epidemicTotalNodeModels.add(epidemicTotalNodeModel);
@@ -247,7 +248,9 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
             // epidemicTotalStatisticModel.set
         });
         // epidemicTotalStatisticModels.stream().sorted(Comparator.comparing(a -> a.getNodeModels().stream().sorted(Comparator.comparing(EpidemicTotalNodeModel::getCount))))
-        Collections.sort(epidemicTotalStatisticModels, new CompareConfirmed());
-        return epidemicTotalStatisticModels;
+//        Collections.sort(epidemicTotalStatisticModels, new CompareConfirmed());
+        List<EpidemicTotalStatisticModel> collect = epidemicTotalStatisticModels.stream().sorted(Comparator.comparing(a -> a.getNodeModels().get(0).getCount())).collect(Collectors.toList());
+        Collections.reverse(collect);
+        return collect;
     }
 }

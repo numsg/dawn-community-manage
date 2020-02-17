@@ -6,9 +6,9 @@ spring:
     name: dawn-community-manage
 
   datasource:
-    url: jdbc:postgresql://127.0.0.1:5432/dawn-db-10 #业务数据库访问url
+    url: jdbc:postgresql://116.62.205.14:30030/dawn-db #业务数据库访问url
     username: postgres    #业务数据库访问用户名
-    password: 123456 #业务数据库访问用户密码
+    password: postgres #业务数据库访问用户密码
     driver-class-name: org.postgresql.Driver #数据库访问驱动名称
     tomcat:   #默认使用tomcat连接池配置
       max-idle:  10 #数据库连接池允许的最大空闲连接数
@@ -33,7 +33,7 @@ logging:
   config: classpath:logback-spring.xml
 
 access:
-  data-collection: http://ncov.gsafety.com/api
+  data-collection: http://39.105.209.108:8090/api
 # app相关配置
 app:
   multiTenancy: 123456

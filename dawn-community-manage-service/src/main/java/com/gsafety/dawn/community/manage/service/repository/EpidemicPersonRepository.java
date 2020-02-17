@@ -53,4 +53,9 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
     // 统计-小区-医疗情况
     @Query()
     Integer countAllByMultiTenancyAndVillageIdAndMedicalCondition(String districtCode , String villageId  ,String medicalId);
+
+    // 根据name和phone确定人员是否存在
+    @Query()
+    List<EpidemicPersonEntity> queryAllByNameAndMobileNumber(String name , String mobile);
+
 }

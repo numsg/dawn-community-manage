@@ -1,7 +1,6 @@
 package com.gsafety.dawn.community.manage.service.serviceimpl;
 
 import com.gsafety.dawn.community.manage.contract.model.ModifyMedicalTreatmentModel;
-import com.gsafety.dawn.community.manage.contract.model.comparator.CompareConfirmed;
 import com.gsafety.dawn.community.manage.contract.model.total.*;
 import com.gsafety.dawn.community.manage.contract.model.EpidemicPersonModel;
 import com.gsafety.dawn.community.manage.contract.service.EpidemicPersonService;
@@ -15,6 +14,8 @@ import com.gsafety.dawn.community.manage.service.repository.DSourceDataRepositor
 import com.gsafety.dawn.community.manage.service.repository.DataSourceRepository;
 import com.gsafety.dawn.community.manage.service.repository.EpidemicPersonRepository;
 import fr.opensagres.xdocreport.core.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +37,8 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
     private DSourceDataMapper dSourceDataMapper;
     @Autowired
     private DataSourceRepository dataSourceRepository;
-    @Autowired
-    private DataSourceMapper dataSourceMapper;
+
+    Logger logger = LoggerFactory.getLogger(this.getClass());
     // 诊断情况id
     private static final String diagnosisId = "97629e08-cb68-489d-8f62-8c8467358d69";
     // 诊断为确认
@@ -51,25 +52,37 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
 
     @Override
     public EpidemicPersonModel addOneEpidemicPerson(EpidemicPersonModel epidemicPersonModel) {
+        List<EpidemicPersonEntity> epidemicPersonEntities = epidemicPersonRepository.queryAllByNameAndMobileNumber(epidemicPersonModel.getName(), epidemicPersonModel.getMobileNumber());
+        if (!CollectionUtils.isEmpty(epidemicPersonEntities)) {
+            logger.info("新增失败，重点关注人员名称和电话已存在");
+            return null;
+        }
         EpidemicPersonEntity epidemicPersonEntity = epidemicPersonMapper.modelToEntity(epidemicPersonModel);
         return epidemicPersonMapper.entityToModel(epidemicPersonRepository.save(epidemicPersonEntity));
     }
 
     @Override
     public EpidemicPersonModel modifyOneEpidemicPerson(String id, EpidemicPersonModel epidemicPersonModel) {
-        EpidemicPersonModel result = new EpidemicPersonModel();
-        if (id == null || !id.equals(epidemicPersonModel.getId()) || !epidemicPersonRepository.existsById(id)) {
-            return result;
+        if (StringUtils.isEmpty(epidemicPersonModel.getId()) || !epidemicPersonRepository.existsById(id)) {
+            logger.error("修改失败，重点关注人员不存在");
+            return null;
         }
-        if (0 < epidemicPersonRepository.updateEpidemicPerson(epidemicPersonModel.getId(), epidemicPersonModel.getName(),
-                epidemicPersonModel.getGender(), epidemicPersonModel.getAge(), epidemicPersonModel.getVillageId(), epidemicPersonModel.getTemperature(),
-                epidemicPersonModel.getDiagnosisSituation(), epidemicPersonModel.getMedicalCondition(), epidemicPersonModel.getSpecialSituation(),
-                epidemicPersonModel.getSubmitTime(), epidemicPersonModel.getDiseaseTime(), epidemicPersonModel.getUpdateTime(), epidemicPersonModel.getNote(),
-                epidemicPersonModel.getMultiTenancy(), epidemicPersonModel.getExpendProperty(), epidemicPersonModel.getMobileNumber())) {
-            result = epidemicPersonMapper.entityToModel(epidemicPersonRepository.getOne(id));
-        }
-
-        return result;
+        epidemicPersonModel.setUpdateTime(new Date());
+        EpidemicPersonEntity epidemicPersonEntity = epidemicPersonRepository.saveAndFlush(epidemicPersonMapper.modelToEntity(epidemicPersonModel));
+        return epidemicPersonMapper.entityToModel(epidemicPersonEntity);
+        //        if (id == null || !id.equals(epidemicPersonModel.getId()) || !epidemicPersonRepository.existsById(id)) {
+        //            logger.error("修改失败，重点关注人员不存在");
+        //            return null;
+        //        }
+        //        EpidemicPersonModel result = new EpidemicPersonModel();
+        //        if (0 < epidemicPersonRepository.updateEpidemicPerson(epidemicPersonModel.getId(), epidemicPersonModel.getName(),
+        //                epidemicPersonModel.getGender(), epidemicPersonModel.getAge(), epidemicPersonModel.getVillageId(), epidemicPersonModel.getTemperature(),
+        //                epidemicPersonModel.getDiagnosisSituation(), epidemicPersonModel.getMedicalCondition(), epidemicPersonModel.getSpecialSituation(),
+        //                epidemicPersonModel.getSubmitTime(), epidemicPersonModel.getDiseaseTime(), epidemicPersonModel.getUpdateTime(), epidemicPersonModel.getNote(),
+        //                epidemicPersonModel.getMultiTenancy(), epidemicPersonModel.getExpendProperty(), epidemicPersonModel.getMobileNumber())) {
+        //            result = epidemicPersonMapper.entityToModel(epidemicPersonRepository.getOne(id));
+        //        }
+        //        return result;
     }
 
     @Override

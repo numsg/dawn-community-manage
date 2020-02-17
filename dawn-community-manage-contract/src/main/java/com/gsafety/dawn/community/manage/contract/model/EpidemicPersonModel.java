@@ -19,6 +19,23 @@ public class EpidemicPersonModel {
     private String note;
     private String multiTenancy;
     private String expendProperty;
+    // + 是否接触
+    private boolean isContact;
+    // + 确诊情况--数据字典(分类诊疗意见)
+    private String confirmedDiagnosis;
+    // + 预留字段重点人员的计算逻辑
+    private String reserveField;
+    // + 是否来源于手机端
+    private boolean isByphone;
+    // + 操作人
+    private String operator;
+    // + 楼栋
+    private String building;
+    // + 单元
+    private String unitNumber;
+    // + 房间号
+    private String roomNumber;
+
 
     public EpidemicPersonModel() {
         //无参构造
@@ -170,4 +187,69 @@ public class EpidemicPersonModel {
     public void setExpendProperty(String expendProperty) {
         this.expendProperty = expendProperty;
     }
+
+    public boolean isContact() {
+        return isContact;
+    }
+
+    public void setContact(boolean contact) {
+        isContact = contact;
+    }
+
+    public String getConfirmedDiagnosis() {
+        return confirmedDiagnosis;
+    }
+
+    public void setConfirmedDiagnosis(String confirmedDiagnosis) {
+        this.confirmedDiagnosis = confirmedDiagnosis;
+    }
+
+    public String getReserveField() {
+        return reserveField;
+    }
+
+    public void setReserveField(String reserveField) {
+        this.reserveField = reserveField;
+    }
+
+    public boolean isByphone() {
+        return isByphone;
+    }
+
+    public void setByphone(boolean byphone) {
+        isByphone = byphone;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
+    public String getBuilding() {
+        return building;
+    }
+
+    public void setBuilding(String building) {
+        this.building = building;
+    }
+
+    public String getUnitNumber() {
+        return unitNumber;
+    }
+
+    public void setUnitNumber(String unitNumber) {
+        this.unitNumber = unitNumber;
+    }
+
+    public String getRoomNumber() {
+        return roomNumber;
+    }
+
+    public void setRoomNumber(String roomNumber) {
+        this.roomNumber = roomNumber;
+    }
+
 }

@@ -1,18 +1,13 @@
 package com.gsafety.dawn.community.manage.service.serviceimpl;
 
-import com.gsafety.dawn.community.common.util.DateUtil;
-import com.gsafety.dawn.community.common.util.ExcelUtil;
-import com.gsafety.dawn.community.common.util.IDCardUtil;
-import com.gsafety.dawn.community.common.util.StringUtil;
+import com.gsafety.dawn.community.common.util.*;
 import com.gsafety.dawn.community.manage.contract.model.BasicInformationModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyStatisticModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleFilterModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
-import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
 import com.gsafety.dawn.community.manage.contract.model.total.DailyStatisticPageModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.model.total.PendingInvestigatModel;
-import com.gsafety.dawn.community.manage.contract.model.total.PlotLinkageModel;
 import com.gsafety.dawn.community.manage.contract.service.BasicInformationService;
 import com.gsafety.dawn.community.manage.contract.service.DailyTroubleshootRecordService;
 import com.gsafety.dawn.community.manage.contract.service.refactor.TroubleshootRecordService;
@@ -25,12 +20,15 @@ import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
 import com.gsafety.dawn.community.manage.service.entity.DailyTroubleshootRecordEntity;
 import com.gsafety.dawn.community.manage.service.entity.EpidemicPersonEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.PersonBaseEntity;
+import com.gsafety.dawn.community.manage.service.entity.refactor.TroubleshootHistoryRecordEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.TroubleshootRecordEntity;
 import com.gsafety.dawn.community.manage.service.repository.BasicInformationRepository;
 import com.gsafety.dawn.community.manage.service.repository.DSourceDataRepository;
 import com.gsafety.dawn.community.manage.service.repository.DailyTroubleshootRecordRepository;
 import com.gsafety.dawn.community.manage.service.repository.EpidemicPersonRepository;
-import org.apache.commons.lang3.StringUtils;
+import com.gsafety.dawn.community.manage.service.repository.refactor.PersonBaseRepository;
+import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootHistoryRecordRepository;
+import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootRecordRepository;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -47,6 +45,8 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -76,6 +76,15 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
     @Autowired
     private TroubleshootRecordMapper troubleshootRecordMapper;
 
+    @Autowired
+    private PersonBaseRepository personBaseRepository;
+
+    @Autowired
+    private TroubleshootRecordRepository troubleshootRecordRepository;
+
+    @Autowired
+    private TroubleshootHistoryRecordRepository troubleshootHistoryRecordRepository;
+
     /**
      * The Record mapper.
      */
@@ -93,6 +102,9 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
      */
     @Autowired
     EpidemicPersonRepository epidemicPersonRepository;
+
+    @Autowired
+    private CommonUtil commonUtil;
 
     // 社区id
     @Value("${app.commId}")
@@ -264,72 +276,73 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
      */
     // 解析每个tab中的内容
     public List<DailyTroubleshootRecordEntity> parseSheetRecord(Sheet sheet) {
-        if (sheet == null) {
-            logger.error("tab页内容为空");
-            return Collections.emptyList();
-        }
-        List<DailyTroubleshootRecordEntity> recordEntities = new ArrayList<>();
-        List<TroubleshootRecordEntity> troubleshootRecordEntities = new ArrayList<>();
-        int endRow = sheet.getPhysicalNumberOfRows();
-        int firstSheetNumber = sheet.getFirstRowNum();
-        for (int rowNum = firstSheetNumber + 1; rowNum < endRow; rowNum++) {
-            Row row = sheet.getRow(rowNum);
+        try {
+            if (sheet == null) {
+                logger.error("tab页内容为空");
+                return Collections.emptyList();
+            }
+            List<DailyTroubleshootRecordEntity> recordEntities = new ArrayList<>();
+            List<TroubleshootRecordEntity> troubleshootRecordEntities = new ArrayList<>();
+            int endRow = sheet.getPhysicalNumberOfRows();
+            int firstSheetNumber = sheet.getFirstRowNum();
+            Date day = new Date();
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+            String now = df.format(day);
+            for (int rowNum = firstSheetNumber + 1; rowNum < endRow; rowNum++) {
+                Row row = sheet.getRow(rowNum);
 
-            // 小区在系统不存在，不允许导入
-            String plot = ExcelUtil.convertCellValueToString(row.getCell(6));
+                // 小区在系统不存在，不允许导入
+                String plot = ExcelUtil.convertCellValueToString(row.getCell(6));
 
-            List<DSourceDataEntity> dataList = dSourceDataRepository.findAllByName(plot);
-            if (dataList.isEmpty())
-                continue;
-            plot = dataList.get(0).getId();
+                List<DSourceDataEntity> dataList = dSourceDataRepository.findAllByName(plot);
+                if (dataList.isEmpty())
+                    continue;
+                plot = dataList.get(0).getId();
 
-            TroubleshootRecordEntity troubleshootRecordEntity = new TroubleshootRecordEntity();
-            PersonBaseEntity personBaseEntity = new PersonBaseEntity();
+                TroubleshootRecordEntity troubleshootRecord = new TroubleshootRecordEntity();
+                PersonBaseEntity personBase = new PersonBaseEntity();
 
-            // ID
-            troubleshootRecordEntity.setId(StringUtil.genUUID());
-            // 时间
-            troubleshootRecordEntity.setCreateDate(TS);
-            // 备注
-            int iNote = random.nextInt(notes.length-1);
-            troubleshootRecordEntity.setNote(notes[iNote]);
-            // plot
-            troubleshootRecordEntity.setPlot(plot);
+                // ID
+                troubleshootRecord.setId(StringUtil.genUUID());
+                // 时间
+                troubleshootRecord.setCreateTime(new Date());
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+                troubleshootRecord.setCreateDate(format.parse(format.format(troubleshootRecord.getCreateTime())));
+                // 备注
+                troubleshootRecord.setNote(ID_CARD_UTIL.randomOne(notes));
+                // plot
+                troubleshootRecord.setPlot(plot);
+                String address = ExcelUtil.convertCellValueToString(row.getCell(5));
+                String name = ExcelUtil.convertCellValueToString(row.getCell(0));
 
-
-            String address = ExcelUtil.convertCellValueToString(row.getCell(5));
-            String name = ExcelUtil.convertCellValueToString(row.getCell(0));
-
-            // personBaseEntity
-            // id
-            personBaseEntity.setId(StringUtil.genUUID());
-            // code
-            personBaseEntity.setCode(StringUtil.genUUID());
-            // 身份证
-            personBaseEntity.setIdentificationNumber(ID_CARD_UTIL.getRandomID());
-            // 手机号码
-            String phone = ExcelUtil.convertCellValueToString(row.getCell(4));
-            personBaseEntity.setPhone(phone);
-            // 地址
-            personBaseEntity.setAddress(address);
-            // 性别
-            int iSex = random.nextInt(notes.length-1);
-            System.out.println("iSex:" + iSex);
-            personBaseEntity.setSex(sex[iSex]);
-            // 其它
-            personBaseEntity.setOther(notes[iNote]);
-            // isByphone
-            personBaseEntity.setIsByPhone(false);
-            // name
-            personBaseEntity.setName(name);
-            // multiTenancy and district code
-            personBaseEntity.setDistrictCode("420115001012");
-            // 江夏
-            personBaseEntity.setMultiTenancy("420115001012");
-            personBaseEntity.setDistrictCode("420000/420100/420115/420115001/420115001012");
+                // personBase
+                // id
+                personBase.setId(StringUtil.genUUID());
+                // code
+                personBase.setCode(StringUtil.genUUID());
+                // 身份证
+                personBase.setIdentificationNumber(ID_CARD_UTIL.getRandomID());
+                // 手机号码
+                String phone = ExcelUtil.convertCellValueToString(row.getCell(4));
+                personBase.setPhone(phone);
+                // 地址
+                personBase.setAddress(address);
+                // 性别
+//            personBase.setSex(ID_CARD_UTIL.randomOne(sex));
+                // 其它
+                personBase.setOther(ID_CARD_UTIL.randomOne(notes));
+                // isByphone
+                personBase.setIsByPhone(false);
+                // name
+                personBase.setName(name);
+                // multiTenancy and district code
+                personBase.setDistrictCode("420115001012");
+                // 江夏
+                personBase.setMultiTenancy("420115001012");
+                personBase.setDistrictCode("420000/420100/420115/420115001/420115001012");
 
 
-            // 其它症状
+                // 其它症状
 //            String other = ExcelUtil.convertCellValueToString(row.getCell(12));
 //            String dataIds = getDataIds(other);
 //            if(dataIds != null){
@@ -337,7 +350,7 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 //            }
 
 
-            // 分类诊疗意见
+                // 分类诊疗意见
 //            String opinion = ExcelUtil.convertCellValueToString(row.getCell(13));
 //            String dataIdO = getDataIds(opinion);
 //            if(dataIdO != null){
@@ -347,13 +360,13 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 
 //            String idCard = ExcelUtil.convertCellValueToString(row.getCell(1));
 //            String sex = ExcelUtil.convertCellValueToString(row.getCell(2));
-            String age = ExcelUtil.convertCellValueToString(row.getCell(3));
+                String age = ExcelUtil.convertCellValueToString(row.getCell(3));
 
 
 //
-            String build = ExcelUtil.convertCellValueToString(row.getCell(7));
-            String unit = ExcelUtil.convertCellValueToString(row.getCell(8));
-            String roomNo = ExcelUtil.convertCellValueToString(row.getCell(9));
+                String build = ExcelUtil.convertCellValueToString(row.getCell(7));
+                String unit = ExcelUtil.convertCellValueToString(row.getCell(8));
+                String roomNo = ExcelUtil.convertCellValueToString(row.getCell(9));
 //            String tempture = ExcelUtil.convertCellValueToString(row.getCell(10));
 //            String contact = ExcelUtil.convertCellValueToString(row.getCell(11));
 
@@ -367,44 +380,39 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 
 //            DailyTroubleshootRecordEntity recordEntity = new DailyTroubleshootRecordEntity();
 
-            // building
-            troubleshootRecordEntity.setBuilding(build);
-            // unitnumber
-            troubleshootRecordEntity.setUnitNumber(unit);
-            // roomNo
-            troubleshootRecordEntity.setRoomNo(roomNo);
-            // is phone
-            troubleshootRecordEntity.setIsByPhone(false);
-            // istempture
-            troubleshootRecordEntity.setIsExceedTemp(random.nextBoolean());
-            // isLeaveArea
-            troubleshootRecordEntity.setIsLeaveArea(random.nextBoolean());
-            // isContact
-            boolean isContact = true;
-            if (iNote > 1)
-                isContact = false;
-            troubleshootRecordEntity.setIsContact(isContact);
-            // personBaseId personBaseEntity
-            troubleshootRecordEntity.setPersonBaseId(personBaseEntity.getId());
-            troubleshootRecordEntity.setPersonBase(personBaseEntity);
-            // age
-            troubleshootRecordEntity.setAge(Integer.valueOf(age));
-            // 确诊情况
-            int iDiagonsis = random.nextInt(diagonsis.length - 1);
-            System.out.println("iSex:" + iDiagonsis);
-            troubleshootRecordEntity.setConfirmed_diagnosis(diagonsis[iDiagonsis]);
-            // 其它症状
-            int iSymoptos = random.nextInt(otherSymptoms.length-1);
-            System.out.println("iSex:" + iSymoptos);
-            troubleshootRecordEntity.setOtherSymptoms(otherSymptoms[iSymoptos]);
-            // 分类诊疗意见
-            int iMedicalOpinions = random.nextInt(medicalOpinions.length-1);
-            System.out.println("iSex:" + iSex);
-            troubleshootRecordEntity.setMedicalOpinion(medicalOpinions[iMedicalOpinions]);
-            // 多租户 和 district_code
-            // 江夏
-            troubleshootRecordEntity.setDistrictCode("420115001012");
-            troubleshootRecordEntity.setMultiTenancy("420115001012");
+                // building
+                troubleshootRecord.setBuilding(build);
+                // unitnumber
+                troubleshootRecord.setUnitNumber(unit);
+                // roomNo
+                troubleshootRecord.setRoomNo(roomNo);
+                // is phone
+                troubleshootRecord.setIsByPhone(false);
+                // istempture
+                troubleshootRecord.setIsExceedTemp(random.nextBoolean());
+                // isLeaveArea
+                troubleshootRecord.setIsLeaveArea(random.nextBoolean());
+                // isContact
+                boolean isContact = false;
+
+                if (ID_CARD_UTIL.randomOne(sex) == "3f265ff3-75b8-49f1-9669-4506535a500c")
+                    isContact = true;
+                troubleshootRecord.setIsContact(isContact);
+                // personBaseId personBase
+                troubleshootRecord.setPersonBaseId(personBase.getId());
+                troubleshootRecord.setPersonBase(personBase);
+                // age
+                troubleshootRecord.setAge(Integer.valueOf(age));
+                // 确诊情况ID_CARD_UTIL.randomOne(notes)
+                troubleshootRecord.setConfirmed_diagnosis(ID_CARD_UTIL.randomOne(diagonsis));
+                // 其它症状
+                troubleshootRecord.setOtherSymptoms(ID_CARD_UTIL.randomOne(otherSymptoms));
+                // 分类诊疗意见
+                troubleshootRecord.setMedicalOpinion(ID_CARD_UTIL.randomOne(medicalOpinions));
+                // 多租户 和 district_code
+                // 江夏
+                troubleshootRecord.setDistrictCode("420115001012");
+                troubleshootRecord.setMultiTenancy("420115001012");
 
 
 //            recordEntity.setId(UUID.randomUUID().toString());
@@ -421,11 +429,11 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 //                recordEntity.setAge(Integer.valueOf(age));
 //            }
 //
-//            if (sex == null || "".equals(sex)) {
-//                recordEntity.setSex(noSexId);
-//            } else {
-//                recordEntity.setSex(sex.equals("男") ? maleId : femaleId);
-//            }
+                if (sex == null || "".equals(sex)) {
+                    personBase.setSex(noSexId);
+                } else {
+                    personBase.setSex(sex.equals("男") ? maleId : femaleId);
+                }
 //            if (contact.equals("t")) {
 //                recordEntity.setContact(true);
 //            } else {
@@ -447,12 +455,27 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 //            recordEntity.setPhone(phone);
 //            // 体温大于37.5 以及 已有相同数据不添加 未过滤
 //            recordEntities.add(recordEntity);
-            troubleshootRecordService.add(troubleshootRecordMapper.entityToModel(troubleshootRecordEntity));
+//            troubleshootRecordService.add(troubleshootRecord);
+                personBaseRepository.save(personBase);
+                troubleshootRecordRepository.save(troubleshootRecord);
+
+                TroubleshootHistoryRecordEntity troubleshootHistoryRecordEntity = new TroubleshootHistoryRecordEntity();
+                troubleshootHistoryRecordEntity = commonUtil.mapper(troubleshootRecord, troubleshootHistoryRecordEntity);
+                troubleshootHistoryRecordEntity.setId(UUID.randomUUID().toString());
+                troubleshootHistoryRecordEntity.setPersonBase(null);
+                troubleshootHistoryRecordEntity.setPersonBaseId(personBase.getId());
+                troubleshootHistoryRecordRepository.save(troubleshootHistoryRecordEntity);
+                troubleshootHistoryRecordRepository.save(troubleshootHistoryRecordEntity);
+            }
+            return recordEntities;
+
+        } catch (ParseException e) {
+            logger.error("parse error", e, e.getMessage(), e.getCause());
+            return null;
         }
-        return recordEntities;
     }
 
-    /**
+        /**
      * Add epid mic epidemic person entity.
      *
      * @param dailyTroubleshootRecordEntity the daily troubleshoot record entity

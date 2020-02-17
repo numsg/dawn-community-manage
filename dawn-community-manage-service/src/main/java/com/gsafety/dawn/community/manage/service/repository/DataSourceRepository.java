@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 /**
  * The interface  data source  repository.
@@ -41,4 +42,8 @@ public interface DataSourceRepository  extends JpaRepository<DataSourceEntity,St
 
     @Query
     DataSourceEntity queryByDescription(String districtCode);
+
+    // 根据districtCode和tag查询数据源
+    @Query()
+    List<DataSourceEntity> queryAllByDescription(String districtCode);
 }

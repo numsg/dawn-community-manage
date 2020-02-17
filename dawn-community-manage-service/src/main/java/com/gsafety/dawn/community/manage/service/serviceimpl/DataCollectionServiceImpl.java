@@ -89,6 +89,10 @@ public class DataCollectionServiceImpl {
 
     private String url = "/changde/search";
 
+    private static final String keyNames[]= { "id","name","phone","sex","currentVillage","building","remark",
+            "roomNumber","unit","age","medicalAdvice","createTime","touchPersonIsolation","fever",
+            "symptom","communityCode","wuhanAddress","reporterName","reporterPhone","idNumber"};
+
     // 杨桥湖社区id
     // private static final String communityDataSourceId = "a2e01f0e-6c86-4a41-bcf3-c07c1ffa2f82";
     // 其他状况id
@@ -159,7 +163,7 @@ public class DataCollectionServiceImpl {
         }
     }
 
-    public Boolean TraversalAndInsertData(RequestModel requestModel) {
+    public Boolean TraversalAndInsertData(RequestModel requestModel) throws IllegalAccessException {
         Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
         if (map.get("data") == null || map.get("success").equals(false)) {
             return false;
@@ -171,20 +175,9 @@ public class DataCollectionServiceImpl {
             return false;
         }
 
+        List<String> keyList=new ArrayList<>();
+        Collections.addAll(keyList,keyNames);
         for (Object obj : list) {
-         //   Class cls=obj.getClass();
-         //   Field[] fields = cls.getDeclaredFields();
-          //  for(int i=0; i<fields.length; i++){
-          //      Field f = fields[i];
-          //      f.setAccessible(true);
-                //System.out.println("属性名:" + f.getName() + " 0:" + f.get(obj));
-                // 判断字段是否在keyNames数组（在表中有对应的字段）中，不在的放到拓展字段中。
-          //  }
-            String keyNames[]= { "id","name","phone","sex","currentVillage","building","remark",
-            "roomNumber","unit","age","medicalAdvice","createTime","touchPersonIsolation","fever",
-            "symptom","communityCode","residence"};
-
-
             Map objMap = JsonUtil.fromJson(toJson(obj), Map.class);
             Object recordId = objMap.get("id");
             Object personName = objMap.get("name");
@@ -240,14 +233,30 @@ public class DataCollectionServiceImpl {
                 Random random = new Random();
                 record.setPlot(plots.get(random.nextInt(plots.size())).getId());
             }
+            if (objMap.get("reporterName")!=null){
+                record.setReporterName(objMap.get("reporterName").toString());
+            }
+            if (objMap.get("reporterPhone")!=null){
+                record.setReporterPhone(objMap.get("reporterPhone").toString());
+            }
+            // 将其他字段放到拓展属性里
+            Map<String,Object> temp =JsonUtil.fromJson(toJson(obj), Map.class);
+            Map<String,Object> expendPropertyMap=new HashMap<>();
+
+            for(Map.Entry<String,Object> entry : temp.entrySet()) {
+                if (!keyList.contains(entry.getKey())){
+                    expendPropertyMap.put(entry.getKey(),entry.getValue());
+                }
+            }
+            record.setExpendProperty(JsonUtil.toJson(expendPropertyMap));
+
             PersonBase personBase = new PersonBase();
-//            if (objMap.get("residence") != null) {
-//                personBase.setAddress(objMap.get("residence").toString());
-//            }
+            if (objMap.get("residence") != null) {
+                personBase.setAddress(objMap.get("residence").toString());
+            }
             if (objMap.get("wuhanAddress") != null) {
                 personBase.setAddress(objMap.get("wuhanAddress").toString());
             }
-
             if (sex == null) {
                 personBase.setSex(noSexId);
             } else {

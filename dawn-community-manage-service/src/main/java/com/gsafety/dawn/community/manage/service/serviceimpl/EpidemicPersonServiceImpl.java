@@ -53,12 +53,18 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
     @Override
     public EpidemicPersonModel addOneEpidemicPerson(EpidemicPersonModel epidemicPersonModel) {
         List<EpidemicPersonEntity> epidemicPersonEntities = epidemicPersonRepository.queryAllByNameAndMobileNumber(epidemicPersonModel.getName(), epidemicPersonModel.getMobileNumber());
-        if (!CollectionUtils.isEmpty(epidemicPersonEntities)) {
-            logger.info("新增失败，重点关注人员名称和电话已存在");
-            return null;
+        EpidemicPersonModel result = null;
+        if (CollectionUtils.isEmpty(epidemicPersonEntities)) {
+            logger.info("列表中无该重点关注人员，新增重点关注人员");
+            epidemicPersonModel.setUpdateTime(new Date());
+            epidemicPersonModel.setSubmitTime(new Date());
+            EpidemicPersonEntity epidemicPersonEntity = epidemicPersonMapper.modelToEntity(epidemicPersonModel);
+            result = epidemicPersonMapper.entityToModel(epidemicPersonRepository.save(epidemicPersonEntity));
+        } else {
+            logger.info("列表中存在该重点关注人员，修改数据");
+            result = modifyOneEpidemicPerson(epidemicPersonModel.getId(), epidemicPersonModel);
         }
-        EpidemicPersonEntity epidemicPersonEntity = epidemicPersonMapper.modelToEntity(epidemicPersonModel);
-        return epidemicPersonMapper.entityToModel(epidemicPersonRepository.save(epidemicPersonEntity));
+        return result;
     }
 
     @Override

@@ -80,7 +80,7 @@ public class EpidemicPersonEntity {
     private String reserveField;
     // + 是否来源于手机端
     @Column(name = "is_by_phone")
-    private boolean isByphone;
+    private boolean isByPhone;
     // + 操作人
     @Column(name = "operator")
     private String operator;
@@ -246,12 +246,12 @@ public class EpidemicPersonEntity {
         this.reserveField = reserveField;
     }
 
-    public boolean isByphone() {
-        return isByphone;
+    public boolean isByPhone() {
+        return isByPhone;
     }
 
-    public void setByphone(boolean byphone) {
-        isByphone = byphone;
+    public void setByPhone(boolean byPhone) {
+        isByPhone = byPhone;
     }
 
     public String getOperator() {

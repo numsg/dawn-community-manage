@@ -354,8 +354,8 @@ public class EpidemicPersonServiceImpl extends DataSourceShareIds implements Epi
             // reserveField
             //
             // isByphone
-            epidemicPersonModel.setByphone(troubleshootRecord.getIsByPhone());
-            // operator
+            epidemicPersonModel.setByPhone(troubleshootRecord.getIsByPhone());
+            // operatorP
             //
             // building
             epidemicPersonModel.setBuilding(troubleshootRecord.getBuilding());

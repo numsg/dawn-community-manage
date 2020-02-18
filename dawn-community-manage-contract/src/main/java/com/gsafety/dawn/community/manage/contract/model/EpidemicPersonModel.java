@@ -26,7 +26,7 @@ public class EpidemicPersonModel {
     // + 预留字段重点人员的计算逻辑
     private String reserveField;
     // + 是否来源于手机端
-    private boolean isByphone;
+    private boolean isByPhone;
     // + 操作人
     private String operator;
     // + 楼栋
@@ -212,12 +212,12 @@ public class EpidemicPersonModel {
         this.reserveField = reserveField;
     }
 
-    public boolean isByphone() {
-        return isByphone;
+    public boolean isByPhone() {
+        return isByPhone;
     }
 
-    public void setByphone(boolean byphone) {
-        isByphone = byphone;
+    public void setByPhone(boolean byPhone) {
+        isByPhone = byPhone;
     }
 
     public String getOperator() {

@@ -1,5 +1,6 @@
 package com.gsafety.dawn.community.manage.contract.service.refactor;
 
+import com.gsafety.dawn.community.manage.contract.model.refactor.CommunityBriefModel;
 import com.gsafety.dawn.community.manage.contract.model.refactor.PlotBuildingUnitStatistics;
 import com.gsafety.dawn.community.manage.contract.model.refactor.ReportingStaffStatistics;
 import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
@@ -27,4 +28,6 @@ public interface TroubleshootRecordService {
      */
     List<PlotBuildingUnitStatistics> getPlotBuildingUnitStatistics(String multiTenancy);
 
+
+    CommunityBriefModel getCommunityDailyBriefing(String multiTenancy);
 }

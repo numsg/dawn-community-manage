@@ -1,16 +1,23 @@
 package com.gsafety.dawn.community.manage.service.serviceimpl.refactor;
 
 import com.gsafety.dawn.community.common.util.CommonUtil;
+import com.gsafety.dawn.community.common.util.DateUtil;
+import com.gsafety.dawn.community.common.util.NumberUtil;
 import com.gsafety.dawn.community.common.util.StringUtil;
 import com.gsafety.dawn.community.manage.contract.model.refactor.PlotBuildingUnitStatistics;
 import com.gsafety.dawn.community.manage.contract.model.refactor.ReportingStaffStatistics;
 import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
 import com.gsafety.dawn.community.manage.contract.service.EpidemicPersonService;
+import com.gsafety.dawn.community.manage.contract.model.refactor.*;
 import com.gsafety.dawn.community.manage.contract.service.refactor.TroubleshootRecordService;
 import com.gsafety.dawn.community.manage.service.datamappers.refactor.PersonBaseMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.refactor.ReportingStaffMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.refactor.TroubleshootRecordMapper;
+import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
+import com.gsafety.dawn.community.manage.service.entity.DataSourceEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.*;
+import com.gsafety.dawn.community.manage.service.repository.DSourceDataRepository;
+import com.gsafety.dawn.community.manage.service.repository.DataSourceRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootHistoryRecordRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.PersonBaseRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootRecordRepository;
@@ -51,10 +58,18 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
     private ReportingStaffMapper reportingStaffMapper;
 
     @Autowired
+    private DataSourceRepository dataSourceRepository;
+
+    @Autowired
+    private DSourceDataRepository dSourceDataRepository;
+
+    @Autowired
     private CommonUtil commonUtil;
 
     @Autowired
     private EpidemicPersonService epidemicPersonService;
+    // 分类诊疗医疗意见下的  无
+   private  static final String NoMedicalOption="8470e8e9-90ba-484b-8f33-148a1f5028fc";
 
     // 排查记录历史表保留周期
     @Value("${app.saveCycle}")
@@ -227,5 +242,59 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             logger.error("getBuildingUnitStatistics error", e, e.getMessage(), e.getCause());
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    public CommunityBriefModel getCommunityDailyBriefing(String multiTenancy) {
+        CommunityBriefModel result=new CommunityBriefModel();
+        List<DataSourceEntity> communities=dataSourceRepository.queryAllByDescription(multiTenancy);
+        // 查询的结果正常情况是一个
+        if (communities.isEmpty()){
+            return null;
+        }
+        List<DSourceDataEntity> plots=dSourceDataRepository.findAllByDataSourceId(communities.get(0).getId());
+        result.setPlotTotal(plots.size());
+        List<PlotBriefModel> plotBriefs=new ArrayList<>();
+        Integer troubleshootTotal=0;
+        Integer dailyTroubleshootTotal=0;
+        Integer abnormalTotal=0;
+        for (DSourceDataEntity plot : plots) {
+            PlotBriefModel plotBriefModel=new PlotBriefModel();
+            Integer plotDailyTroubleshootTotal=0;
+            Integer plotAbnormalTotal=0;
+            String rate="0";
+            List<TroubleshootRecordEntity> records=troubleshootRecordRepository.queryAllByPlot(plot.getId());
+            Integer plotTroubleshootTotal=records.size();
+            if (!records.isEmpty()){
+                Date date= DateUtil.getDayStartDate();
+                // 当天上报记录
+                List<TroubleshootRecordEntity> dailyRecords= records.stream().filter(f -> f.getCreateDate().getTime() == date.getTime()).collect(Collectors.toList());
+                // 当日填报人数
+                plotDailyTroubleshootTotal= dailyRecords.size();
+                // 异常人数
+                plotAbnormalTotal= dailyRecords.stream().filter(f -> f.getIsExceedTemp() || !f.getMedicalOpinion().equals(NoMedicalOption)).collect(Collectors.toList()).size();
+                //填报率
+                String doubleNumber=NumberUtil.divide(Integer.toString(plotDailyTroubleshootTotal), Integer.toString(plotTroubleshootTotal));
+                rate= NumberUtil.multiply(doubleNumber,Integer.toString(100)) +"%";
+            }
+            plotBriefModel.setPlotId(plot.getId());
+            plotBriefModel.setPlotName(plot.getName());
+            plotBriefModel.setPlotTroubleshootTotal(plotTroubleshootTotal);
+            plotBriefModel.setPlotDailyTroubleshootTotal(plotDailyTroubleshootTotal);
+            plotBriefModel.setTroubleshootRate(rate);
+
+            troubleshootTotal+=plotTroubleshootTotal;
+            dailyTroubleshootTotal+=plotDailyTroubleshootTotal;
+            abnormalTotal+=plotAbnormalTotal;
+            plotBriefs.add(plotBriefModel);
+        }
+        result.setCommunityCode(multiTenancy);
+        result.setCommunityName(communities.get(0).getName());
+        result.setAbnormalTotal(troubleshootTotal);
+        result.setDailyTroubleshootTotal(dailyTroubleshootTotal);
+        result.setTroubleshootTotal(abnormalTotal);
+        result.setPlotBriefModels(plotBriefs);
+
+        return result;
     }
 }

@@ -32,4 +32,8 @@ public interface TroubleshootRecordRepository extends JpaRepository<Troubleshoot
     @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.PlotReportingStaffEntity(count(c),c.plot) " +
             "from TroubleshootRecordEntity c where c.multiTenancy  = :multiTenancy group by c.plot")
     List<PlotReportingStaffEntity> findPlotReportingStaff(@Param("multiTenancy") String multiTenancy);
+
+
+    @Query
+     List<TroubleshootRecordEntity> queryAllByPlot(String plotId);
 }

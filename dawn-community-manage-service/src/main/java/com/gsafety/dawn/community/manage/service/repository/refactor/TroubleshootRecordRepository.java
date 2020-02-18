@@ -1,5 +1,6 @@
 package com.gsafety.dawn.community.manage.service.repository.refactor;
 
+import com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroubleshootingStatisticEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.PlotBuildingUnitStaffEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.PlotReportingStaffEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.TroubleshootRecordEntity;
@@ -33,7 +34,6 @@ public interface TroubleshootRecordRepository extends JpaRepository<Troubleshoot
             "from TroubleshootRecordEntity c where c.multiTenancy  = :multiTenancy group by c.plot")
     List<PlotReportingStaffEntity> findPlotReportingStaff(@Param("multiTenancy") String multiTenancy);
 
-
     @Query
-     List<TroubleshootRecordEntity> queryAllByPlot(String plotId);
+    List<TroubleshootRecordEntity> queryAllByPlot(String plotId);
 }

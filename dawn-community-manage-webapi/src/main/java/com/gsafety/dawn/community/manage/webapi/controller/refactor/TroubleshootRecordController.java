@@ -1,10 +1,7 @@
 package com.gsafety.dawn.community.manage.webapi.controller.refactor;
 
 import com.gsafety.dawn.community.manage.contract.model.AccessControlModel;
-import com.gsafety.dawn.community.manage.contract.model.refactor.CommunityBriefModel;
-import com.gsafety.dawn.community.manage.contract.model.refactor.PlotBuildingUnitStatistics;
-import com.gsafety.dawn.community.manage.contract.model.refactor.ReportingStaffStatistics;
-import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
+import com.gsafety.dawn.community.manage.contract.model.refactor.*;
 import com.gsafety.dawn.community.manage.contract.service.refactor.TroubleshootRecordService;
 import com.gsafety.java.common.exception.HttpError;
 import com.gsafety.java.common.exception.HttpRestException;
@@ -94,20 +91,20 @@ public class TroubleshootRecordController {
         }
     }
 
-    @GetMapping(value = "/plot-building-unit-staff/{multiTenancy}/multiTenancy", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "获取社区下小区楼栋单元已排查未排查统计", notes = "checkNameIsRepeat(name)")
+    @PostMapping(value = "/plot-building-unit-staff/paged-query", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "分页查询社区下小区楼栋单元已排查未排查统计", notes = "getPlotBuildingUnitStatistics()")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = PlotBuildingUnitStatistics.class,responseContainer = "List"),
+            @ApiResponse(code = 200, message = "OK", response = PlotBuildingUnitPagedResult.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
             @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<List<PlotBuildingUnitStatistics>> getPlotBuildingUnitStatistics(@PathVariable @ApiParam(value = "多租户", required = true) String multiTenancy) {
+    public ResponseEntity<PlotBuildingUnitPagedResult> getPlotBuildingUnitStatistics(@RequestBody @ApiParam(value = "分页参数,页码从1开始", required = true) PagedQueryModel pagedQueryModel) {
         try {
-            List<PlotBuildingUnitStatistics> result = troubleshootRecordService.getPlotBuildingUnitStatistics(multiTenancy);
+            PlotBuildingUnitPagedResult result = troubleshootRecordService.getPlotBuildingUnitStatistics(pagedQueryModel);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
             logger.error("getPlotBuildingUnitStatistics error", e.getMessage(), e);
-            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

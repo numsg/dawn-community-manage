@@ -1,7 +1,6 @@
 package com.gsafety.dawn.community.manage.service.serviceimpl.refactor;
 
 import com.gsafety.dawn.community.common.util.CommonUtil;
-import com.gsafety.dawn.community.common.util.DateUtil;
 import com.gsafety.dawn.community.common.util.NumberUtil;
 import com.gsafety.dawn.community.common.util.StringUtil;
 import com.gsafety.dawn.community.manage.contract.model.refactor.PlotBuildingUnitStatistics;
@@ -25,10 +24,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,7 +72,7 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
     @Autowired
     private EpidemicPersonService epidemicPersonService;
     // 分类诊疗医疗意见下的  无
-   private  static final String NoMedicalOption="8470e8e9-90ba-484b-8f33-148a1f5028fc";
+    private static final String NoMedicalOption = "8470e8e9-90ba-484b-8f33-148a1f5028fc";
 
     // 排查记录历史表保留周期
     @Value("${app.saveCycle}")
@@ -207,18 +210,24 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
     }
 
     @Override
-    public List<PlotBuildingUnitStatistics> getPlotBuildingUnitStatistics(String multiTenancy) {
+    public PlotBuildingUnitPagedResult getPlotBuildingUnitStatistics(PagedQueryModel pagedQueryModel) {
+        PlotBuildingUnitPagedResult result = new PlotBuildingUnitPagedResult();
+        String multiTenancy = pagedQueryModel.getMultiTenancy();
+        Pageable pageable =PageRequest.of(pagedQueryModel.getPageNumber()-1, pagedQueryModel.getPageSize());
         try {
             if (StringUtil.isEmpty(multiTenancy)) {
-                return Collections.emptyList();
+                return null;
             }
-            List<PlotBuildingUnitStaffEntity> plotBuildingUnitStaffEntities = troubleshootRecordRepository.findPlotBuildingUnitStaff(multiTenancy);
+            Page<PlotBuildingUnitStaffEntity> pageResult = troubleshootRecordRepository.findPlotBuildingUnitStaff(multiTenancy, pageable);
+            result.setTotalPages(pageResult.getTotalPages());
+            List<PlotBuildingUnitStaffEntity> plotBuildingUnitStaffEntities = pageResult.getContent();
+            // List<PlotBuildingUnitStaffEntity> plotBuildingUnitStaffEntities=troubleshootRecordRepository.findPlotBuildingUnitStaff(multiTenancy);
             if (CollectionUtils.isEmpty(plotBuildingUnitStaffEntities)) {
-                return Collections.emptyList();
+                return result;
             }
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
             Date date = format.parse(format.format(new Date()));
-            List<PlotBuildingUnitStatistics> result = new ArrayList<>();
+            List<PlotBuildingUnitStatistics> pageContent = new ArrayList<>();
             Map<String, List<PlotBuildingUnitStaffEntity>> groupPlotBuildingUnitNumbers = plotBuildingUnitStaffEntities.stream().collect(Collectors.groupingBy(PlotBuildingUnitStaffEntity::getPlotBuildingUnitNumber));
             for (Map.Entry<String, List<PlotBuildingUnitStaffEntity>> entry :
                     groupPlotBuildingUnitNumbers.entrySet()) {
@@ -234,65 +243,77 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
                     plotBuildingUnitStatistics.setCheckedCount(checkedCount.intValue());
                     Long unCheckedCount = entry.getValue().stream().filter(f -> f.getCreateDate().getTime() != date.getTime()).mapToLong(m -> m.getCount()).sum();
                     plotBuildingUnitStatistics.setUnCheckedCount(unCheckedCount.intValue());
-                    result.add(plotBuildingUnitStatistics);
+                    pageContent.add(plotBuildingUnitStatistics);
                 }
             }
+            result.setPageContent(pageContent);
             return result;
         } catch (Exception e) {
             logger.error("getBuildingUnitStatistics error", e, e.getMessage(), e.getCause());
-            return Collections.emptyList();
+            return null;
         }
     }
 
     @Override
     public CommunityBriefModel getCommunityDailyBriefing(String multiTenancy) {
-        CommunityBriefModel result=new CommunityBriefModel();
-        List<DataSourceEntity> communities=dataSourceRepository.queryAllByDescription(multiTenancy);
+        CommunityBriefModel result = new CommunityBriefModel();
+        List<DataSourceEntity> communities = dataSourceRepository.queryAllByDescription(multiTenancy);
         // 查询的结果正常情况是一个
-        if (communities.isEmpty()){
+        if (communities.isEmpty()) {
             return null;
         }
-        List<DSourceDataEntity> plots=dSourceDataRepository.findAllByDataSourceId(communities.get(0).getId());
+        List<DSourceDataEntity> plots = dSourceDataRepository.findAllByDataSourceId(communities.get(0).getId());
         result.setPlotTotal(plots.size());
-        List<PlotBriefModel> plotBriefs=new ArrayList<>();
-        Integer troubleshootTotal=0;
-        Integer dailyTroubleshootTotal=0;
-        Integer abnormalTotal=0;
+        List<PlotBriefModel> plotBriefs = new ArrayList<>();
+        Integer troubleshootTotal = 0;
+        Integer dailyTroubleshootTotal = 0;
+        Integer abnormalTotal = 0;
         for (DSourceDataEntity plot : plots) {
-            PlotBriefModel plotBriefModel=new PlotBriefModel();
-            Integer plotDailyTroubleshootTotal=0;
-            Integer plotAbnormalTotal=0;
-            String rate="0";
-            List<TroubleshootRecordEntity> records=troubleshootRecordRepository.queryAllByPlot(plot.getId());
-            Integer plotTroubleshootTotal=records.size();
-            if (!records.isEmpty()){
-                Date date= DateUtil.getDayStartDate();
-                // 当天上报记录
-                List<TroubleshootRecordEntity> dailyRecords= records.stream().filter(f -> f.getCreateDate().getTime() == date.getTime()).collect(Collectors.toList());
-                // 当日填报人数
-                plotDailyTroubleshootTotal= dailyRecords.size();
-                // 异常人数
-                plotAbnormalTotal= dailyRecords.stream().filter(f -> f.getIsExceedTemp() || !f.getMedicalOpinion().equals(NoMedicalOption)).collect(Collectors.toList()).size();
-                //填报率
-                String doubleNumber=NumberUtil.divide(Integer.toString(plotDailyTroubleshootTotal), Integer.toString(plotTroubleshootTotal));
-                rate= NumberUtil.multiply(doubleNumber,Integer.toString(100)) +"%";
+            PlotBriefModel plotBriefModel = new PlotBriefModel();
+            Integer plotDailyTroubleshootTotal = 0;
+            Integer plotAbnormalTotal = 0;
+            String rate = "0";
+            List<TroubleshootRecordEntity> records = troubleshootRecordRepository.queryAllByPlot(plot.getId());
+            Integer plotTroubleshootTotal = records.size();
+            if (!records.isEmpty()) {
+                // Date date= DateUtil.getDayStartDate();
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+
+                try {
+                    Date date = format.parse(format.format(new Date()));
+                    System.out.println(date);
+                    // 当天上报记录
+                    List<TroubleshootRecordEntity> dailyRecords = records.stream().filter(f -> f.getCreateDate().getTime() == date.getTime()).collect(Collectors.toList());
+                    // 当日填报人数
+                    plotDailyTroubleshootTotal = dailyRecords.size();
+                    // 异常人数
+                    plotAbnormalTotal = dailyRecords.stream().filter(f -> f.getIsExceedTemp() || !f.getMedicalOpinion().equals(NoMedicalOption)).collect(Collectors.toList()).size();
+                    //填报率
+                    String doubleNumber = NumberUtil.divide(Integer.toString(plotDailyTroubleshootTotal), Integer.toString(plotTroubleshootTotal));
+                    rate = NumberUtil.multiply(doubleNumber, Integer.toString(100)) + "%";
+
+                } catch (ParseException e) {
+                    logger.error("getCommunityDailyBriefing error", e, e.getMessage(), e.getCause());
+
+                }
             }
             plotBriefModel.setPlotId(plot.getId());
             plotBriefModel.setPlotName(plot.getName());
             plotBriefModel.setPlotTroubleshootTotal(plotTroubleshootTotal);
             plotBriefModel.setPlotDailyTroubleshootTotal(plotDailyTroubleshootTotal);
+            plotBriefModel.setPlotAbnormalTotal(plotAbnormalTotal);
             plotBriefModel.setTroubleshootRate(rate);
 
-            troubleshootTotal+=plotTroubleshootTotal;
-            dailyTroubleshootTotal+=plotDailyTroubleshootTotal;
-            abnormalTotal+=plotAbnormalTotal;
+            troubleshootTotal += plotTroubleshootTotal;
+            dailyTroubleshootTotal += plotDailyTroubleshootTotal;
+            abnormalTotal += plotAbnormalTotal;
             plotBriefs.add(plotBriefModel);
         }
         result.setCommunityCode(multiTenancy);
         result.setCommunityName(communities.get(0).getName());
-        result.setAbnormalTotal(troubleshootTotal);
+        result.setAbnormalTotal(abnormalTotal);
         result.setDailyTroubleshootTotal(dailyTroubleshootTotal);
-        result.setTroubleshootTotal(abnormalTotal);
+        result.setTroubleshootTotal(troubleshootTotal);
         result.setPlotBriefModels(plotBriefs);
 
         return result;

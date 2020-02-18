@@ -1,9 +1,6 @@
 package com.gsafety.dawn.community.manage.contract.service.refactor;
 
-import com.gsafety.dawn.community.manage.contract.model.refactor.CommunityBriefModel;
-import com.gsafety.dawn.community.manage.contract.model.refactor.PlotBuildingUnitStatistics;
-import com.gsafety.dawn.community.manage.contract.model.refactor.ReportingStaffStatistics;
-import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
+import com.gsafety.dawn.community.manage.contract.model.refactor.*;
 
 import java.util.List;
 
@@ -23,10 +20,9 @@ public interface TroubleshootRecordService {
 
     /**
      * 获取社区下的小区楼栋单元分组统计
-     * @param multiTenancy
      * @return
      */
-    List<PlotBuildingUnitStatistics> getPlotBuildingUnitStatistics(String multiTenancy);
+    PlotBuildingUnitPagedResult getPlotBuildingUnitStatistics(PagedQueryModel pagedQueryModel);
 
 
     CommunityBriefModel getCommunityDailyBriefing(String multiTenancy);

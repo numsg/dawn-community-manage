@@ -38,6 +38,8 @@ public class EpidemicPersonController {
     public ResponseEntity<EpidemicPersonModel> addOneEpidemicPerson(@RequestBody @ApiParam(value = "疫情人员信息", required = true) EpidemicPersonModel epidemicPersonModel) {
         epidemicPersonModel.setId(UUID.randomUUID().toString());
         epidemicPersonModel.setUpdateTime(epidemicPersonModel.getSubmitTime());
+        epidemicPersonModel.setSubmitTime(new Date());
+        epidemicPersonModel.setDiseaseTime(new Date());
         EpidemicPersonModel result = epidemicPersonService.addOneEpidemicPerson(epidemicPersonModel);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

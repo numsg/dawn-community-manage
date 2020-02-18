@@ -1,30 +1,40 @@
 package com.gsafety.dawn.community.manage.service.serviceimpl;
 
+import com.gsafety.dawn.community.common.util.DateUtil;
 import com.gsafety.dawn.community.manage.contract.model.ModifyMedicalTreatmentModel;
-import com.gsafety.dawn.community.manage.contract.model.comparator.CompareConfirmed;
+import com.gsafety.dawn.community.manage.contract.model.refactor.PersonBase;
+import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
 import com.gsafety.dawn.community.manage.contract.model.total.*;
 import com.gsafety.dawn.community.manage.contract.model.EpidemicPersonModel;
 import com.gsafety.dawn.community.manage.contract.service.EpidemicPersonService;
 import com.gsafety.dawn.community.manage.service.datamappers.DSourceDataMapper;
-import com.gsafety.dawn.community.manage.service.datamappers.DataSourceMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.EpidemicPersonMapper;
 import com.gsafety.dawn.community.manage.service.entity.DSourceDataEntity;
 import com.gsafety.dawn.community.manage.service.entity.DataSourceEntity;
 import com.gsafety.dawn.community.manage.service.entity.EpidemicPersonEntity;
+import com.gsafety.dawn.community.manage.service.entity.refactor.TroubleshootHistoryRecordEntity;
 import com.gsafety.dawn.community.manage.service.repository.DSourceDataRepository;
 import com.gsafety.dawn.community.manage.service.repository.DataSourceRepository;
 import com.gsafety.dawn.community.manage.service.repository.EpidemicPersonRepository;
+import com.gsafety.dawn.community.manage.service.repository.refactor.PersonBaseRepository;
+import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootHistoryRecordRepository;
+import com.gsafety.dawn.community.manage.service.serviceimpl.share.DataSourceShareIds;
 import fr.opensagres.xdocreport.core.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Comparator.comparing;
 
 @Service
 @Transactional
-public class EpidemicPersonServiceImpl implements EpidemicPersonService {
+public class EpidemicPersonServiceImpl extends DataSourceShareIds implements EpidemicPersonService {
     @Autowired
     private EpidemicPersonMapper epidemicPersonMapper;
     @Autowired
@@ -36,7 +46,9 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
     @Autowired
     private DataSourceRepository dataSourceRepository;
     @Autowired
-    private DataSourceMapper dataSourceMapper;
+    private TroubleshootHistoryRecordRepository troubleshootHistoryRecordRepository;
+
+    Logger logger = LoggerFactory.getLogger(this.getClass());
     // 诊断情况id
     private static final String diagnosisId = "97629e08-cb68-489d-8f62-8c8467358d69";
     // 诊断为确认
@@ -50,25 +62,43 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
 
     @Override
     public EpidemicPersonModel addOneEpidemicPerson(EpidemicPersonModel epidemicPersonModel) {
-        EpidemicPersonEntity epidemicPersonEntity = epidemicPersonMapper.modelToEntity(epidemicPersonModel);
-        return epidemicPersonMapper.entityToModel(epidemicPersonRepository.save(epidemicPersonEntity));
+        List<EpidemicPersonEntity> epidemicPersonEntities = epidemicPersonRepository.queryAllByNameAndMobileNumber(epidemicPersonModel.getName(), epidemicPersonModel.getMobileNumber());
+        EpidemicPersonModel result = null;
+        if (CollectionUtils.isEmpty(epidemicPersonEntities)) {
+            logger.info("列表中无该重点关注人员，新增重点关注人员");
+            epidemicPersonModel.setUpdateTime(new Date());
+            epidemicPersonModel.setSubmitTime(new Date());
+            EpidemicPersonEntity epidemicPersonEntity = epidemicPersonMapper.modelToEntity(epidemicPersonModel);
+            result = epidemicPersonMapper.entityToModel(epidemicPersonRepository.save(epidemicPersonEntity));
+        } else {
+            logger.info("列表中存在该重点关注人员，修改数据");
+            result = modifyOneEpidemicPerson(epidemicPersonModel.getId(), epidemicPersonModel);
+        }
+        return result;
     }
 
     @Override
     public EpidemicPersonModel modifyOneEpidemicPerson(String id, EpidemicPersonModel epidemicPersonModel) {
-        EpidemicPersonModel result = new EpidemicPersonModel();
-        if (id == null || !id.equals(epidemicPersonModel.getId()) || !epidemicPersonRepository.existsById(id)) {
-            return result;
+        if (StringUtils.isEmpty(epidemicPersonModel.getId()) || !epidemicPersonRepository.existsById(id)) {
+            logger.error("修改失败，重点关注人员不存在");
+            return null;
         }
-        if (0 < epidemicPersonRepository.updateEpidemicPerson(epidemicPersonModel.getId(), epidemicPersonModel.getName(),
-                epidemicPersonModel.getGender(), epidemicPersonModel.getAge(), epidemicPersonModel.getVillageId(), epidemicPersonModel.getTemperature(),
-                epidemicPersonModel.getDiagnosisSituation(), epidemicPersonModel.getMedicalCondition(), epidemicPersonModel.getSpecialSituation(),
-                epidemicPersonModel.getSubmitTime(), epidemicPersonModel.getDiseaseTime(), epidemicPersonModel.getUpdateTime(), epidemicPersonModel.getNote(),
-                epidemicPersonModel.getMultiTenancy(), epidemicPersonModel.getExpendProperty(), epidemicPersonModel.getMobileNumber())) {
-            result = epidemicPersonMapper.entityToModel(epidemicPersonRepository.getOne(id));
-        }
-
-        return result;
+        epidemicPersonModel.setUpdateTime(new Date());
+        EpidemicPersonEntity epidemicPersonEntity = epidemicPersonRepository.saveAndFlush(epidemicPersonMapper.modelToEntity(epidemicPersonModel));
+        return epidemicPersonMapper.entityToModel(epidemicPersonEntity);
+        //        if (id == null || !id.equals(epidemicPersonModel.getId()) || !epidemicPersonRepository.existsById(id)) {
+        //            logger.error("修改失败，重点关注人员不存在");
+        //            return null;
+        //        }
+        //        EpidemicPersonModel result = new EpidemicPersonModel();
+        //        if (0 < epidemicPersonRepository.updateEpidemicPerson(epidemicPersonModel.getId(), epidemicPersonModel.getName(),
+        //                epidemicPersonModel.getGender(), epidemicPersonModel.getAge(), epidemicPersonModel.getVillageId(), epidemicPersonModel.getTemperature(),
+        //                epidemicPersonModel.getDiagnosisSituation(), epidemicPersonModel.getMedicalCondition(), epidemicPersonModel.getSpecialSituation(),
+        //                epidemicPersonModel.getSubmitTime(), epidemicPersonModel.getDiseaseTime(), epidemicPersonModel.getUpdateTime(), epidemicPersonModel.getNote(),
+        //                epidemicPersonModel.getMultiTenancy(), epidemicPersonModel.getExpendProperty(), epidemicPersonModel.getMobileNumber())) {
+        //            result = epidemicPersonMapper.entityToModel(epidemicPersonRepository.getOne(id));
+        //        }
+        //        return result;
     }
 
     @Override
@@ -93,6 +123,24 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
         });
         return result;
     }
+
+    @Override
+    public List<SpecialCountModel> diagnosisCountWithConfirmedAndSuspected(String communityId) {
+        return null;
+    }
+
+    @Override
+    public List<SpecialCountModel> diagnosisCountWithHealthAndDeath(String communityId) {
+
+
+        // 治愈
+        List<EpidemicPersonEntity> queryResult = epidemicPersonRepository.queryAllByDiagnosisSituationAndMultiTenancyOrderByUpdateTimeAsc(diagnosisHealthId, "123456");
+        queryResult.forEach(date -> {
+            System.out.println(date.getUpdateTime());
+        });
+        return null;
+    }
+
 
     // 更新医疗情况信息
     @Override
@@ -151,12 +199,14 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
             // DiagnosisCountModel diagnosisCountModel = new DiagnosisCountModel();
             EpidemicTotalNodeModel epidemicTotalNodeModel = new EpidemicTotalNodeModel();
             epidemicTotalNodeModel.setTypeName(a.getName());
+            epidemicTotalNodeModel.setColor(a.getImgColor());
+            epidemicTotalNodeModel.setId(a.getId());
             // diagnosisCountModel.setdSourceDataModel(dSourceDataMapper.entityToModel(a));
             Integer integer = 0;
             if (classOrMedical) {
                 integer = epidemicPersonRepository.countAllByMultiTenancyAndConfirmedDiagnosis(districtCode, a.getId());
             } else {
-                integer = epidemicPersonRepository.countAllByMultiTenancyAndMedicalCondition(districtCode, dataSourceId);
+                integer = epidemicPersonRepository.countAllByMultiTenancyAndMedicalCondition(districtCode, a.getId());
             }
             epidemicTotalNodeModel.setCount(integer);
             epidemicTotalNodeModels.add(epidemicTotalNodeModel);
@@ -179,6 +229,8 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
         List<EpidemicTotalNodeModel> epidemicTotalNodeModels = new ArrayList<>();
         dSourceDataEntities.forEach(a -> {
             EpidemicTotalNodeModel epidemicTotalNodeModel = new EpidemicTotalNodeModel();
+            epidemicTotalNodeModel.setColor(a.getImgColor());
+            epidemicTotalNodeModel.setId(a.getId());
             epidemicTotalNodeModel.setTypeName(a.getName());
             // DiagnosisCountModel diagnosisCountModel = new DiagnosisCountModel();
             // diagnosisCountModel.setdSourceDataModel(dSourceDataMapper.entityToModel(a));
@@ -186,7 +238,7 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
             if (classOrMedical) {
                 integer = epidemicPersonRepository.countAllByMultiTenancyAndVillageIdAndConfirmedDiagnosis(districtCode, plotId, a.getId());
             } else {
-                integer = epidemicPersonRepository.countAllByMultiTenancyAndVillageIdAndMedicalCondition(districtCode, plotId, dataSourceId);
+                integer = epidemicPersonRepository.countAllByMultiTenancyAndVillageIdAndMedicalCondition(districtCode, plotId, a.getId());
             }
             epidemicTotalNodeModel.setCount(integer);
             epidemicTotalNodeModels.add(epidemicTotalNodeModel);
@@ -229,7 +281,109 @@ public class EpidemicPersonServiceImpl implements EpidemicPersonService {
             // epidemicTotalStatisticModel.set
         });
         // epidemicTotalStatisticModels.stream().sorted(Comparator.comparing(a -> a.getNodeModels().stream().sorted(Comparator.comparing(EpidemicTotalNodeModel::getCount))))
-        Collections.sort(epidemicTotalStatisticModels, new CompareConfirmed());
-        return epidemicTotalStatisticModels;
+//        Collections.sort(epidemicTotalStatisticModels, new CompareConfirmed());
+        List<EpidemicTotalStatisticModel> collect = epidemicTotalStatisticModels.stream()
+                .sorted(comparing(EpidemicTotalStatisticModel::getCount).reversed())
+                .collect(Collectors.toList());
+//        Collections.reverse(collect);
+        return collect;
     }
+
+    // 把日常排查的数据添加到重点关注人员
+    @Override
+    public boolean syncTroubleshooting(TroubleshootRecord troubleshootRecord) {
+        logger.info("进入");
+        if(StringUtils.isEmpty(troubleshootRecord.getPersonBaseId()))
+            return false;
+        logger.info("personbase");
+//        boolean exist = personBaseRepository.existsById(troubleshootRecord.getId());
+//        if(!exist)
+//            return false;
+        PersonBase personBase = troubleshootRecord.getPersonBase();
+        boolean isDoubleFever = false;
+        // 体温大于37.3查询该人员昨天的记录
+        if(troubleshootRecord.getIsExceedTemp()){
+            // 昨天开始与结束的时间
+            Date lastDayStartDate = DateUtil.getLastDayStartDate();
+            Date lastDayEndDate = DateUtil.getLastDayEndDate();
+            List<TroubleshootHistoryRecordEntity> allByPersonBaseIdAndCreateTimeBetween = troubleshootHistoryRecordRepository.findAllByPersonBaseIdAndCreateTimeBetween(troubleshootRecord.getPersonBaseId(), lastDayStartDate, lastDayEndDate);
+            // 昨天的记录不为空
+            if(!CollectionUtils.isEmpty(allByPersonBaseIdAndCreateTimeBetween)
+                    && allByPersonBaseIdAndCreateTimeBetween.get(0).getIsExceedTemp())
+                isDoubleFever = true;
+        }
+        // 体温连续两天大于37.3，或者3类分类医疗意见
+        if (     isDoubleFever ||
+                !StringUtils.isEmpty(troubleshootRecord.getMedicalOpinion())
+                        && (troubleshootRecord.getMedicalOpinion().equals(CONFIRMEDPATIENTID)
+                        || troubleshootRecord.getMedicalOpinion().equals(SUSPECTEDPATIENTID)
+                        || troubleshootRecord.getMedicalOpinion().equals(CTDIAGNOSISPNEUMONIAID))
+        ) {
+            // 组装成model
+            EpidemicPersonModel epidemicPersonModel = new EpidemicPersonModel();
+            // id
+            epidemicPersonModel.setId(UUID.randomUUID().toString());
+            // name
+            epidemicPersonModel.setName(personBase.getName());
+            // age
+            epidemicPersonModel.setAge(troubleshootRecord.getAge());
+            // gender
+            epidemicPersonModel.setGender(personBase.getSex());
+            // mobileNumber
+            epidemicPersonModel.setMobileNumber(personBase.getPhone());
+            // villageId
+            epidemicPersonModel.setVillageId(troubleshootRecord.getPlot());
+            // temperature
+            epidemicPersonModel.setTemperature(troubleshootRecord.getIsExceedTemp());
+            // diagnosisSituation
+            // 确诊情况
+            // medicalCondition
+            epidemicPersonModel.setMedicalCondition(NOMEDICAL);
+            // specialSituation
+            // 特殊情况
+            // note
+            epidemicPersonModel.setNote(troubleshootRecord.getNote());
+            // multiTenancy
+            epidemicPersonModel.setMultiTenancy(troubleshootRecord.getMultiTenancy());
+            // expendProperty
+            epidemicPersonModel.setExpendProperty(troubleshootRecord.getExpendProperty());
+            // isContact
+            epidemicPersonModel.setContact(troubleshootRecord.getIsContact());
+            // confirmedDiagnosis
+            epidemicPersonModel.setConfirmedDiagnosis(troubleshootRecord.getMedicalOpinion());
+            // reserveField
+            //
+            // isByphone
+            epidemicPersonModel.setByphone(troubleshootRecord.getIsByPhone());
+            // operator
+            //
+            // building
+            epidemicPersonModel.setBuilding(troubleshootRecord.getBuilding());
+            // unit_number
+            epidemicPersonModel.setUnitNumber(troubleshootRecord.getUnitNumber());
+            // roomID
+            epidemicPersonModel.setRoomNumber(troubleshootRecord.getRoomNo());
+            // 创建时间
+            epidemicPersonModel.setSubmitTime(new Date());
+            // 提交时间
+            epidemicPersonModel.setUpdateTime(new Date());
+            // diseaseTime 时间
+            epidemicPersonModel.setDiseaseTime(new Date());
+            // 保存
+            EpidemicPersonModel result = addOneEpidemicPerson(epidemicPersonModel);
+            if(result != null)
+                return true;
+        }
+        return false;
+    }
+
+    // 体温是否小于37.3
+    public boolean isFever(String tempture){
+        String str = "('a:小于36℃', 'b:36-36.5℃', 'c:36.5-37℃' , 'd:37-37.3℃')";
+        boolean contains = str.contains(tempture);
+        if(contains)
+            return false;
+        return true;
+    }
+
 }

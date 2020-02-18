@@ -5,6 +5,7 @@ import com.gsafety.dawn.community.common.util.StringUtil;
 import com.gsafety.dawn.community.manage.contract.model.refactor.PlotBuildingUnitStatistics;
 import com.gsafety.dawn.community.manage.contract.model.refactor.ReportingStaffStatistics;
 import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
+import com.gsafety.dawn.community.manage.contract.service.EpidemicPersonService;
 import com.gsafety.dawn.community.manage.contract.service.refactor.TroubleshootRecordService;
 import com.gsafety.dawn.community.manage.service.datamappers.refactor.PersonBaseMapper;
 import com.gsafety.dawn.community.manage.service.datamappers.refactor.ReportingStaffMapper;
@@ -51,6 +52,9 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
 
     @Autowired
     private CommonUtil commonUtil;
+
+    @Autowired
+    private EpidemicPersonService epidemicPersonService;
 
     // 排查记录历史表保留周期
     @Value("${app.saveCycle}")
@@ -108,6 +112,9 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             troubleshootHistoryRecordEntity.setPersonBase(null);
             troubleshootHistoryRecordEntity.setPersonBaseId(personBaseEntity.getId());
             troubleshootHistoryRecordRepository.save(troubleshootHistoryRecordEntity);
+
+            // 是否新增到重点关注人员
+            epidemicPersonService.syncTroubleshooting(troubleshootRecord);
             return troubleshootRecordRepository.getOne(troubleshootRecord.getId()) != null;
         } catch (Exception e) {
             logger.error("add error", e, e.getMessage(), e.getCause());
@@ -158,6 +165,8 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             troubleshootHistoryRecordEntity.setPersonBase(null);
             troubleshootHistoryRecordEntity.setPersonBaseId(troubleshootRecordEntity.getPersonBaseId());
             troubleshootHistoryRecordRepository.save(troubleshootHistoryRecordEntity);
+            // 是否新增到重点关注人员
+            epidemicPersonService.syncTroubleshooting(troubleshootRecord);
             return troubleshootRecordRepository.getOne(troubleshootRecord.getId()).getCreateTime() == troubleshootRecord.getCreateTime();
         } catch (Exception e) {
             logger.error("update error", e, e.getMessage(), e.getCause());

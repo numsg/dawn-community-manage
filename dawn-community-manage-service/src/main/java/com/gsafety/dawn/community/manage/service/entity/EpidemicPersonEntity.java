@@ -32,7 +32,7 @@ public class EpidemicPersonEntity {
 
     // 体温
     @Column(name = "temperature", length = 12)
-    private String temperature;
+    private boolean temperature;
 
     // 确诊情况
     @Column(name = "diagnosis_situation", length = 64)
@@ -142,11 +142,11 @@ public class EpidemicPersonEntity {
         this.villageId = villageId;
     }
 
-    public String getTemperature() {
+    public boolean isTemperature() {
         return temperature;
     }
 
-    public void setTemperature(String temperature) {
+    public void setTemperature(boolean temperature) {
         this.temperature = temperature;
     }
 

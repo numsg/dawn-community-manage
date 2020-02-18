@@ -1,6 +1,7 @@
 package com.gsafety.dawn.community.manage.contract.service;
 
 import com.gsafety.dawn.community.manage.contract.model.ModifyMedicalTreatmentModel;
+import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
 import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.model.EpidemicPersonModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DistrictDiagnosisCountModel;
@@ -22,6 +23,9 @@ public interface EpidemicPersonService {
     // 统计
     List<DiagnosisCountModel> diagnosisCount(String districtCode);
 
+    List<SpecialCountModel> diagnosisCountWithConfirmedAndSuspected(String communityId);
+
+    List<SpecialCountModel> diagnosisCountWithHealthAndDeath(String communityId);
 
     // 更新医疗情况信息
     boolean modifyMedicalTreatment(ModifyMedicalTreatmentModel medicalTreatmentModel);
@@ -37,4 +41,6 @@ public interface EpidemicPersonService {
 
     // 统计-小区-医疗情况
     List<EpidemicTotalStatisticModel> plotMedical(String districtCode , String dataSourceId);
+
+    boolean syncTroubleshooting(TroubleshootRecord troubleshootRecord);
 }

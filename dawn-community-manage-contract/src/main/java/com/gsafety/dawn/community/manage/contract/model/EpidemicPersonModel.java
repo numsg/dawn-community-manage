@@ -9,7 +9,7 @@ public class EpidemicPersonModel {
     private String gender;
     private String mobileNumber;
     private String villageId;
-    private String temperature;
+    private boolean temperature;
     private String diagnosisSituation;
     private String medicalCondition;
     private String specialSituation;
@@ -41,7 +41,7 @@ public class EpidemicPersonModel {
         //无参构造
     }
 
-    public EpidemicPersonModel(String id, String name, Integer age, String gender, String mobileNumber, String villageId, String temperature, String diagnosisSituation, String medicalCondition, String specialSituation, Date submitTime, Date diseaseTime, Date updateTime, String note, String multiTenancy, String expendProperty) {
+    public EpidemicPersonModel(String id, String name, Integer age, String gender, String mobileNumber, String villageId, boolean temperature, String diagnosisSituation, String medicalCondition, String specialSituation, Date submitTime, Date diseaseTime, Date updateTime, String note, String multiTenancy, String expendProperty) {
         this.id = id;
         this.name = name;
         this.age = age;
@@ -108,11 +108,11 @@ public class EpidemicPersonModel {
         this.villageId = villageId;
     }
 
-    public String getTemperature() {
+    public boolean isTemperature() {
         return temperature;
     }
 
-    public void setTemperature(String temperature) {
+    public void setTemperature(boolean temperature) {
         this.temperature = temperature;
     }
 

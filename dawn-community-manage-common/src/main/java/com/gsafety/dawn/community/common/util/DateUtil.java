@@ -91,6 +91,24 @@ public class DateUtil {
         return calendar1.getTime();
     }
 
+    // 昨天的结束时间
+    public static Date getLastDayEndDate(){
+        Date endTimeDate = DateUtil.getEndTimeDate();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(endTimeDate);
+        calendar.set(Calendar.HOUR_OF_DAY  , -24);
+        return calendar.getTime();
+    }
+
+    // 昨天的开始时间
+    public static Date getLastDayStartDate(){
+        Date startDate = DateUtil.getStartTimeDate();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startDate);
+        calendar.set(Calendar.HOUR_OF_DAY , -24);
+        return calendar.getTime();
+    }
+
     public static Date stringFormat(String date){
         Date result=null;
         try {

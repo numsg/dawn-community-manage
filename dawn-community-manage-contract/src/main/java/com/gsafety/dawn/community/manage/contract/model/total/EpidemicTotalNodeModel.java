@@ -5,9 +5,13 @@ package com.gsafety.dawn.community.manage.contract.model.total;
  */
 public class EpidemicTotalNodeModel {
 
+    private String id;
+
     private String typeName;
 
     private int count;
+
+    private String color;
 
     public EpidemicTotalNodeModel() {
         // 空构造
@@ -27,5 +31,21 @@ public class EpidemicTotalNodeModel {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }

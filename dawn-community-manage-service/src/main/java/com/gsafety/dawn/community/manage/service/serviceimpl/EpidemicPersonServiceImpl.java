@@ -292,32 +292,33 @@ public class EpidemicPersonServiceImpl extends DataSourceShareIds implements Epi
     // 把日常排查的数据添加到重点关注人员
     @Override
     public boolean syncTroubleshooting(TroubleshootRecord troubleshootRecord) {
-        logger.info("进入");
+        logger.info("进入同步重点关注人员");
         if(StringUtils.isEmpty(troubleshootRecord.getPersonBaseId()))
             return false;
-        logger.info("personbase");
 //        boolean exist = personBaseRepository.existsById(troubleshootRecord.getId());
 //        if(!exist)
 //            return false;
         PersonBase personBase = troubleshootRecord.getPersonBase();
-        boolean isDoubleFever = false;
+//        boolean isDoubleFever = false;
         // 体温大于37.3查询该人员昨天的记录
-        if(troubleshootRecord.getIsExceedTemp()){
-            // 昨天开始与结束的时间
-            Date lastDayStartDate = DateUtil.getLastDayStartDate();
-            Date lastDayEndDate = DateUtil.getLastDayEndDate();
-            List<TroubleshootHistoryRecordEntity> allByPersonBaseIdAndCreateTimeBetween = troubleshootHistoryRecordRepository.findAllByPersonBaseIdAndCreateTimeBetween(troubleshootRecord.getPersonBaseId(), lastDayStartDate, lastDayEndDate);
-            // 昨天的记录不为空
-            if(!CollectionUtils.isEmpty(allByPersonBaseIdAndCreateTimeBetween)
-                    && allByPersonBaseIdAndCreateTimeBetween.get(0).getIsExceedTemp())
-                isDoubleFever = true;
-        }
+//        if(troubleshootRecord.getIsExceedTemp()){
+//            // 昨天开始与结束的时间
+//            Date lastDayStartDate = DateUtil.getLastDayStartDate();
+//            Date lastDayEndDate = DateUtil.getLastDayEndDate();
+//            List<TroubleshootHistoryRecordEntity> allByPersonBaseIdAndCreateTimeBetween = troubleshootHistoryRecordRepository.findAllByPersonBaseIdAndCreateTimeBetween(troubleshootRecord.getPersonBaseId(), lastDayStartDate, lastDayEndDate);
+//            // 昨天的记录不为空
+//            if(!CollectionUtils.isEmpty(allByPersonBaseIdAndCreateTimeBetween)
+//                    && allByPersonBaseIdAndCreateTimeBetween.get(0).getIsExceedTemp())
+//                isDoubleFever = true;
+//        }
         // 体温连续两天大于37.3，或者3类分类医疗意见
-        if (     isDoubleFever ||
+        if (   troubleshootRecord.getIsExceedTemp() ||
                 !StringUtils.isEmpty(troubleshootRecord.getMedicalOpinion())
                         && (troubleshootRecord.getMedicalOpinion().equals(CONFIRMEDPATIENTID)
                         || troubleshootRecord.getMedicalOpinion().equals(SUSPECTEDPATIENTID)
-                        || troubleshootRecord.getMedicalOpinion().equals(CTDIAGNOSISPNEUMONIAID))
+                        || troubleshootRecord.getMedicalOpinion().equals(CTDIAGNOSISPNEUMONIAID)
+                        || troubleshootRecord.getMedicalOpinion().equals(GENERALFEVER)
+                        || troubleshootRecord.getMedicalOpinion().equals(CLOSECONTACTS))
         ) {
             // 组装成model
             EpidemicPersonModel epidemicPersonModel = new EpidemicPersonModel();

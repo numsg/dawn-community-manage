@@ -1,17 +1,13 @@
 package com.gsafety.dawn.community.manage.service.serviceimpl;
 
-import com.gsafety.dawn.community.common.util.DateUtil;
 import com.gsafety.dawn.community.common.util.StringUtil;
 import com.gsafety.dawn.community.manage.contract.model.total.DistributionStatisticsRequest;
 import com.gsafety.dawn.community.manage.contract.model.total.DistributionStatisticsResult;
 import com.gsafety.dawn.community.manage.contract.service.StatisticsService;
 import com.gsafety.dawn.community.manage.service.entity.statistics.DistributionStatisticsEntity;
 import com.gsafety.dawn.community.manage.service.repository.EpidemicPerStatisticsRepository;
-import com.gsafety.dawn.community.manage.service.repository.EpidemicPersonRepository;
-import com.gsafety.java.common.utils.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import springfox.documentation.spring.web.json.Json;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;

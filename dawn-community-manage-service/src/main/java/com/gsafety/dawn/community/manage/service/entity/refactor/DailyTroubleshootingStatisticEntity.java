@@ -24,6 +24,18 @@ public class DailyTroubleshootingStatisticEntity {
 
     private long ct;
 
+    private long allTotal;
+
+    private long allFever;
+
+    private long allContact;
+
+    private long allConfirmed;
+
+    private long allSuspect;
+
+    private long allCt;
+
     public DailyTroubleshootingStatisticEntity(String date, long total, long fever, long contact, long confirmed, long suspect, long ct) {
         this.date = date;
         this.total = total;
@@ -91,5 +103,53 @@ public class DailyTroubleshootingStatisticEntity {
 
     public void setCt(long ct) {
         this.ct = ct;
+    }
+
+    public long getAllTotal() {
+        return allTotal;
+    }
+
+    public void setAllTotal(long allTotal) {
+        this.allTotal = allTotal;
+    }
+
+    public long getAllFever() {
+        return allFever;
+    }
+
+    public void setAllFever(long allFever) {
+        this.allFever = allFever;
+    }
+
+    public long getAllContact() {
+        return allContact;
+    }
+
+    public void setAllContact(long allContact) {
+        this.allContact = allContact;
+    }
+
+    public long getAllConfirmed() {
+        return allConfirmed;
+    }
+
+    public void setAllConfirmed(long allConfirmed) {
+        this.allConfirmed = allConfirmed;
+    }
+
+    public long getAllSuspect() {
+        return allSuspect;
+    }
+
+    public void setAllSuspect(long allSuspect) {
+        this.allSuspect = allSuspect;
+    }
+
+    public long getAllCt() {
+        return allCt;
+    }
+
+    public void setAllCt(long allCt) {
+        this.allCt = allCt;
     }
 }

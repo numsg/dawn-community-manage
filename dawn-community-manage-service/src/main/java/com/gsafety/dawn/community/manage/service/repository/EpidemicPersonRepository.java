@@ -5,6 +5,7 @@ import com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroublesho
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
@@ -76,8 +77,8 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
             "WHEN h.medicalOpinion = '5e959c1b-584a-42d5-a28c-78ad5e57c1fb' THEN \n" +
             "1 \n" +
             "END) ) from TroubleshootHistoryRecordEntity  as h \n" +
-            "where  h.createTime>=current_date-1 AND h.createDate <current_date")
-    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordDayMon();
+            "where  h.createTime>=current_date-1 AND h.createTime <current_date AND  h.multiTenancy  = :multiTenancy")
+    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordDayMon(@Param("multiTenancy") String multiTenancy);
 
     @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroubleshootingStatisticEntity(to_char(current_date - 2,'MM月DD号') , count(*) , count(CASE \n" +
             "WHEN h.isExceedTemp = 't' THEN \n" +
@@ -97,8 +98,8 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
             "WHEN h.medicalOpinion = '5e959c1b-584a-42d5-a28c-78ad5e57c1fb' THEN \n" +
             "1 \n" +
             "END) ) from TroubleshootHistoryRecordEntity  as h \n" +
-            "where  h.createTime>=current_date-2 AND h.createDate <current_date - 1 ")
-    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordTue();
+            "where  h.createTime>=current_date-2 AND h.createTime <current_date - 1 AND  h.multiTenancy  = :multiTenancy ")
+    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordTue(@Param("multiTenancy") String multiTenancy);
 
     @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroubleshootingStatisticEntity(to_char(current_date - 3,'MM月DD号') , count(*) , count(CASE \n" +
             "WHEN h.isExceedTemp = 't' THEN \n" +
@@ -118,8 +119,8 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
             "WHEN h.medicalOpinion = '5e959c1b-584a-42d5-a28c-78ad5e57c1fb' THEN \n" +
             "1 \n" +
             "END) ) from TroubleshootHistoryRecordEntity  as h \n" +
-            "where  h.createTime>=current_date-3 AND h.createDate <current_date - 2 ")
-    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordDayWed();
+            "where  h.createTime>=current_date-3 AND h.createTime <current_date - 2 AND  h.multiTenancy  = :multiTenancy")
+    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordDayWed(@Param("multiTenancy") String multiTenancy);
 
     @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroubleshootingStatisticEntity(to_char(current_date - 4,'MM月DD号') , count(*) , count(CASE \n" +
             "WHEN h.isExceedTemp = 't' THEN \n" +
@@ -139,8 +140,8 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
             "WHEN h.medicalOpinion = '5e959c1b-584a-42d5-a28c-78ad5e57c1fb' THEN \n" +
             "1 \n" +
             "END) ) from TroubleshootHistoryRecordEntity  as h \n" +
-            "where  h.createTime>=current_date-4 AND h.createDate <current_date - 3 ")
-    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordThu();
+            "where  h.createTime>=current_date-4 AND h.createTime <current_date - 3 AND  h.multiTenancy  = :multiTenancy")
+    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordThu(@Param("multiTenancy") String multiTenancy);
 
     @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroubleshootingStatisticEntity(to_char(current_date - 5,'MM月DD号') , count(*) , count(CASE \n" +
             "WHEN h.isExceedTemp = 't' THEN \n" +
@@ -160,8 +161,8 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
             "WHEN h.medicalOpinion = '5e959c1b-584a-42d5-a28c-78ad5e57c1fb' THEN \n" +
             "1 \n" +
             "END) ) from TroubleshootHistoryRecordEntity  as h \n" +
-            "where  h.createTime>=current_date-5 AND h.createDate <current_date - 4 ")
-    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordFri();
+            "where  h.createTime>=current_date-5 AND h.createTime <current_date - 4 AND  h.multiTenancy  = :multiTenancy")
+    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordFri(@Param("multiTenancy") String multiTenancy);
 
     @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroubleshootingStatisticEntity(to_char(current_date - 6,'MM月DD号') , count(*) , count(CASE \n" +
             "WHEN h.isExceedTemp = 't' THEN \n" +
@@ -181,8 +182,8 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
             "WHEN h.medicalOpinion = '5e959c1b-584a-42d5-a28c-78ad5e57c1fb' THEN \n" +
             "1 \n" +
             "END) ) from TroubleshootHistoryRecordEntity  as h \n" +
-            "where  h.createTime>=current_date-6 AND h.createDate <current_date - 5 ")
-    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordSat();
+            "where  h.createTime>=current_date-6 AND h.createTime <current_date - 5 AND  h.multiTenancy  = :multiTenancy")
+    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordSat(@Param("multiTenancy") String multiTenancy);
 
     @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroubleshootingStatisticEntity(to_char(current_date - 7,'MM月DD号') , count(*) , count(CASE \n" +
             "WHEN h.isExceedTemp = 't' THEN \n" +
@@ -202,8 +203,30 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
             "WHEN h.medicalOpinion = '5e959c1b-584a-42d5-a28c-78ad5e57c1fb' THEN \n" +
             "1 \n" +
             "END) ) from TroubleshootHistoryRecordEntity  as h \n" +
-            "where  h.createTime>=current_date-7 AND h.createDate <current_date - 6 ")
-    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordSun();
+            "where  h.createTime>=current_date-7 AND h.createTime <current_date - 6 AND  h.multiTenancy  = :multiTenancy")
+    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordSun(@Param("multiTenancy") String multiTenancy);
 
+
+    // 查询8天以前的综合
+    @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroubleshootingStatisticEntity(to_char(current_date - 7,'MM月DD号') , count(*) , count(CASE \n" +
+            "WHEN h.isExceedTemp = 't' THEN \n" +
+            "1 \n" +
+            "END) , count(CASE \n" +
+            "WHEN h.isContact = 't' THEN \n" +
+            "1 \n" +
+            "END)  ,count(\n" +
+            "CASE \n" +
+            "WHEN h.medicalOpinion = 'f56d6e21-5f64-48d0-a55f-5defd9d4c166' THEN \n" +
+            "1 \n" +
+            "END\n" +
+            ") ,count(CASE \n" +
+            "WHEN h.medicalOpinion = '903db428-4f4b-4f67-a5ab-3631a77b633d' THEN \n" +
+            "1 \n" +
+            "END) , count(CASE \n" +
+            "WHEN h.medicalOpinion = '5e959c1b-584a-42d5-a28c-78ad5e57c1fb' THEN \n" +
+            "1 \n" +
+            "END) ) from TroubleshootHistoryRecordEntity  as h \n" +
+            "where  h.createTime < current_date-7 AND  h.multiTenancy  = :multiTenancy")
+    List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordBefore(@Param("multiTenancy") String multiTenancy);
 
 }

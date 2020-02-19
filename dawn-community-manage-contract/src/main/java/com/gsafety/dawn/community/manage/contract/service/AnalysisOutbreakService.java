@@ -10,6 +10,6 @@ public interface AnalysisOutbreakService {
 
 
     // 确诊、疑似、发热、接触人员近7日统计
-    List<DailyTroubleshootingStatisticModel> troubleStatistic();
+    List<DailyTroubleshootingStatisticModel> troubleStatistic(String multiTenancy);
 
 }

@@ -1,6 +1,8 @@
 package com.gsafety.dawn.community.manage.service.repository;
 
+import com.gsafety.dawn.community.manage.contract.model.total.DailyTroublePlotStatisticModel;
 import com.gsafety.dawn.community.manage.service.entity.EpidemicPersonEntity;
+import com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroublePlotStatisticEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroubleshootingStatisticEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -57,6 +59,30 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
 
     @Query()
     List<EpidemicPersonEntity> queryAllByNameAndMobileNumber(String name, String mobileNumber);
+
+
+//    @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroublePlotStatisticEntity(to_char(current_date - 1,'MM月DD号') , count(*) , h.plot)  \n" +
+//            "from TroubleshootHistoryRecordEntity  as h  \n" +
+//            "where h.createTime>=current_date-1 AND h.createTime <current_date AND  h.multiTenancy  = :multiTenancy AND h.plot in (:plotIds) GROUP BY h.plot\n")
+//    List<DailyTroublePlotStatisticEntity> staPlotsMon(@Param("multiTenancy") String multiTenancy , @Param("plotIds") List<Long> plotIds , @Param("startIndex") int startIndex);
+//
+
+//    @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroublePlotStatisticEntity(to_char(current_date - (:startIndex),'MM月DD号') , count(*) , h.plot)  \n" +
+//            "from TroubleshootHistoryRecordEntity  as h  \n" +
+//            "where h.createTime>=current_date-(:startIndex) AND h.createTime <current_date- (:endIndex) AND  h.multiTenancy  = :multiTenancy AND h.plot in (:plotIds) GROUP BY h.plot\n")
+//    List<DailyTroublePlotStatisticEntity> staPlotsMon(@Param("multiTenancy") String multiTenancy , @Param("plotIds") List<Long> plotIds , @Param("startIndex") int startIndex , @Param("endIndex") int endIndex);
+
+    @Query("select new com.gsafety.dawn.community.manage.contract.model.total.DailyTroublePlotStatisticModel(to_char(current_date - (:startIndex),'MM月DD号') , count(*) , h.plot)  \n" +
+            "from TroubleshootHistoryRecordEntity  as h  \n" +
+            "where h.createTime>=current_date-(:startIndex) AND h.createTime <current_date- (:endIndex) AND  h.multiTenancy  = :multiTenancy AND h.plot in (:plotIds) GROUP BY h.plot\n")
+    List<DailyTroublePlotStatisticModel> staPlotsMon(@Param("multiTenancy") String multiTenancy, @Param("plotIds") List<String> plotIds, @Param("startIndex") int startIndex, @Param("endIndex") int endIndex);
+
+    @Query("select new com.gsafety.dawn.community.manage.contract.model.total.DailyTroublePlotStatisticModel(to_char(current_date - (:startIndex),'MM月DD号') , count(*) , h.plot)  \n" +
+            "from TroubleshootHistoryRecordEntity  as h  \n" +
+            "where h.createTime>=current_date-(:startIndex) AND h.createTime <current_date- (:endIndex) AND  h.multiTenancy  = :multiTenancy  GROUP BY h.plot\n")
+    List<DailyTroublePlotStatisticModel> staPlotsNull(@Param("multiTenancy") String multiTenancy, @Param("startIndex") int startIndex, @Param("endIndex") int endIndex);
+
+
 
 
     @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroubleshootingStatisticEntity(to_char(current_date - 1,'MM月DD号') , count(*) , count(CASE \n" +

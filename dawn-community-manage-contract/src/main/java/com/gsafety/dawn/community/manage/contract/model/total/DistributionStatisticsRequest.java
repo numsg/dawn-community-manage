@@ -3,7 +3,7 @@ package com.gsafety.dawn.community.manage.contract.model.total;
 import java.util.Date;
 
 public class DistributionStatisticsRequest {
-    private String  diagnosisSituationId;
+    private String  medicalConditionId;
     private String type; //统计类型 1-小区，2=性别，3-年龄
     private Date startTime;
     private Date endTime;
@@ -18,13 +18,12 @@ public class DistributionStatisticsRequest {
         this.multiTenancy = multiTenancy;
     }
 
-    public String getDiagnosisSituationId() {
-        return diagnosisSituationId;
+    public String getMedicalConditionId() {
+        return medicalConditionId;
     }
 
-
-    public void setDiagnosisSituationId(String diagnosisSituationId) {
-        this.diagnosisSituationId = diagnosisSituationId;
+    public void setMedicalConditionId(String medicalConditionId) {
+        this.medicalConditionId = medicalConditionId;
     }
 
     public String getType() {

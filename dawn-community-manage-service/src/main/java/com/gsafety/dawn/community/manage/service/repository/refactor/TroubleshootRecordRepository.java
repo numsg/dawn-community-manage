@@ -37,7 +37,7 @@ public interface TroubleshootRecordRepository extends JpaRepository<Troubleshoot
          //List<PlotBuildingUnitStaffEntity> findPlotBuildingUnitStaff(@Param("multiTenancy") String multiTenancy);
     Page<PlotBuildingUnitStaffEntity> findPlotBuildingUnitStaff(@Param("multiTenancy") String multiTenancy, Pageable pageable);
 
-    @Query(nativeQuery = true ,value = "select sum(b.count) from (select count(*) from  b_troubleshoot_record where multi_tenancy=?1 group by building,unit_number,create_date,plot) as b")
+    @Query(nativeQuery = true ,value = "select count(b.count) from (select count(*) from  b_troubleshoot_record where multi_tenancy=?1 group by building,unit_number,create_date,plot) as b")
     Integer getCountByPlotBuildingUnitStaff( String multiTenancy);
 
 

@@ -17,31 +17,31 @@ public interface EpidemicPerStatisticsRepository extends JpaRepository<EpidemicP
 
     /**
      * 按小区统计
-     * @param diagnosisSituation diagnosisSituation
+     * @param medicalCondition medicalCondition
      * @param multiTenancy multiTenancy
      * @param startTime startTime
      * @param endTime endTime
      * @return list
      */
     @Query(value = "select  new com.gsafety.dawn.community.manage.service.entity.statistics.DistributionStatisticsEntity(count(c),c.villageId)" +
-            "from EpidemicPersonEntity c where c.diagnosisSituation  = :diagnosisSituation  and c.multiTenancy  = :multiTenancy  and " +
+            "from EpidemicPersonEntity c where c.medicalCondition  = :medicalCondition  and c.multiTenancy  = :multiTenancy  and " +
             "c.diseaseTime between :startTime and :endTime group by c.villageId")
-    List<DistributionStatisticsEntity> statisticsByPlot(@Param("diagnosisSituation") String diagnosisSituation, @Param("multiTenancy") String multiTenancy,
+    List<DistributionStatisticsEntity> statisticsByPlot(@Param("medicalCondition") String medicalCondition, @Param("multiTenancy") String multiTenancy,
                                                         @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 
 
     //按性别统计
     @Query(value = "select  new com.gsafety.dawn.community.manage.service.entity.statistics.DistributionStatisticsEntity(count(c),c.gender)" +
-            "from EpidemicPersonEntity c where c.diagnosisSituation  = :diagnosisSituation  and c.multiTenancy  = :multiTenancy and " +
+            "from EpidemicPersonEntity c where c.medicalCondition  = :medicalCondition  and c.multiTenancy  = :multiTenancy and " +
              "c.diseaseTime between :startTime and :endTime  group by c.gender")
-    List<DistributionStatisticsEntity> statisticsByGender(@Param("diagnosisSituation") String diagnosisSituation, @Param("multiTenancy") String multiTenancy,
+    List<DistributionStatisticsEntity> statisticsByGender(@Param("medicalCondition") String medicalCondition, @Param("multiTenancy") String multiTenancy,
                                                       @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 
     // 按年龄统计
        @Query(value = "select  new com.gsafety.dawn.community.manage.service.entity.statistics.DistributionStatisticsEntity(count(c),c.age)" +
-            "from EpidemicPersonEntity c where c.diagnosisSituation  = :diagnosisSituation  and c.multiTenancy  = :multiTenancy and " +
+            "from EpidemicPersonEntity c where c.medicalCondition  = :medicalCondition  and c.multiTenancy  = :multiTenancy and " +
             "c.diseaseTime between :startTime and :endTime group by c.age")
-    List<DistributionStatisticsEntity> statisticsByAge(@Param("diagnosisSituation") String diagnosisSituation, @Param("multiTenancy") String multiTenancy,
+    List<DistributionStatisticsEntity> statisticsByAge(@Param("medicalCondition") String medicalCondition, @Param("multiTenancy") String multiTenancy,
                                                 @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 
 

@@ -30,7 +30,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public List<DistributionStatisticsResult> distributionStatistics(DistributionStatisticsRequest paramModel) {
         List<DistributionStatisticsResult> result=new ArrayList<>();
-        String  diagnosisSituationId=paramModel.getDiagnosisSituationId();
+        String  medicalConditionId=paramModel.getMedicalConditionId();
         Date startTime=paramModel.getStartTime();
         Date endTime=paramModel.getEndTime();
         String multiTenancy=paramModel.getMultiTenancy();
@@ -40,11 +40,11 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
         List<DistributionStatisticsEntity> queryResult=new ArrayList<>();
         if ("1".equals(type)){ // 按小区统计
-            queryResult=epidemicPerStatisticsRepository.statisticsByPlot(diagnosisSituationId,multiTenancy,startTime,endTime);
+            queryResult=epidemicPerStatisticsRepository.statisticsByPlot(medicalConditionId,multiTenancy,startTime,endTime);
         }else if ("2".equals(type)){ // 按性别统计
-            queryResult=epidemicPerStatisticsRepository.statisticsByGender(diagnosisSituationId,multiTenancy,startTime,endTime);
+            queryResult=epidemicPerStatisticsRepository.statisticsByGender(medicalConditionId,multiTenancy,startTime,endTime);
         }else if("3".equals(type)){ //按年龄统计
-            queryResult=epidemicPerStatisticsRepository.statisticsByAge(diagnosisSituationId,multiTenancy,startTime,endTime);
+            queryResult=epidemicPerStatisticsRepository.statisticsByAge(medicalConditionId,multiTenancy,startTime,endTime);
         }
 
         queryResult.forEach(ele ->{

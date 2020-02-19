@@ -3,15 +3,15 @@ package com.gsafety.dawn.community.manage.contract.model.refactor;
 import java.util.List;
 
 public class PlotBuildingUnitPagedResult {
-   private Integer totalPages;
+   private Integer total;
    private List<PlotBuildingUnitStatistics> pageContent;
 
-    public Integer getTotalPages() {
-        return totalPages;
+    public Integer getTotal() {
+        return total;
     }
 
-    public void setTotalPages(Integer totalPages) {
-        this.totalPages = totalPages;
+    public void setTotal(Integer total) {
+        this.total = total;
     }
 
     public List<PlotBuildingUnitStatistics> getPageContent() {

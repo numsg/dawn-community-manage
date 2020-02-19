@@ -20,6 +20,7 @@ import com.gsafety.dawn.community.manage.service.repository.DataSourceRepository
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootHistoryRecordRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.PersonBaseRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootRecordRepository;
+import com.gsafety.java.common.utils.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -210,16 +212,19 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
     }
 
     @Override
+    @Transactional
     public PlotBuildingUnitPagedResult getPlotBuildingUnitStatistics(PagedQueryModel pagedQueryModel) {
         PlotBuildingUnitPagedResult result = new PlotBuildingUnitPagedResult();
         String multiTenancy = pagedQueryModel.getMultiTenancy();
-        Pageable pageable =PageRequest.of(pagedQueryModel.getPageNumber()-1, pagedQueryModel.getPageSize());
+        Sort sort =new Sort(Sort.Direction.ASC, "building").and(new Sort(Sort.Direction.ASC, "unitNumber"));
+        Pageable pageable =PageRequest.of(pagedQueryModel.getPageNumber()-1, pagedQueryModel.getPageSize(),sort);
+
         try {
             if (StringUtil.isEmpty(multiTenancy)) {
                 return null;
             }
             Page<PlotBuildingUnitStaffEntity> pageResult = troubleshootRecordRepository.findPlotBuildingUnitStaff(multiTenancy, pageable);
-            result.setTotalPages(pageResult.getTotalPages());
+            result.setTotal(troubleshootRecordRepository.getCountByPlotBuildingUnitStaff(multiTenancy));
             List<PlotBuildingUnitStaffEntity> plotBuildingUnitStaffEntities = pageResult.getContent();
             // List<PlotBuildingUnitStaffEntity> plotBuildingUnitStaffEntities=troubleshootRecordRepository.findPlotBuildingUnitStaff(multiTenancy);
             if (CollectionUtils.isEmpty(plotBuildingUnitStaffEntities)) {

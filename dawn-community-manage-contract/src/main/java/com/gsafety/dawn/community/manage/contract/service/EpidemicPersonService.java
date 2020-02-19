@@ -4,9 +4,7 @@ import com.gsafety.dawn.community.manage.contract.model.ModifyMedicalTreatmentMo
 import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
 import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.model.EpidemicPersonModel;
-import com.gsafety.dawn.community.manage.contract.model.total.DistrictDiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.model.total.EpidemicTotalStatisticModel;
-import com.gsafety.dawn.community.manage.contract.model.total.SpecialCountModel;
 
 import java.util.List;
 
@@ -22,10 +20,6 @@ public interface EpidemicPersonService {
 
     // 统计
     List<DiagnosisCountModel> diagnosisCount(String districtCode);
-
-    List<SpecialCountModel> diagnosisCountWithConfirmedAndSuspected(String communityId);
-
-    List<SpecialCountModel> diagnosisCountWithHealthAndDeath(String communityId);
 
     // 更新医疗情况信息
     boolean modifyMedicalTreatment(ModifyMedicalTreatmentModel medicalTreatmentModel);

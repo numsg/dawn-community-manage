@@ -3,9 +3,7 @@ package com.gsafety.dawn.community.manage.webapi.controller;
 import com.gsafety.dawn.community.manage.contract.model.ModifyMedicalTreatmentModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.model.EpidemicPersonModel;
-import com.gsafety.dawn.community.manage.contract.model.total.DistrictDiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.model.total.EpidemicTotalStatisticModel;
-import com.gsafety.dawn.community.manage.contract.model.total.SpecialCountModel;
 import com.gsafety.dawn.community.manage.contract.service.EpidemicPersonService;
 import com.gsafety.java.common.exception.HttpError;
 import com.gsafety.springboot.common.annotation.LimitIPRequestAnnotation;
@@ -16,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;

@@ -124,24 +124,6 @@ public class EpidemicPersonServiceImpl extends DataSourceShareIds implements Epi
         return result;
     }
 
-    @Override
-    public List<SpecialCountModel> diagnosisCountWithConfirmedAndSuspected(String communityId) {
-        return null;
-    }
-
-    @Override
-    public List<SpecialCountModel> diagnosisCountWithHealthAndDeath(String communityId) {
-
-
-        // 治愈
-        List<EpidemicPersonEntity> queryResult = epidemicPersonRepository.queryAllByDiagnosisSituationAndMultiTenancyOrderByUpdateTimeAsc(diagnosisHealthId, "123456");
-        queryResult.forEach(date -> {
-            System.out.println(date.getUpdateTime());
-        });
-        return null;
-    }
-
-
     // 更新医疗情况信息
     @Override
     public boolean modifyMedicalTreatment(ModifyMedicalTreatmentModel medicalTreatmentModel) {

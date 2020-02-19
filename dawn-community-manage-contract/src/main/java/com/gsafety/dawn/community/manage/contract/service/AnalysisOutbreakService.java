@@ -2,6 +2,7 @@ package com.gsafety.dawn.community.manage.contract.service;
 
 import com.gsafety.dawn.community.manage.contract.model.refactor.DailyTroubleshootingStatisticModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DailyTroublePlotStatisticModel;
+import com.gsafety.dawn.community.manage.contract.model.total.EpidemicClassificaModel;
 
 import java.util.List;
 import java.util.Map;
@@ -18,4 +19,7 @@ public interface AnalysisOutbreakService {
     Map<String, List<DailyTroublePlotStatisticModel>> troublePlotStatistic(String multiTenancy , List<String> plots);
 
     List<DailyTroubleshootingStatisticModel> calcEveryData(String multiTenancy);
+
+
+    List<EpidemicClassificaModel> epidemicCureAndDeath(String multiTenancy);
 }

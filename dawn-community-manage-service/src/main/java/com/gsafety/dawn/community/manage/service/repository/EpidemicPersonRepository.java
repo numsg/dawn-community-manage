@@ -1,6 +1,7 @@
 package com.gsafety.dawn.community.manage.service.repository;
 
 import com.gsafety.dawn.community.manage.contract.model.total.DailyTroublePlotStatisticModel;
+import com.gsafety.dawn.community.manage.contract.model.total.EpidemicClassificaModel;
 import com.gsafety.dawn.community.manage.contract.model.total.TypeOtherModel;
 import com.gsafety.dawn.community.manage.contract.model.total.TypePersonModel;
 import com.gsafety.dawn.community.manage.service.entity.EpidemicPersonEntity;
@@ -272,4 +273,47 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
             "where  h.createTime < current_date-7 AND  h.multiTenancy  = :multiTenancy")
     List<DailyTroubleshootingStatisticEntity> statisticHistoryRecordBefore(@Param("multiTenancy") String multiTenancy);
 
+
+
+
+    // 自愈死亡
+    @Query("select new com.gsafety.dawn.community.manage.contract.model.total.EpidemicClassificaModel(" +
+            "to_char(current_date - (:startIndex) ,'MM月DD号') , count(*)  ,count(CASE \n" +
+            "WHEN b.medicalCondition = :cure THEN \n" +
+            "1 \n" +
+            "END) , count(CASE \n" +
+            "WHEN b.medicalCondition = :death THEN \n" +
+            "1 \n" +
+            "END) )\n" +
+            "from EpidemicPersonEntity  as b \n" +
+            "where  b.multiTenancy  = :multiTenancy AND b.diseaseTime>=current_date-(:startIndex) AND b.diseaseTime <current_date-(:endIndex)   ")
+    List<EpidemicClassificaModel> statisEpidemic(@Param("multiTenancy") String multiTenancy , @Param("startIndex") int startIndex, @Param("endIndex") int endIndex ,
+                                                 @Param("cure") String cure , @Param("death") String death);
+
+    @Query("select new com.gsafety.dawn.community.manage.contract.model.total.EpidemicClassificaModel(" +
+            "to_char(current_date  ,'MM月DD号') , count(*)  ,count(CASE \n" +
+            "WHEN b.medicalCondition = :cure THEN \n" +
+            "1 \n" +
+            "END) , count(CASE \n" +
+            "WHEN b.medicalCondition = :death THEN \n" +
+            "1 \n" +
+            "END) )\n" +
+            "from EpidemicPersonEntity  as b \n" +
+            "where  b.multiTenancy  = :multiTenancy AND b.diseaseTime>=current_date AND b.diseaseTime <current_date + 1 ")
+    List<EpidemicClassificaModel> statisEpidemicToday(@Param("multiTenancy") String multiTenancy ,
+                                                 @Param("cure") String cure , @Param("death") String death);
+
+
+    // 7天之前所有的治愈和死亡
+    @Query("select new com.gsafety.dawn.community.manage.contract.model.total.EpidemicClassificaModel(" +
+            "to_char(current_date - 7 ,'MM月DD号') , count(*)  ,count(CASE \n" +
+            "WHEN b.medicalCondition = :cure THEN \n" +
+            "1 \n" +
+            "END) , count(CASE \n" +
+            "WHEN b.medicalCondition = :death THEN \n" +
+            "1 \n" +
+            "END) )\n" +
+            "from EpidemicPersonEntity  as b \n" +
+            "where  b.multiTenancy  = :multiTenancy AND b.diseaseTime < current_date-7 ")
+    List<EpidemicClassificaModel> statisEpidemicBefore(@Param("multiTenancy") String multiTenancy ,@Param("cure") String cure , @Param("death") String death);
 }

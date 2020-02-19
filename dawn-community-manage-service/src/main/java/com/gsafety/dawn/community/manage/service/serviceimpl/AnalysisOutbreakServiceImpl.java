@@ -2,6 +2,7 @@ package com.gsafety.dawn.community.manage.service.serviceimpl;
 
 import com.gsafety.dawn.community.manage.contract.model.refactor.DailyTroubleshootingStatisticModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DailyTroublePlotStatisticModel;
+import com.gsafety.dawn.community.manage.contract.model.total.EpidemicClassificaModel;
 import com.gsafety.dawn.community.manage.contract.model.total.TypeOtherModel;
 import com.gsafety.dawn.community.manage.contract.model.total.TypePersonModel;
 import com.gsafety.dawn.community.manage.contract.service.AnalysisOutbreakService;
@@ -175,5 +176,44 @@ public class AnalysisOutbreakServiceImpl extends DataSourceShareIds implements A
             dailyTroubleshootingStatisticModel.setAllCt(tempCTs.size());
         }
         return dailyTroubleshootingStatisticModel;
+    }
+
+
+    // 死亡治愈接口 - 添加一个
+    @Override
+    public List<EpidemicClassificaModel> epidemicCureAndDeath(String multiTenancy){
+        List<EpidemicClassificaModel> epidemicClassificaModels = new ArrayList<>();
+        for (int i = 0 ; i < 7 ; i++){
+            if(i == 0){
+                List<EpidemicClassificaModel> todayData = epidemicPersonRepository.statisEpidemicToday(multiTenancy, CURE, DEATH);
+                epidemicClassificaModels.addAll(todayData);
+                continue;
+            }
+            List<EpidemicClassificaModel> temp = epidemicPersonRepository.statisEpidemic(multiTenancy, i, i - 1, CURE, DEATH);
+            epidemicClassificaModels.addAll(temp);
+        }
+        Collections.reverse(epidemicClassificaModels);
+        List<EpidemicClassificaModel> before = epidemicPersonRepository.statisEpidemicBefore(multiTenancy, CURE, DEATH);
+        combineEpideModes(epidemicClassificaModels , before);
+        return epidemicClassificaModels;
+    }
+
+    // 把结果累加
+    public List<EpidemicClassificaModel> combineEpideModes(List<EpidemicClassificaModel> sevenDates , List<EpidemicClassificaModel> beforDates ){
+        EpidemicClassificaModel before = beforDates.get(0);
+        for(int i= 0 ; i < sevenDates.size() ; i++){
+            EpidemicClassificaModel temp = sevenDates.get(i);
+            if(i == 0){
+                temp.setAllTotal(before.getAllTotal() +  temp.getTotal());
+                temp.setAllCure(before.getAllCure() + temp.getCure());
+                temp.setAllDeath(before.getAllDeath() + temp.getDeath());
+                continue;
+            }
+            EpidemicClassificaModel last = sevenDates.get(i - 1);
+            temp.setAllTotal(last.getAllTotal() + temp.getTotal());
+            temp.setAllCure(last.getAllCure() + temp.getCure());
+            temp.setAllDeath(last.getAllDeath() + temp.getDeath());
+        }
+        return sevenDates;
     }
 }

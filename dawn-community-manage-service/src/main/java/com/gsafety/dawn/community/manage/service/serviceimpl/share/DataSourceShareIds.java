@@ -26,5 +26,11 @@ public class DataSourceShareIds {
     // 医疗情况-暂无
     public static final String NOMEDICAL = "b695df70-33a5-4d13-993c-1f5c16bbb707";
 
+    // 治愈
+    public static final String CURE = "1aecb194-7aa6-4c08-b902-1d9f4008bc5b";
+
+    // 死亡
+    public static final String DEATH = "2b4535c8-77d8-4cd2-ba12-af5f4b527637";
+
 
 }

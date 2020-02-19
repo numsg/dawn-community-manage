@@ -1,9 +1,12 @@
 package com.gsafety.dawn.community.manage.service.repository;
 
 import com.gsafety.dawn.community.manage.contract.model.total.DailyTroublePlotStatisticModel;
+import com.gsafety.dawn.community.manage.contract.model.total.TypeOtherModel;
+import com.gsafety.dawn.community.manage.contract.model.total.TypePersonModel;
 import com.gsafety.dawn.community.manage.service.entity.EpidemicPersonEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroublePlotStatisticEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroubleshootingStatisticEntity;
+import com.gsafety.dawn.community.manage.service.entity.refactor.TroubleshootHistoryRecordEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -61,22 +64,12 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
     List<EpidemicPersonEntity> queryAllByNameAndMobileNumber(String name, String mobileNumber);
 
 
-//    @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroublePlotStatisticEntity(to_char(current_date - 1,'MM月DD号') , count(*) , h.plot)  \n" +
-//            "from TroubleshootHistoryRecordEntity  as h  \n" +
-//            "where h.createTime>=current_date-1 AND h.createTime <current_date AND  h.multiTenancy  = :multiTenancy AND h.plot in (:plotIds) GROUP BY h.plot\n")
-//    List<DailyTroublePlotStatisticEntity> staPlotsMon(@Param("multiTenancy") String multiTenancy , @Param("plotIds") List<Long> plotIds , @Param("startIndex") int startIndex);
-//
-
-//    @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroublePlotStatisticEntity(to_char(current_date - (:startIndex),'MM月DD号') , count(*) , h.plot)  \n" +
-//            "from TroubleshootHistoryRecordEntity  as h  \n" +
-//            "where h.createTime>=current_date-(:startIndex) AND h.createTime <current_date- (:endIndex) AND  h.multiTenancy  = :multiTenancy AND h.plot in (:plotIds) GROUP BY h.plot\n")
-//    List<DailyTroublePlotStatisticEntity> staPlotsMon(@Param("multiTenancy") String multiTenancy , @Param("plotIds") List<Long> plotIds , @Param("startIndex") int startIndex , @Param("endIndex") int endIndex);
-
+    // 统计图1
     @Query("select new com.gsafety.dawn.community.manage.contract.model.total.DailyTroublePlotStatisticModel(to_char(current_date - (:startIndex),'MM月DD号') , count(*) , h.plot)  \n" +
             "from TroubleshootHistoryRecordEntity  as h  \n" +
             "where h.createTime>=current_date-(:startIndex) AND h.createTime <current_date- (:endIndex) AND  h.multiTenancy  = :multiTenancy AND h.plot in (:plotIds) GROUP BY h.plot\n")
     List<DailyTroublePlotStatisticModel> staPlotsMon(@Param("multiTenancy") String multiTenancy, @Param("plotIds") List<String> plotIds, @Param("startIndex") int startIndex, @Param("endIndex") int endIndex);
-
+    // 统计图1
     @Query("select new com.gsafety.dawn.community.manage.contract.model.total.DailyTroublePlotStatisticModel(to_char(current_date - (:startIndex),'MM月DD号') , count(*) , h.plot)  \n" +
             "from TroubleshootHistoryRecordEntity  as h  \n" +
             "where h.createTime>=current_date-(:startIndex) AND h.createTime <current_date- (:endIndex) AND  h.multiTenancy  = :multiTenancy  GROUP BY h.plot\n")
@@ -85,6 +78,30 @@ public interface EpidemicPersonRepository extends JpaRepository<EpidemicPersonEn
 
 
 
+
+
+
+    // 七天之前发热、密切接触、确诊、疑似、ct
+
+    // 计算每天的之前的增量
+    @Query("select distinct new com.gsafety.dawn.community.manage.contract.model.total.TypePersonModel(h.personBaseId , h.isExceedTemp , to_char(current_date - (:startIndex) ,'MM月DD日')) " +
+            " from TroubleshootHistoryRecordEntity  as h where  h.createTime < current_date-(:startIndex) AND h.isExceedTemp = 't' AND  h.multiTenancy  = :multiTenancy")
+    List<TypePersonModel> beforeFeversEveryDay(@Param("multiTenancy") String multiTenancy ,  @Param("startIndex") int startIndex);
+    // 密切接触
+    @Query("select distinct new com.gsafety.dawn.community.manage.contract.model.total.TypePersonModel(h.personBaseId , h.isContact , to_char(current_date - (:startIndex) ,'MM月DD日')) " +
+            " from TroubleshootHistoryRecordEntity  as h where  h.createTime < current_date-(:startIndex) AND h.isContact = 't' AND  h.multiTenancy  = :multiTenancy")
+    List<TypePersonModel> beforeContactsEveryDay(@Param("multiTenancy") String multiTenancy ,  @Param("startIndex") int startIndex);
+    // 确诊、疑似、ct
+    @Query("select distinct new com.gsafety.dawn.community.manage.contract.model.total.TypeOtherModel(h.personBaseId , h.medicalOpinion , to_char(current_date - (:startIndex) ,'MM月DD日')) " +
+            " from TroubleshootHistoryRecordEntity  as h where  h.createTime < current_date-(:startIndex) AND h.medicalOpinion = :medicalOpinion AND  h.multiTenancy  = :multiTenancy")
+    List<TypeOtherModel> beforeOthersEveryDay(@Param("medicalOpinion") String medicalOpinion , @Param("multiTenancy") String multiTenancy ,  @Param("startIndex") int startIndex);
+
+
+
+
+
+
+    // 统计图2
     @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.DailyTroubleshootingStatisticEntity(to_char(current_date - 1,'MM月DD号') , count(*) , count(CASE \n" +
             "WHEN h.isExceedTemp = 't' THEN \n" +
             "1 \n" +

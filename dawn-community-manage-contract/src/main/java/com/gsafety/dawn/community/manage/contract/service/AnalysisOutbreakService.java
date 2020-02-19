@@ -16,4 +16,6 @@ public interface AnalysisOutbreakService {
 
 
     Map<String, List<DailyTroublePlotStatisticModel>> troublePlotStatistic(String multiTenancy , List<String> plots);
+
+    List<DailyTroubleshootingStatisticModel> calcEveryData(String multiTenancy);
 }

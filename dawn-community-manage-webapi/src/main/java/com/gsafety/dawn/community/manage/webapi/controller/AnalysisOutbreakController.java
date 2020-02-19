@@ -46,4 +46,16 @@ public class AnalysisOutbreakController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+
+    @GetMapping(value = "/troubleshoot-overall/{districtCode}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "日常排查历史记录按小区统计", notes = "troubleshoot-overall")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = List.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+    public ResponseEntity<List<DailyTroubleshootingStatisticModel>> troubleshootOverall(@PathVariable @ApiParam(value = "行政区划code", required = true) String districtCode) {
+        List<DailyTroubleshootingStatisticModel> result = analysisOutbreakService.calcEveryData(districtCode);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 }

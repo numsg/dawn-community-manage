@@ -119,12 +119,18 @@ public class DateUtil {
         return result;
     }
     public static Date dateFormat(Date date){
+        return getDateByFormat(date,df);
+    }
+
+
+    public static Date  getDateByFormat(Date date,DateFormat format){
         Date result=null;
         try {
-            result = df.parse(df.format(date));
+            result = format.parse(format.format(date));
         } catch (ParseException e) {
             e.printStackTrace();
         }
         return result;
     }
+
 }

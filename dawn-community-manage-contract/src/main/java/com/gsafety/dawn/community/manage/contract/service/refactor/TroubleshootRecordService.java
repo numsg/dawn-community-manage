@@ -19,10 +19,9 @@ public interface TroubleshootRecordService {
     List<ReportingStaffStatistics> getReportingStaffStatistics(String multiTenancy);
 
     /**
-     * 获取社区下的小区楼栋单元分组统计
-     * @return
+     * 分页获取社区下的小区楼栋单元分组统计
      */
-   // PlotBuildingUnitPagedResult getPlotBuildingUnitStatistics(PagedQueryModel pagedQueryModel);
+    PlotBuildingUnitPagedResult pagedStatistics(PagedQueryModel pagedQueryModel);
 
     List<PlotBuildingUnitStatistics> getPlotBuildingUnitStatistics(String  multiTenancy);
 

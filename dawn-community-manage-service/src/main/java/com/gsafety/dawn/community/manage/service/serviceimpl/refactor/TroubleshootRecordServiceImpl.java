@@ -20,7 +20,6 @@ import com.gsafety.dawn.community.manage.service.repository.DataSourceRepository
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootHistoryRecordRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.PersonBaseRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootRecordRepository;
-import com.gsafety.java.common.utils.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -211,60 +210,50 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
         }
     }
 
-//    @Override
-//    public PlotBuildingUnitPagedResult getPlotBuildingUnitStatistics(PagedQueryModel pagedQueryModel) {
-//        PlotBuildingUnitPagedResult result = new PlotBuildingUnitPagedResult();
-//        String multiTenancy = pagedQueryModel.getMultiTenancy();
-//        Sort sort =new Sort(Sort.Direction.ASC, "building").and(new Sort(Sort.Direction.ASC, "unitNumber"));
-//        Pageable pageable =PageRequest.of(pagedQueryModel.getPageNumber()-1, pagedQueryModel.getPageSize(),sort);
-//
-//        try {
-//            if (StringUtil.isEmpty(multiTenancy)) {
-//                return null;
-//            }
-//           // Page<PlotBuildingUnitStaffEntity> pageResult = troubleshootRecordRepository.findPlotBuildingUnitStaff(multiTenancy, pageable);
-//            //result.setTotal(pageResult.getTotalElements());
-//            //List<PlotBuildingUnitStaffEntity> plotBuildingUnitStaffEntities = pageResult.getContent();
-//            // List<PlotBuildingUnitStaffEntity> plotBuildingUnitStaffEntities=troubleshootRecordRepository.findPlotBuildingUnitStaff(multiTenancy);
-//
-//            if (CollectionUtils.isEmpty(plotBuildingUnitStaffEntities)) {
-//                return result;
-//            }
-//            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
-//            Date date = format.parse(format.format(new Date()));
-//            List<PlotBuildingUnitStatistics> pageContent = new ArrayList<>();
-//
-//            Map<String, List<PlotBuildingUnitStaffEntity>> groupPlotBuildingUnitNumbers =
-//                    plotBuildingUnitStaffEntities.stream().collect(Collectors.groupingBy(PlotBuildingUnitStaffEntity::getPlotBuildingUnitNumber));
-//
-//            for (Map.Entry<String, List<PlotBuildingUnitStaffEntity>> entry :
-//                    groupPlotBuildingUnitNumbers.entrySet()) {
-//
-//                if (!CollectionUtils.isEmpty(entry.getValue())) {
-//                    PlotBuildingUnitStatistics plotBuildingUnitStatistics = new PlotBuildingUnitStatistics();
-//                    plotBuildingUnitStatistics.setBuilding(entry.getValue().get(0).getBuilding());
-//                    plotBuildingUnitStatistics.setPlotId(entry.getValue().get(0).getPlotId());
-//                    Long exceedTempCount = entry.getValue().stream().mapToLong(m -> m.getExceedTempCount()).sum();
-//                    plotBuildingUnitStatistics.setUnitNumber(entry.getValue().get(0).getUnitNumber());
-//                    plotBuildingUnitStatistics.setFeverCount(exceedTempCount.intValue());
-//                    Long checkedCount = entry.getValue().stream().filter(f -> f.getCreateDate().getTime() == date.getTime()).mapToLong(m -> m.getCount()).sum();
-//                    plotBuildingUnitStatistics.setCheckedCount(checkedCount.intValue());
-//                    Long unCheckedCount = entry.getValue().stream().filter(f -> f.getCreateDate().getTime() != date.getTime()).mapToLong(m -> m.getCount()).sum();
-//                    plotBuildingUnitStatistics.setUnCheckedCount(unCheckedCount.intValue());
-//                    pageContent.add(plotBuildingUnitStatistics);
-//                }
-//            }
-//            result.setPageContent(pageContent);
-//            return result;
-//        } catch (Exception e) {
-//            logger.error("getBuildingUnitStatistics error", e, e.getMessage(), e.getCause());
-//            return null;
-//        }
-//    }
+    @Override
+    public PlotBuildingUnitPagedResult pagedStatistics(PagedQueryModel pagedQueryModel) {
+        PlotBuildingUnitPagedResult result = new PlotBuildingUnitPagedResult();
+        try {
+            String multiTenancy = pagedQueryModel.getMultiTenancy();
+            if (StringUtil.isEmpty(multiTenancy)) {
+                return null;
+            }
+            Sort sort= new Sort(Sort.Direction.ASC, "building").and(new Sort(Sort.Direction.ASC, "unitNumber"));
+            Pageable pageable = PageRequest.of(pagedQueryModel.getPageNumber() - 1, pagedQueryModel.getPageSize(),sort);
+            Page<PlotBuildingUnitStaffEntity> page = troubleshootRecordRepository.pagedStatistics(multiTenancy, pageable);
+            List<PlotBuildingUnitStaffEntity> plotBuildingUnitStaffEntities = page.getContent();
+            if (CollectionUtils.isEmpty(plotBuildingUnitStaffEntities)) {
+                return result;
+            }
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+            Date date = format.parse(format.format(new Date()));
+            List<PlotBuildingUnitStatistics> pageContent = new ArrayList<>();
+            plotBuildingUnitStaffEntities.forEach(entity -> {
+                PlotBuildingUnitStatistics plotBuildingUnit = new PlotBuildingUnitStatistics();
+                plotBuildingUnit.setBuilding(entity.getBuilding());
+                plotBuildingUnit.setUnitNumber(entity.getUnitNumber());
+                plotBuildingUnit.setPlotId(entity.getPlotId());
+                Long feverCount = entity.getExceedTempCount();
+                plotBuildingUnit.setFeverCount(feverCount.intValue());
+                Integer checkedCount=troubleshootRecordRepository.queryCountWhenPagedStatistics(multiTenancy,
+                        entity.getBuilding(), entity.getPlotId(), entity.getUnitNumber(), date);
+                plotBuildingUnit.setCheckedCount(checkedCount);
+                Long count = entity.getCount();
+                plotBuildingUnit.setUnCheckedCount(count.intValue()-checkedCount);
+                pageContent.add(plotBuildingUnit);
+            });
+            result.setTotal(page.getTotalElements());
+            result.setPageContent(pageContent);
+            return result;
+        } catch (Exception e) {
+            logger.error("pagedStatistics error", e, e.getMessage(), e.getCause());
+            return null;
+        }
+    }
+
 
     @Override
     public List<PlotBuildingUnitStatistics> getPlotBuildingUnitStatistics(String multiTenancy) {
-
         try {
             if (StringUtil.isEmpty(multiTenancy)) {
                 return Collections.emptyList();
@@ -298,10 +287,10 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
                     result.add(plotBuildingUnitStatistics);
                 }
             }
-            return  result.stream().sorted(Comparator.comparing(PlotBuildingUnitStatistics::getBuilding)).collect(Collectors.toList());
+            return result.stream().sorted(Comparator.comparing(PlotBuildingUnitStatistics::getBuilding).thenComparing(PlotBuildingUnitStatistics::getUnitNumber)).collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("getBuildingUnitStatistics error", e, e.getMessage(), e.getCause());
-            return null;
+            return Collections.emptyList();
         }
     }
 
@@ -324,7 +313,7 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             Integer plotDailyTroubleshootTotal = 0;
             Integer plotAbnormalTotal = 0;
             String rate = "0.00%";
-            List<TroubleshootRecordEntity> records = troubleshootRecordRepository.queryAllByPlotAndMultiTenancy(plot.getId(),multiTenancy);
+            List<TroubleshootRecordEntity> records = troubleshootRecordRepository.queryAllByPlotAndMultiTenancy(plot.getId(), multiTenancy);
             Integer plotTroubleshootTotal = records.size();
             if (!records.isEmpty()) {
                 // Date date= DateUtil.getDayStartDate();
@@ -338,7 +327,7 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
                     plotDailyTroubleshootTotal = dailyRecords.size();
                     if (!dailyRecords.isEmpty()) {
                         // 异常人数
-                        plotAbnormalTotal = dailyRecords.stream().filter(f -> f.getIsExceedTemp() ||!f.getMedicalOpinion().equals(NoMedicalOption)).collect(Collectors.toList()).size();
+                        plotAbnormalTotal = dailyRecords.stream().filter(f -> f.getIsExceedTemp() || !f.getMedicalOpinion().equals(NoMedicalOption)).collect(Collectors.toList()).size();
                         //填报率
                         String doubleNumber = NumberUtil.divide(Integer.toString(plotDailyTroubleshootTotal), Integer.toString(plotTroubleshootTotal));
                         rate = NumberUtil.multiply(doubleNumber, Integer.toString(100)) + "%";

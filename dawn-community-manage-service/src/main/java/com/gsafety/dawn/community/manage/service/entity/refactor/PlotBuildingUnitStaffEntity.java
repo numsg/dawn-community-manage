@@ -12,6 +12,14 @@ public class PlotBuildingUnitStaffEntity {
     private String plotId;
     private String plotBuildingUnitNumber;
 
+    public PlotBuildingUnitStaffEntity(long count,  String building, String unitNumber, String plotId,long exceedTempCount) {
+        this.count = count;
+        this.exceedTempCount = exceedTempCount;
+        this.building = building;
+        this.unitNumber = unitNumber;
+        this.plotId = plotId;
+    }
+
     public PlotBuildingUnitStaffEntity(long count, String building, String unitNumber, Date createDate, String plotId, long exceedTempCount) {
         this.count = count;
         this.building = building;

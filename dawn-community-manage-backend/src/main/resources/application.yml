@@ -6,7 +6,7 @@ spring:
     name: dawn-community-manage
 
   datasource:
-    url: jdbc:postgresql://116.62.205.14:30020/dawn #业务数据库访问url
+    url: jdbc:postgresql://116.62.205.14:30025/dawn-db #业务数据库访问url
     username: postgres    #业务数据库访问用户名
     password: postgres #业务数据库访问用户密码
     driver-class-name: org.postgresql.Driver #数据库访问驱动名称
@@ -22,7 +22,7 @@ spring:
     properties:
       enabled: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
       naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties.hibernate.temp.use_jdbc_metadata_defaults: false   # 禁用Postgresql的特性检查（如CLOB），因为postgresql的驱动暂没有实现此特性
     database-platform: org.hibernate.dialect.PostgreSQL95Dialect
@@ -33,7 +33,7 @@ logging:
   config: classpath:logback-spring.xml
 
 access:
-  data-collection: http://ncov.gsafety.com/api
+  data-collection: http://39.105.209.108:8090/api
 # app相关配置
 app:
   multiTenancy: 123456

@@ -91,16 +91,34 @@ public class TroubleshootRecordController {
         }
     }
 
-    @PostMapping(value = "/plot-building-unit-staff/paged-query", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "分页查询社区下小区楼栋单元已排查未排查统计", notes = "getPlotBuildingUnitStatistics()")
+//    @PostMapping(value = "/plot-building-unit-staff/paged-query", produces = MediaType.APPLICATION_JSON_VALUE)
+//    @ApiOperation(value = "分页查询社区下小区楼栋单元已排查未排查统计", notes = "getPlotBuildingUnitStatistics()")
+//    @ApiResponses(value = {
+//            @ApiResponse(code = 200, message = "OK", response = PlotBuildingUnitPagedResult.class),
+//            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+//            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+//    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+//    public ResponseEntity<PlotBuildingUnitPagedResult> getPlotBuildingUnitStatistics(@RequestBody @ApiParam(value = "分页参数,页码从1开始", required = true) PagedQueryModel pagedQueryModel) {
+//        try {
+//            PlotBuildingUnitPagedResult result = troubleshootRecordService.getPlotBuildingUnitStatistics(pagedQueryModel);
+//            return new ResponseEntity<>(result, HttpStatus.OK);
+//        } catch (Exception e) {
+//            logger.error("getPlotBuildingUnitStatistics error", e.getMessage(), e);
+//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+
+
+    @GetMapping(value = "/plot-building-unit-staff/{multiTenancy}/multiTenancy", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "查询社区下小区楼栋单元已排查未排查统计", notes = "getPlotBuildingUnitStatistics()")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = PlotBuildingUnitPagedResult.class),
+            @ApiResponse(code = 200, message = "OK", response = PlotBuildingUnitStatistics.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
             @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<PlotBuildingUnitPagedResult> getPlotBuildingUnitStatistics(@RequestBody @ApiParam(value = "分页参数,页码从1开始", required = true) PagedQueryModel pagedQueryModel) {
+    public ResponseEntity<List<PlotBuildingUnitStatistics>> getPlotBuildingUnitStatistics(@PathVariable @ApiParam(value = "多租户", required = true) String multiTenancy) {
         try {
-            PlotBuildingUnitPagedResult result = troubleshootRecordService.getPlotBuildingUnitStatistics(pagedQueryModel);
+            List<PlotBuildingUnitStatistics> result = troubleshootRecordService.getPlotBuildingUnitStatistics(multiTenancy);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
             logger.error("getPlotBuildingUnitStatistics error", e.getMessage(), e);

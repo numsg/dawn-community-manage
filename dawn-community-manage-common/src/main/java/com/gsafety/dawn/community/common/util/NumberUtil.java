@@ -12,10 +12,6 @@ public class NumberUtil {
         // 无参构造
     }
 
-    /**
-     * The Df. 结果格式化
-     */
-    private static DecimalFormat df = new DecimalFormat("0.00"); // 保留四位小数
 
     /**
      * Add string. 加法
@@ -27,6 +23,7 @@ public class NumberUtil {
     public static String add(String a, String b) {
         BigDecimal number1 = new BigDecimal(a);
         BigDecimal number2 = new BigDecimal(b);
+        DecimalFormat df = new DecimalFormat("0.00");
         return df.format(number1.add(number2));
     }
 
@@ -40,6 +37,7 @@ public class NumberUtil {
     public static String multiply(String a, String b) {
         BigDecimal number1 = new BigDecimal(a);
         BigDecimal number2 = new BigDecimal(b);
+        DecimalFormat df = new DecimalFormat("0.00");
         return df.format(number1.multiply(number2));
     }
 
@@ -55,6 +53,7 @@ public class NumberUtil {
     public static String divide(String a, String b) {
         BigDecimal dividend = new BigDecimal(a); // 被除数
         BigDecimal divisor = new BigDecimal(b); // 除数
+        DecimalFormat df = new DecimalFormat("0.000000");
         return df.format(dividend.divide(divisor, 4, BigDecimal.ROUND_HALF_UP)); //四舍五入 ，并保留四位小数
     }
 }

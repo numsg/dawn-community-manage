@@ -3,14 +3,14 @@ package com.gsafety.dawn.community.manage.contract.model.refactor;
 import java.util.List;
 
 public class PlotBuildingUnitPagedResult {
-   private Integer total;
+   private Long total;
    private List<PlotBuildingUnitStatistics> pageContent;
 
-    public Integer getTotal() {
+    public Long getTotal() {
         return total;
     }
 
-    public void setTotal(Integer total) {
+    public void setTotal(Long total) {
         this.total = total;
     }
 

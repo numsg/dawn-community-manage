@@ -71,18 +71,17 @@ public class DataCollectionServiceImpl {
 
     //分类诊疗医疗意见：
     // 0:确诊患者，
-    private static final String confirmedPatientId = "c9eedfbc-ae5a-40b7-8a62-c049c5678deb";
-    //1:疑似患者，6293737c-5775-426d-9845-f919eafba1be
-    private static final String suspectedPatientId = "6293737c-5775-426d-9845-f919eafba1be";
-    //3:一版发热患者，c0bb07b2-db54-4fd1-89d3-20b0672a2779
-    private static final String feverPatientId = "c0bb07b2-db54-4fd1-89d3-20b0672a2779";
-    //2:CT诊断肺炎患者 c9eedfbc-ae5a-40b7-8a62-c049c5678deb
-    private static final String CTPatientId = "c9eedfbc-ae5a-40b7-8a62-c049c5678deb";
-    //4:密切接触者  6293737c-5775-426d-9845-f919eafba1be
-    private static final String contractPatientId = "6293737c-5775-426d-9845-f919eafba1be";
-
-
-    private String url = "/search/v2";
+    private static final String confirmedPatientId = "f56d6e21-5f64-48d0-a55f-5defd9d4c166";
+    //1:疑似患者，
+    private static final String suspectedPatientId = "903db428-4f4b-4f67-a5ab-3631a77b633d";
+    //3:一版发热患者，
+    private static final String feverPatientId = "2e8cad5c-5462-43ce-bdd2-b40d9c7b9b76";
+    //2:CT诊断肺炎患者
+    private static final String CTPatientId = "5e959c1b-584a-42d5-a28c-78ad5e57c1fb";
+    //4:密切接触者
+    private static final String contractPatientId = "893880b7-1ef8-4fed-b890-188b03f83f51";
+    // 无：8470e8e9-90ba-484b-8f33-148a1f5028fc
+     private String url = "/search/v2";
 
     private static  String [] keyNames= { "id","name","phone","sex","currentVillage","building","remark",
             "roomNumber","unit","age","medicalAdvice","createTime","touchPersonIsolation","fever",
@@ -285,7 +284,8 @@ public class DataCollectionServiceImpl {
 
 
     private String convertMedicalOpinion(String number) {
-        String result = null;
+        //无
+        String result = null ;
         if (number.equals("0")) {
             result = confirmedPatientId;
         } else if (number.equals("1")) {
@@ -296,8 +296,9 @@ public class DataCollectionServiceImpl {
             result = feverPatientId;
         } else if (number.equals("4")) {
             result = contractPatientId;
+        } else{
+             result = "8470e8e9-90ba-484b-8f33-148a1f5028fc";
         }
-
         return result;
     }
 

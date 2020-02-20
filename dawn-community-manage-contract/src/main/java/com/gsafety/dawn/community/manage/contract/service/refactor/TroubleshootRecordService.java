@@ -22,8 +22,9 @@ public interface TroubleshootRecordService {
      * 获取社区下的小区楼栋单元分组统计
      * @return
      */
-    PlotBuildingUnitPagedResult getPlotBuildingUnitStatistics(PagedQueryModel pagedQueryModel);
+   // PlotBuildingUnitPagedResult getPlotBuildingUnitStatistics(PagedQueryModel pagedQueryModel);
 
+    List<PlotBuildingUnitStatistics> getPlotBuildingUnitStatistics(String  multiTenancy);
 
     CommunityBriefModel getCommunityDailyBriefing(String multiTenancy);
 }

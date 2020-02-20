@@ -33,12 +33,24 @@ public interface TroubleshootRecordRepository extends JpaRepository<Troubleshoot
     @Query(value = "select  new com.gsafety.dawn.community.manage.service.entity.refactor.PlotBuildingUnitStaffEntity(count(c),c.building,c.unitNumber,c.createDate,c.plot," +
             "SUM(CASE WHEN isExceedTemp IS TRUE THEN 1 ELSE 0 END)) " +
             "from TroubleshootRecordEntity c where c.multiTenancy  = :multiTenancy " +
-            "group by c.building,c.unitNumber,c.createDate,c.plot")
-         //List<PlotBuildingUnitStaffEntity> findPlotBuildingUnitStaff(@Param("multiTenancy") String multiTenancy);
-    Page<PlotBuildingUnitStaffEntity> findPlotBuildingUnitStaff(@Param("multiTenancy") String multiTenancy, Pageable pageable);
+            "group by c.building,c.unitNumber,c.createDate,c.plot order by  c.building asc,c.unitNumber asc ")
+//         Page<PlotBuildingUnitStaffEntity> findPlotBuildingUnitStaff(@Param("multiTenancy") String multiTenancy, Pageable pageable);
+         List<PlotBuildingUnitStaffEntity> findPlotBuildingUnitStaff(@Param("multiTenancy") String multiTenancy);
 
-    @Query(nativeQuery = true ,value = "select count(b.count) from (select count(*) from  b_troubleshoot_record where multi_tenancy=?1 group by building,unit_number,create_date,plot) as b")
-    Integer getCountByPlotBuildingUnitStaff( String multiTenancy);
+
+
+//    @Query(value = "select  new com.gsafety.dawn.community.manage.service.entity.refactor.PlotBuildingUnitStaffEntity(count(c),c.building,c.unitNumber,c.createDate,c.plot," +
+//            "SUM(CASE WHEN isExceedTemp IS TRUE THEN 1 ELSE 0 END)) " +
+//            "from TroubleshootRecordEntity c where c.createDate = :createDate and  c.multiTenancy  = :multiTenancy " +
+//            "group by c.building,c.unitNumber,c.plot")
+//    Page<PlotBuildingUnitStaffEntity> findPlotBuildingUnitStaff(@Param("multiTenancy") String multiTenancy,@Param("createDate") String createDate,
+//                                                                Pageable pageable);
+
+
+    //List<PlotBuildingUnitStaffEntity> findPlotBuildingUnitStaff(@Param("multiTenancy") String multiTenancy);
+
+   // @Query(nativeQuery = true ,value = "select count(b.count) from (select count(*) from  b_troubleshoot_record where multi_tenancy=?1 group by building,unit_number,create_date,plot) as b")
+    //Integer getCountByPlotBuildingUnitStaff( String multiTenancy);
 
 
     @Query("select new com.gsafety.dawn.community.manage.service.entity.refactor.PlotReportingStaffEntity(count(c),c.plot) " +
@@ -46,5 +58,5 @@ public interface TroubleshootRecordRepository extends JpaRepository<Troubleshoot
     List<PlotReportingStaffEntity> findPlotReportingStaff(@Param("multiTenancy") String multiTenancy);
 
     @Query
-    List<TroubleshootRecordEntity> queryAllByPlot(String plotId);
+    List<TroubleshootRecordEntity> queryAllByPlotAndMultiTenancy(String plotId,String multiTenancy);
 }

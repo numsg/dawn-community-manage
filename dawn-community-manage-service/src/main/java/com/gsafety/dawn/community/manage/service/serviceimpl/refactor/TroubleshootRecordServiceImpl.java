@@ -298,7 +298,7 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
                     result.add(plotBuildingUnitStatistics);
                 }
             }
-            return result;
+            return  result.stream().sorted(Comparator.comparing(PlotBuildingUnitStatistics::getBuilding)).collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("getBuildingUnitStatistics error", e, e.getMessage(), e.getCause());
             return null;

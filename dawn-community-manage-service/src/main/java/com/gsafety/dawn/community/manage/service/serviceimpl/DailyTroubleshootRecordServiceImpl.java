@@ -5,6 +5,8 @@ import com.gsafety.dawn.community.manage.contract.model.BasicInformationModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyStatisticModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleFilterModel;
 import com.gsafety.dawn.community.manage.contract.model.DailyTroubleshootRecordModel;
+import com.gsafety.dawn.community.manage.contract.model.refactor.PersonBase;
+import com.gsafety.dawn.community.manage.contract.model.refactor.TroubleshootRecord;
 import com.gsafety.dawn.community.manage.contract.model.total.DailyStatisticPageModel;
 import com.gsafety.dawn.community.manage.contract.model.total.DiagnosisCountModel;
 import com.gsafety.dawn.community.manage.contract.model.total.PendingInvestigatModel;
@@ -299,8 +301,8 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
                     continue;
                 plot = dataList.get(0).getId();
 
-                TroubleshootRecordEntity troubleshootRecord = new TroubleshootRecordEntity();
-                PersonBaseEntity personBase = new PersonBaseEntity();
+                TroubleshootRecord troubleshootRecord = new TroubleshootRecord();
+                PersonBase personBase = new PersonBase();
 
                 // ID
                 troubleshootRecord.setId(StringUtil.genUUID());
@@ -455,17 +457,17 @@ public class DailyTroubleshootRecordServiceImpl implements DailyTroubleshootReco
 //            recordEntity.setPhone(phone);
 //            // 体温大于37.5 以及 已有相同数据不添加 未过滤
 //            recordEntities.add(recordEntity);
-//            troubleshootRecordService.add(troubleshootRecord);
-                personBaseRepository.save(personBase);
-                troubleshootRecordRepository.save(troubleshootRecord);
-
-                TroubleshootHistoryRecordEntity troubleshootHistoryRecordEntity = new TroubleshootHistoryRecordEntity();
-                troubleshootHistoryRecordEntity = commonUtil.mapper(troubleshootRecord, troubleshootHistoryRecordEntity);
-                troubleshootHistoryRecordEntity.setId(UUID.randomUUID().toString());
-                troubleshootHistoryRecordEntity.setPersonBase(null);
-                troubleshootHistoryRecordEntity.setPersonBaseId(personBase.getId());
-                troubleshootHistoryRecordRepository.save(troubleshootHistoryRecordEntity);
-                troubleshootHistoryRecordRepository.save(troubleshootHistoryRecordEntity);
+            troubleshootRecordService.add(troubleshootRecord);
+//                personBaseRepository.save(personBase);
+//                troubleshootRecordRepository.save(troubleshootRecord);
+//
+//                TroubleshootHistoryRecordEntity troubleshootHistoryRecordEntity = new TroubleshootHistoryRecordEntity();
+//                troubleshootHistoryRecordEntity = commonUtil.mapper(troubleshootRecord, troubleshootHistoryRecordEntity);
+//                troubleshootHistoryRecordEntity.setId(UUID.randomUUID().toString());
+//                troubleshootHistoryRecordEntity.setPersonBase(null);
+//                troubleshootHistoryRecordEntity.setPersonBaseId(personBase.getId());
+//                troubleshootHistoryRecordRepository.save(troubleshootHistoryRecordEntity);
+//                troubleshootHistoryRecordRepository.save(troubleshootHistoryRecordEntity);
             }
             return recordEntities;
 

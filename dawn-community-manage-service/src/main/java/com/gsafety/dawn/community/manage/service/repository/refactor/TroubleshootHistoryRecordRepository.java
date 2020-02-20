@@ -23,4 +23,6 @@ public interface TroubleshootHistoryRecordRepository extends JpaRepository<Troub
     @Query()
     List<TroubleshootHistoryRecordEntity> findAllByPersonBaseIdAndCreateTimeBetween(String personBaseId , Date dateStart , Date dateEnd  );
 
+//    @Query()
+//    List<TroubleshootHistoryRecordEntity> findAllByPersonBaseIdAndCreateDateBeforeOOrderByCreateDateA(String personId , Date createDate);
 }

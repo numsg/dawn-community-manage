@@ -6,7 +6,7 @@ spring:
     name: dawn-community-manage
 
   datasource:
-    url: jdbc:postgresql://116.62.205.14:30025/dawn-db #业务数据库访问url
+    url: jdbc:postgresql://116.62.205.14:30020/dawn #业务数据库访问url
     username: postgres    #业务数据库访问用户名
     password: postgres #业务数据库访问用户密码
     driver-class-name: org.postgresql.Driver #数据库访问驱动名称

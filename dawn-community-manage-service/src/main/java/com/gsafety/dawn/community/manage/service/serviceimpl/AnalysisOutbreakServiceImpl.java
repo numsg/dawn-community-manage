@@ -134,6 +134,7 @@ public class AnalysisOutbreakServiceImpl extends DataSourceShareIds implements A
     // 设计如何求每天的总数
     public List<DailyTroubleshootingStatisticModel> troubleStatisRefor(String multiTenancy) {
         List<DailyTroubleshootingStatisticModel> dailyTroubleshootingStatisticModels = new ArrayList<>();
+        SimpleDateFormat format = new SimpleDateFormat("MM月dd日");
         for (int i = 0; i < 8; i++) {
             List<TypePersonModel> tempFevers = epidemicPersonRepository.beforeFeversEveryDay(multiTenancy, i);
             List<TypePersonModel> tempContacts = epidemicPersonRepository.beforeContactsEveryDay(multiTenancy, i);
@@ -141,6 +142,10 @@ public class AnalysisOutbreakServiceImpl extends DataSourceShareIds implements A
             List<TypeOtherModel> tempSuspects = epidemicPersonRepository.beforeOthersEveryDay(SUSPECTEDPATIENTID, multiTenancy, i);
             List<TypeOtherModel> tempCTs = epidemicPersonRepository.beforeOthersEveryDay(CTDIAGNOSISPNEUMONIAID, multiTenancy, i);
             DailyTroubleshootingStatisticModel dailyTroubleshootingStatisticModel = combineHistoryData(tempFevers, tempContacts, tempConfirmeds, tempSuspects, tempCTs);
+            Date date = new Date();
+            date.setDate(date.getDate() - i);
+            String formatDate = format.format(date);
+            dailyTroubleshootingStatisticModel.setDate(formatDate);
             dailyTroubleshootingStatisticModels.add(dailyTroubleshootingStatisticModel);
         }
         return dailyTroubleshootingStatisticModels;
@@ -160,21 +165,25 @@ public class AnalysisOutbreakServiceImpl extends DataSourceShareIds implements A
             dailyTroubleshootingStatisticModel.setAllContact(0);
         } else {
             dailyTroubleshootingStatisticModel.setAllContact(tempContacts.size());
+            dailyTroubleshootingStatisticModel.setDate(tempContacts.get(0).getDate());
         }
         if (CollectionUtils.isEmpty(tempConfirmeds)) {
             dailyTroubleshootingStatisticModel.setAllConfirmed(0);
         } else {
             dailyTroubleshootingStatisticModel.setAllConfirmed(tempConfirmeds.size());
+            dailyTroubleshootingStatisticModel.setDate(tempConfirmeds.get(0).getDate());
         }
         if (CollectionUtils.isEmpty(tempSuspects)) {
             dailyTroubleshootingStatisticModel.setAllSuspect(0);
         } else {
             dailyTroubleshootingStatisticModel.setAllSuspect(tempSuspects.size());
+            dailyTroubleshootingStatisticModel.setDate(tempSuspects.get(0).getDate());
         }
         if (CollectionUtils.isEmpty(tempCTs)) {
             dailyTroubleshootingStatisticModel.setAllCt(0);
         } else {
             dailyTroubleshootingStatisticModel.setAllCt(tempCTs.size());
+            dailyTroubleshootingStatisticModel.setDate(tempCTs.get(0).getDate());
         }
         return dailyTroubleshootingStatisticModel;
     }

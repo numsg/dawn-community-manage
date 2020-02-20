@@ -4,6 +4,7 @@ import com.gsafety.dawn.community.manage.contract.model.refactor.DailyTroublesho
 import com.gsafety.dawn.community.manage.contract.model.total.DailyTroublePlotStatisticModel;
 import com.gsafety.dawn.community.manage.contract.model.total.EpidemicClassificaModel;
 import com.gsafety.dawn.community.manage.contract.service.AnalysisOutbreakService;
+import com.gsafety.dawn.community.manage.contract.service.TroubleshootingStatisticsService;
 import com.gsafety.java.common.exception.HttpError;
 import com.gsafety.springboot.common.annotation.LimitIPRequestAnnotation;
 import io.swagger.annotations.*;
@@ -27,6 +28,9 @@ public class AnalysisOutbreakController {
 
     @Autowired
     AnalysisOutbreakService analysisOutbreakService;
+
+    @Autowired
+    TroubleshootingStatisticsService troubleshootingStatisticsService;
 
     @GetMapping(value = "/troubleshoot-statistic/{districtCode}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "日常排查历史记录统计", notes = "troubleshootStatistic()")
@@ -69,5 +73,17 @@ public class AnalysisOutbreakController {
     public ResponseEntity<List<EpidemicClassificaModel>> epidemicOverall(@PathVariable @ApiParam(value = "行政区划code", required = true) String districtCode) {
         List<EpidemicClassificaModel> result = analysisOutbreakService.epidemicCureAndDeath(districtCode);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/troubleshoot-generate", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "生成统计的数据", notes = "troubleshoot-generate")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = List.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+    public ResponseEntity<List<EpidemicClassificaModel>> troubleshootGenerate() {
+        troubleshootingStatisticsService.handleHistoryTroubleShootStatistic();
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 }

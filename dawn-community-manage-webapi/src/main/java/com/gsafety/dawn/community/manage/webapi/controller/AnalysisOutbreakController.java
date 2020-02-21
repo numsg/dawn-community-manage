@@ -46,20 +46,21 @@ public class AnalysisOutbreakController {
     @ApiOperation(value = "日常排查历史记录按小区统计", notes = "troubleshootPlotStatistic")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Map.class), @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class), @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<Map<String, List<DailyTroublePlotStatisticModel>>> troubleshootPlotStatistic(@PathVariable @ApiParam(value = "行政区划code", required = true) String districtCode , @RequestBody @ApiParam(value = "小区ids", required = true) List<String> plots) {
-        Map<String, List<DailyTroublePlotStatisticModel>> result = analysisOutbreakService.troublePlotStatistic(districtCode , plots);
+    public ResponseEntity<Map<String, List<DailyTroublePlotStatisticModel>>> troubleshootPlotStatistic(@PathVariable @ApiParam(value = "行政区划code", required = true) String districtCode, @RequestBody @ApiParam(value = "小区ids", required = true) List<String> plots) {
+        Map<String, List<DailyTroublePlotStatisticModel>> result = analysisOutbreakService.troublePlotStatistic(districtCode, plots);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 
     @GetMapping(value = "/troubleshoot-overall/{districtCode}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "日常排查历史记录按小区统计", notes = "troubleshoot-overall")
+    @ApiOperation(value = "日常排查历史记录按统计", notes = "troubleshoot-overall")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = List.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
             @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
     @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
     public ResponseEntity<List<DailyTroubleshootingStatisticModel>> troubleshootOverall(@PathVariable @ApiParam(value = "行政区划code", required = true) String districtCode) {
-        List<DailyTroubleshootingStatisticModel> result = analysisOutbreakService.calcEveryData(districtCode);
+//        List<DailyTroubleshootingStatisticModel> result = analysisOutbreakService.calcEveryData(districtCode);
+        List<DailyTroubleshootingStatisticModel> result = troubleshootingStatisticsService.handleHistoryTroubleShootStatistic(districtCode);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -76,14 +77,14 @@ public class AnalysisOutbreakController {
     }
 
 
-    @GetMapping(value = "/troubleshoot-generate", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "生成统计的数据", notes = "troubleshoot-generate")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = List.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
-            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
-    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
-    public ResponseEntity<List<EpidemicClassificaModel>> troubleshootGenerate() {
-        troubleshootingStatisticsService.handleHistoryTroubleShootStatistic();
-        return new ResponseEntity<>(null, HttpStatus.OK);
-    }
+//    @GetMapping(value = "/troubleshoot-generate", produces = MediaType.APPLICATION_JSON_VALUE)
+//    @ApiOperation(value = "生成统计的数据", notes = "troubleshoot-generate")
+//    @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = List.class),
+//            @ApiResponse(code = 500, message = "Internal Server Error", response = HttpError.class),
+//            @ApiResponse(code = 406, message = "Not Acceptable", response = HttpError.class)})
+//    @LimitIPRequestAnnotation(limitCounts = 10, timeSecond = 1000)
+//    public ResponseEntity<List<EpidemicClassificaModel>> troubleshootGenerate() {
+//        troubleshootingStatisticsService.handleHistoryTroubleShootStatistic();
+//        return new ResponseEntity<>(null, HttpStatus.OK);
+//    }
 }

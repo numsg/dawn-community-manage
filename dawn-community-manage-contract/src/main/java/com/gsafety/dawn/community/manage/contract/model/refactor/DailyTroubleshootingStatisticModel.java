@@ -1,5 +1,7 @@
 package com.gsafety.dawn.community.manage.contract.model.refactor;
 
+import java.util.Date;
+
 /**
  * description:
  *
@@ -9,6 +11,8 @@ package com.gsafety.dawn.community.manage.contract.model.refactor;
 public class DailyTroubleshootingStatisticModel {
 
     private String date;
+
+    private Date measuringDate;
 
     private long total;
 
@@ -152,5 +156,13 @@ public class DailyTroubleshootingStatisticModel {
 
     public void setAllCt(long allCt) {
         this.allCt = allCt;
+    }
+
+    public Date getMeasuringDate() {
+        return measuringDate;
+    }
+
+    public void setMeasuringDate(Date measuringDate) {
+        this.measuringDate = measuringDate;
     }
 }

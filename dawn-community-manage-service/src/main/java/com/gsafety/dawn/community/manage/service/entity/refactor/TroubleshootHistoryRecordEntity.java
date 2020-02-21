@@ -75,8 +75,8 @@ public class TroubleshootHistoryRecordEntity {
     private String otherSymptoms;
 
     // 医疗意见
-    @Column(name = "medical_opinion", length = 10240)
-    private String medicalOpinion;
+    @Column(name = "medical_opinion", length = 10240 , columnDefinition="varchar(10240) default '8470e8e9-90ba-484b-8f33-148a1f5028fc' ")
+    private String medicalOpinion = "8470e8e9-90ba-484b-8f33-148a1f5028fc";
 
     // 备注
     @Column(name = "note", length = 10240)

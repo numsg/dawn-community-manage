@@ -8,6 +8,13 @@ public class DistributionStatisticsResult {
     //private String key; //小区、年龄、性别
     private Integer value;// 数量
 
+    public DistributionStatisticsResult() {
+    }
+
+    public DistributionStatisticsResult(Integer value) {
+        this.value = value;
+    }
+
     public String getId() {
         return id;
     }

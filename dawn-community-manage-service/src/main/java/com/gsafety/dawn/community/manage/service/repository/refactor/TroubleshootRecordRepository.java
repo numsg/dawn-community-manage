@@ -1,6 +1,5 @@
 package com.gsafety.dawn.community.manage.service.repository.refactor;
 
-import com.gsafety.dawn.community.manage.contract.model.refactor.PlotBuildingUnitStatistics;
 import com.gsafety.dawn.community.manage.service.entity.refactor.PlotBuildingUnitStaffEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.PlotReportingStaffEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.TroubleshootRecordEntity;

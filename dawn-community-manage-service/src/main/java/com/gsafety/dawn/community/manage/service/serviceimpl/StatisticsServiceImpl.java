@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional
@@ -44,7 +45,41 @@ public class StatisticsServiceImpl implements StatisticsService {
         }else if ("2".equals(type)){ // 按性别统计
             queryResult=epidemicPerStatisticsRepository.statisticsByGender(medicalConditionId,multiTenancy,startTime,endTime);
         }else if("3".equals(type)){ //按年龄统计
-            queryResult=epidemicPerStatisticsRepository.statisticsByAge(medicalConditionId,multiTenancy,startTime,endTime);
+           List<DistributionStatisticsEntity> ageResult= epidemicPerStatisticsRepository.statisticsByAge(medicalConditionId,multiTenancy,startTime,endTime);
+            DistributionStatisticsEntity ageGroupOne=new DistributionStatisticsEntity(0L,"30岁以下");
+            DistributionStatisticsEntity ageGroupTwo=new DistributionStatisticsEntity(0L,"30-40岁");
+            DistributionStatisticsEntity ageGroupThree=new DistributionStatisticsEntity(0L,"40-50岁");
+            DistributionStatisticsEntity ageGroupFour=new DistributionStatisticsEntity(0L,"50-60岁");
+            DistributionStatisticsEntity ageGroupFive=new DistributionStatisticsEntity(0L,"60岁以上");
+
+            Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
+
+            ageResult.forEach(entity ->{
+                if (pattern.matcher(entity.getItem()).matches()){
+                    try {
+                        int age = Integer.parseInt(entity.getItem());
+                        if (0<= age && age<30){
+                            ageGroupOne.setCount( ageGroupOne.getCount()+entity.getCount());
+                        }else if (age>=30 && age<40){
+                            ageGroupTwo.setCount( ageGroupTwo.getCount()+entity.getCount());
+                        }else if(age>=40 && age<50){
+                            ageGroupThree.setCount( ageGroupThree.getCount()+entity.getCount());
+                        }else if (age>=50 && age <60){
+                            ageGroupFour.setCount( ageGroupFour.getCount()+entity.getCount());
+                        }else{
+                            ageGroupFive.setCount( ageGroupFive.getCount()+entity.getCount());
+                        }
+
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            queryResult.add(ageGroupOne);
+            queryResult.add(ageGroupTwo);
+            queryResult.add(ageGroupThree);
+            queryResult.add(ageGroupFour);
+            queryResult.add(ageGroupFive);
         }
 
         queryResult.forEach(ele ->{

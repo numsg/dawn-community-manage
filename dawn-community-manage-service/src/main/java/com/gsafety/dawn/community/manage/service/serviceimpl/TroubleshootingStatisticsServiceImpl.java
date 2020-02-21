@@ -135,7 +135,7 @@ public class TroubleshootingStatisticsServiceImpl extends DataSourceShareIds imp
                 result.add(isHas);
                 continue;
             }
-            if(isHas == null){
+            if(isHas == null && result.size() > 0){
                 DailyTroubleshootingStatisticModel last = result.get(result.size() - 1);
                 temp.setTotal(0);
                 temp.setAllTotal(last.getAllTotal());
@@ -152,9 +152,9 @@ public class TroubleshootingStatisticsServiceImpl extends DataSourceShareIds imp
                 result.add(temp);
                 continue;
             }
-//            if(isHas == null && i != 0){
-//                result.add(temp);
-//            }
+            if(isHas == null && result.size() == 0){
+                result.add(temp);
+            }
         }
         return result;
     }

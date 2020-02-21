@@ -83,13 +83,14 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             if (troubleshootRecordEntity == null) {
                 troubleshootRecordEntity = troubleshootRecordMapper.modelToEntity(troubleshootRecord);
             } else {
-                if (!troubleshootRecordEntity.getId().equals(troubleshootRecord.getId())) {
-                    return false;
-                }
+//                if (!troubleshootRecordEntity.getId().equals(troubleshootRecord.getId())) {
+//                    return false;
+//                }
 
                // troubleshootRecordEntity = commonUtil.mapper(troubleshootRecordMapper.modelToEntity(troubleshootRecord), troubleshootRecordEntity);
-
+                String id = troubleshootRecordEntity.getId();
                 troubleshootRecordEntity = commonUtil.mapper(troubleshootRecord, troubleshootRecordEntity);
+                troubleshootRecordEntity.setId(id);
             }
             personBaseRepository.save(personBaseEntity);
             troubleshootRecordEntity.setCreateDate(format.parse(format.format(troubleshootRecord.getCreateTime())));

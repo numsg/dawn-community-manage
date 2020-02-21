@@ -2,9 +2,7 @@ package com.gsafety.dawn.community.manage.service.serviceimpl;
 
 import com.gsafety.dawn.community.manage.contract.model.refactor.DailyTroubleshootingStatisticModel;
 import com.gsafety.dawn.community.manage.contract.service.TroubleshootingStatisticsService;
-import com.gsafety.dawn.community.manage.service.entity.TroubleshootingStatisticsEntity;
 import com.gsafety.dawn.community.manage.service.entity.refactor.TroubleshootHistoryRecordEntity;
-import com.gsafety.dawn.community.manage.service.repository.TroubleshootingStatisticsRepository;
 import com.gsafety.dawn.community.manage.service.repository.refactor.TroubleshootHistoryRecordRepository;
 import com.gsafety.dawn.community.manage.service.serviceimpl.share.DataSourceShareIds;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +24,8 @@ public class TroubleshootingStatisticsServiceImpl extends DataSourceShareIds imp
     @Autowired
     TroubleshootHistoryRecordRepository troubleshootHistoryRecordRepository;
 
-    @Autowired
-    TroubleshootingStatisticsRepository troubleshootingStatisticsRepository;
+//    @Autowired
+//    TroubleshootingStatisticsRepository troubleshootingStatisticsRepository;
 
 
     @Override
@@ -40,8 +38,6 @@ public class TroubleshootingStatisticsServiceImpl extends DataSourceShareIds imp
             TroubleshootHistoryRecordEntity temp = historyRecordEntities.get(i);
 
             List<TroubleshootHistoryRecordEntity> hasHistoryRecords = searchHistoryRecords(historyRecordEntities , temp);
-            // 查询该条记录是否有历史记录
-//            List<TroubleshootHistoryRecordEntity> hasHistoryRecords = troubleshootHistoryRecordRepository.findAllByPersonBaseIdAndIdIsNotOrderByCreateDate(temp.getPersonBaseId(), temp.getId());
             // 如果没有历史记录则直接往统计表修改记录
             if (CollectionUtils.isEmpty(hasHistoryRecords)) {
                 insertTroubleStatistic(temp, result);
@@ -224,9 +220,9 @@ public class TroubleshootingStatisticsServiceImpl extends DataSourceShareIds imp
 
 
     // 判断当前是否有统计数据
-    public List<TroubleshootingStatisticsEntity> isHasTroubleStatistic(String plot, String multiTenancy, Date date) {
-        return troubleshootingStatisticsRepository.findAllByPlotAndMultiTenancyAndCreateTime(plot, multiTenancy, date);
-    }
+//    public List<TroubleshootingStatisticsEntity> isHasTroubleStatistic(String plot, String multiTenancy, Date date) {
+//        return troubleshootingStatisticsRepository.findAllByPlotAndMultiTenancyAndCreateTime(plot, multiTenancy, date);
+//    }
 
     // 统计表没有当前人员符合插入的统计记录，则新增统计记录
     public void addNewTroubleStatistic(TroubleshootHistoryRecordEntity temp, int increFever,

@@ -86,14 +86,14 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
 //                if (!troubleshootRecordEntity.getId().equals(troubleshootRecord.getId())) {
 //                    return false;
 //                }
-
                // troubleshootRecordEntity = commonUtil.mapper(troubleshootRecordMapper.modelToEntity(troubleshootRecord), troubleshootRecordEntity);
                 String id = troubleshootRecordEntity.getId();
                 troubleshootRecordEntity = commonUtil.mapper(troubleshootRecord, troubleshootRecordEntity);
                 troubleshootRecordEntity.setId(id);
             }
             personBaseRepository.save(personBaseEntity);
-            troubleshootRecordEntity.setCreateDate(format.parse(format.format(troubleshootRecord.getCreateTime())));
+            Date createDate=format.parse(format.format(troubleshootRecord.getCreateTime()));
+            troubleshootRecordEntity.setCreateDate(createDate);
             troubleshootRecordEntity.setPersonBase(null);
             troubleshootRecordEntity.setPersonBaseId(personBaseEntity.getId());
             troubleshootRecordRepository.save(troubleshootRecordEntity);
@@ -108,7 +108,13 @@ public class TroubleshootRecordServiceImpl implements TroubleshootRecordService 
             }
             TroubleshootHistoryRecordEntity troubleshootHistoryRecordEntity = new TroubleshootHistoryRecordEntity();
             troubleshootHistoryRecordEntity = commonUtil.mapper(troubleshootRecordEntity, troubleshootHistoryRecordEntity);
-            troubleshootHistoryRecordEntity.setId(UUID.randomUUID().toString());
+            List<TroubleshootHistoryRecordEntity> historyRecordEntities= troubleshootHistoryRecordRepository.findByCreateDateAndPersonBaseId(createDate,personBaseEntity.getId());
+            if (!historyRecordEntities.isEmpty()){
+                troubleshootHistoryRecordEntity.setId(historyRecordEntities.get(0).getId());
+            }else{
+                troubleshootHistoryRecordEntity.setId(UUID.randomUUID().toString());
+            }
+
             troubleshootHistoryRecordEntity.setPersonBase(null);
             troubleshootHistoryRecordEntity.setPersonBaseId(personBaseEntity.getId());
             troubleshootHistoryRecordRepository.save(troubleshootHistoryRecordEntity);

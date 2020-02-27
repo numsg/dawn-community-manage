@@ -19,4 +19,5 @@ public interface TroubleshootHistoryRecordRepository extends JpaRepository<Troub
     @Query("select c.id from TroubleshootHistoryRecordEntity c where c.personBaseId  = :personBaseId and c.createDate = :createDate ")
     List<String> findIdByCreateDateAndPersonBaseId(@Param("personBaseId") String personBaseId, @Param("createDate") Date createDate);
 
+   List< TroubleshootHistoryRecordEntity> findByCreateDateAndPersonBaseId(Date createDate , String personBaseId);
 }

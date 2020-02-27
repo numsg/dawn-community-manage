@@ -126,6 +126,8 @@ public class DataCollectionServiceImpl {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date endTimeDate = DateUtil.getDayEndDate();
 
+       // startTimeDate=DateUtil.stringFormat("2020-02-24 00:00:00");
+
         System.out.println(formatter.format(startTimeDate));
         System.out.println(formatter.format(endTimeDate));
 
@@ -155,12 +157,12 @@ public class DataCollectionServiceImpl {
                 requestModel.setPageNo(i);
                 //分页查询时时间段是一致的
                 //requestModel.setStartDate(startTimeDate);
-                TraversalAndInsertData(requestModel);
+                TraversalAndInsertData(requestModel ,i);
             }
         }
     }
 
-    public Boolean TraversalAndInsertData(RequestModel requestModel)  {
+    public Boolean TraversalAndInsertData(RequestModel requestModel,int i)  {
         Map map = httpClientUtil.httpPost(dataCollectionUrl + url, requestModel, Map.class);
         if (map.get("data") == null || map.get("success").equals(false)) {
             return false;
@@ -174,6 +176,12 @@ public class DataCollectionServiceImpl {
 
         List<String> keyList=new ArrayList<>();
         Collections.addAll(keyList,keyNames);
+        if (i==1){
+            Map temp = JsonUtil.fromJson(toJson(list.get(0)), Map.class);
+            Date createTime=DateUtil.stringFormat(temp.get("createTime").toString());
+            startTimeDate = createTime!=null ? createTime: DateUtil.getDayStartDate();
+        }
+
         for (Object obj : list) {
             Map objMap = JsonUtil.fromJson(toJson(obj), Map.class);
             Object recordId = objMap.get("id");
@@ -181,7 +189,7 @@ public class DataCollectionServiceImpl {
             Object phone = objMap.get("phone");
             Object sex = objMap.get("sex");
             Object districtCode = objMap.get("currentVillage");
-            if (districtCode == null || personName == null || phone == null || troubleshootRecordRepository.existsById(recordId.toString())) {
+            if (districtCode == null || personName == null || phone == null) {
                 continue;
             }
             if ("".equals(districtCode) || "".equals(personName) || "".equals(phone)) {
@@ -262,7 +270,6 @@ public class DataCollectionServiceImpl {
             personBase.setPhone(phone.toString());
             personBase.setIdentificationNumber(objMap.get("idNumber") != null ? objMap.get("idNumber").toString() : "");
             personBase.setMultiTenancy(districtCode.toString());
-            startTimeDate = record.getCreateTime();
             record.setPersonBase(personBase);
             troubleshootRecordService.add(record);
         }

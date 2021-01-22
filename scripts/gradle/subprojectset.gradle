@@ -6,7 +6,7 @@ apply plugin: "maven"
 
 repositories {
     maven {
-        url 'http://172.22.24.51:8081/nexus/content/groups/public/'
+        url 'http://nexus.gsafety.com/repository/maven-public/'
     }
 }
 

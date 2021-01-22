@@ -18,9 +18,9 @@ publishing {
     repositories {
         maven {
             if (project.version.endsWith("SNAPSHOT")) {
-                url "http://172.22.24.51:8081/nexus/content/repositories/snapshots/"
+                url "http://nexus.gsafety.com/repositories/snapshots/"
             } else {
-                url "http://172.22.24.51:8081/nexus/content/repositories/Releases/"
+                url "http://nexus.gsafety.com/repositories/Releases/"
             }
             credentials {
                 username 'deployment'
